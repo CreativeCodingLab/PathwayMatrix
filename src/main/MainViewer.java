@@ -78,7 +78,7 @@ import edu.uic.ncdm.venn.Venn_Detail;
 
 import processing.core.*;
 
-public class MainViewer extends PApplet {
+public class MainViewer extends PAppletaa {
 	private static final long serialVersionUID = 1L;
 	public int count = 0;
 	/**
