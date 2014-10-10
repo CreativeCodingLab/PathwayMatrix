@@ -1,0 +1,3 @@
+-Xmx8192m
+main.MainViewer
+MainViewer.jar
