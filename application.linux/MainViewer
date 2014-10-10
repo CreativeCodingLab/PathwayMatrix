@@ -1,4 +1,0 @@
-#!/bin/sh
-
-APPDIR=$(dirname "$0")
-java -Xmx8192m -Djava.library.path="$APPDIR" -cp "lib/MainViewer.jar"main.MainViewer

@@ -16,11 +16,11 @@ import processing.core.PApplet;
 
 import edu.uic.ncdm.venn.Venn_Overview;
 
-import static main.MainViewer.pairs;
-import static main.MainViewer.ggg;
-import static main.MainViewer.geneRelationList;
-import static main.MainViewer.leaderSortedMap;
-import static main.MainViewer.locals;
+import static main.MainMatrix.pairs;
+import static main.MainMatrix.ggg;
+import static main.MainMatrix.geneRelationList;
+import static main.MainMatrix.leaderSortedMap;
+import static main.MainMatrix.locals;
 import static edu.uic.ncdm.venn.Venn_Overview.numMinerContainData;
 import static edu.uic.ncdm.venn.Venn_Overview.minerGlobalIDof;;
 
@@ -34,10 +34,11 @@ public class Gene {
 	public int order;
 //	public int orderReading;
 	
+	
 	public Gene(String name_, int order_){
 		name = name_;
-		iX = new Integrator(main.MainViewer.marginX,.5f,.1f);
-		iY = new Integrator(main.MainViewer.marginY,.5f,.1f);
+		iX = new Integrator(main.MainMatrix.marginX,.5f,.1f);
+		iY = new Integrator(main.MainMatrix.marginY,.5f,.1f);
 		iW = new Integrator(0,.5f,.1f);
 		iH = new Integrator(0,.5f,.1f);
 		order = order_;
@@ -47,8 +48,8 @@ public class Gene {
 	
 	public static void compute(){
 		 hGenes = new Hashtable<String,int[]>();
-		 for (int i=0; i<main.MainViewer.allGenes.size();i++){
-			 hGenes.put(main.MainViewer.allGenes.get(i), new int[numMinerContainData]);
+		 for (int i=0; i<main.MainMatrix.allGenes.size();i++){
+			 hGenes.put(main.MainMatrix.allGenes.get(i), new int[numMinerContainData]);
 		 }
 		 maxRelationOfGenes = -1;
 		 for (int j=0; j<numMinerContainData;j++){
@@ -265,7 +266,7 @@ public class Gene {
 			int orderReading2 = i;
 			if (orderReading1==orderReading2) continue;
 			if (a.contains(orderReading2)) continue;
-			float dis = computeDis(orderReading1,orderReading2, main.MainViewer.popupOrder.slider.val);
+			float dis = computeDis(orderReading1,orderReading2, main.MainMatrix.popupOrder.slider.val);
 			if (dis<minDis){
 				minDis = dis;
 				minIndex = i;
