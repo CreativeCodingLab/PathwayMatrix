@@ -1,4 +1,8 @@
 PathwayMatrix
 =============
 
-Pathway Viewer for DARPA project.
+Pathway Viewer for secret new project.
+
+Requires Eclipse Helios version.
+
+
