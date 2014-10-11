@@ -589,8 +589,6 @@ public abstract class MinerAdapter implements Miner
 		if (!main.MainMatrix.pairs[main.MainMatrix.processingMiner].contains(rel)){
 			main.MainMatrix.pairs[main.MainMatrix.processingMiner].add(rel);
 		}	
-		//String minerName = main.MainViewer.minerList.get(main.MainViewer.processingMiner).toString();
-		
 		if (!main.MainMatrix.genes[main.MainMatrix.processingMiner].contains(gene1)){
 			main.MainMatrix.genes[main.MainMatrix.processingMiner].add(gene1);
 		}

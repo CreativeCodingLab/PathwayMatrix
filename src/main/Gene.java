@@ -34,7 +34,6 @@ public class Gene {
 	public int order;
 //	public int orderReading;
 	
-	
 	public Gene(String name_, int order_){
 		name = name_;
 		iX = new Integrator(main.MainMatrix.marginX,.5f,.1f);
