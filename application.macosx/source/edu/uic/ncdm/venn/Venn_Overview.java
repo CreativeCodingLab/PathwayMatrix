@@ -51,7 +51,7 @@ public class Venn_Overview{
 		centers = new double[0][0];	
 	}  
     
-	public void compute() {
+	public void initialize() {
 		// Select the list of miner
 		numMinerContainData = 0;
 		for (int i=0;i<minerList.size();i++){
@@ -76,6 +76,9 @@ public class Venn_Overview{
 		}
 		deactive = new boolean[numMinerContainData];
 		
+	}
+		
+	public void compute() {
 		
 		// Obtain relation of intersections
 		ArrayList<String> aData = new ArrayList<String>();
@@ -217,11 +220,7 @@ public class Venn_Overview{
             float y = yy4 + (int) (yi * size);
             Color color = new Color(main.MainMatrix.colorRelations[minerGlobalIDof[i]]);  
             
-            if (PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius/2 && brushing<0){
-            	color = new Color(255,255,255,100);
-            	brushing=i;
-            }
-           // if (deactive[i])
+             // if (deactive[i])
            // 	color = new Color(255,255,255,10);
             
             if (minerGlobalIDof[i]==main.MainMatrix.currentRelation){
@@ -230,6 +229,11 @@ public class Venn_Overview{
             	
            if (radius>0){
         	   	parent.fill(color.getRed(), color.getGreen(), color.getBlue(),180);
+        	   	if (PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius/2 && brushing<0){
+        	   		parent.fill(color.getRed(), color.getGreen(), color.getBlue(),255);
+            	   	brushing=i;
+                }
+              
         	   	parent.ellipse(x , y , radius, radius);
         	   	parent.fill(0);
         	   	//if (deactive[i])
@@ -237,6 +241,11 @@ public class Venn_Overview{
 	            parent.text(labels[i], x , y+4);
            }
         }
+        if (minerGlobalIDof!=null && brushing>=0)
+        	main.MainMatrix.currentRelation = minerGlobalIDof[brushing];
+        else
+        	main.MainMatrix.currentRelation = -1;
+        
         parent.fill(Color.GRAY.getRGB());
 		parent.textSize(14);
 		parent.textAlign(PApplet.LEFT);

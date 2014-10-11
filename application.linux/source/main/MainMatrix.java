@@ -95,12 +95,14 @@ public class MainMatrix extends PApplet {
 	/**
 	 * Blacklist for detecting ubiquitous small molecules.
 	 */
+	
+	
 	private static Blacklist blacklist;
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	//public String currentFile = "../level3/Regulation of DNA Replication.owl";
-	public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
+	public String currentFile = "./level3/Regulation of DNA Replication.owl";
+	//public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
 	
 	public static Button button;
 	
@@ -148,6 +150,7 @@ public class MainMatrix extends PApplet {
 	public static PopupOrder popupOrder;
 	public static PopupGroup popupGroup;
 	public static CheckBox check1;
+	public static CheckBox check2;
 	
 	// Grouping animation
 	public static int stateAnimation =0;
@@ -156,6 +159,12 @@ public class MainMatrix extends PApplet {
 	
 	// Color of miner
 	public static int[] colorRelations;
+	
+	
+	// Allow to draw 
+	public static boolean isAllowedDrawing = false;
+	public static int  ccc = 0; // count to draw progessing bar
+	
 	
 	
 	public PFont metaBold = loadFont("Arial-BoldMT-18.vlw");
@@ -281,6 +290,7 @@ public class MainMatrix extends PApplet {
 		popupOrder  = new PopupOrder(this);
 		popupGroup  = new PopupGroup(this);
 		check1 = new CheckBox(this, "Lensing");
+		check2 = new CheckBox(this, "Highlight groups");
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
 		vennDetail = new Venn_Detail(this);
@@ -328,79 +338,86 @@ public class MainMatrix extends PApplet {
 		
 		// Print message
 		if (processingMiner<minerList.size()){
-			float val = (float) processingMiner/(minerList.size()-1);
-			Color colorMiner = ColorScales.getColor(val, "rainbow", 1f);
-			this.fill(colorMiner.getRGB());
-			this.text(message, marginX+10,this.height-8);
+			
+			ccc+=10;
+			if (ccc>10000) ccc=0;
+			
+			
+			this.fill(colorRelations[processingMiner],100+ccc%155);
+			this.noStroke();
+			this.arc(marginX,this.height-20, 30, 30, 0, PApplet.PI*2*processingMiner/(minerList.size()-1));
+			
+			this.fill(colorRelations[processingMiner]);
+			this.textSize(14);
+			this.text(message, marginX+20,this.height-14);
 		}
-	
-		if (ggg==null || ggg.size()==0)
-			return;
-		else{
-			size = (this.height-marginY)/allGenes.size();
-			size = size*0.75f;
-			if (size>100)
-				size=100;
-		}
-		
-	
-		//checking state of group transition
-		if (leaderSortedMap!=null && stateAnimation==0){
-			float maxDis = 0;
-			for (Map.Entry<Integer, Integer> entry : leaderSortedMap.entrySet()) {
-				int index = entry.getKey();
-				for (int i=1;i<locals[index].size();i++){
-					int child = locals[index].get(i);
-					float dis = PApplet.abs(ggg.get(index).iX.value-ggg.get(child).iX.value);
-					if (dis>maxDis)
-						maxDis = dis;
-					System.out.println("index="+index+"	child="+child+"	dis="+dis);
+
+		if (isAllowedDrawing){
+			if (ggg==null || ggg.size()==0)
+				return;
+			else{
+				size = (this.height-marginY)/allGenes.size();
+				size = size*0.75f;
+				if (size>100)
+					size=100;
+			}
+			
+			// Checking state of group transition
+			System.out.println("stateAnimation="+stateAnimation);
+			if (leaderSortedMap!=null && stateAnimation==0){
+				float maxDis = 0;
+				for (Map.Entry<Integer, Integer> entry : leaderSortedMap.entrySet()) {
+					int index = entry.getKey();
+					for (int i=1;i<locals[index].size();i++){
+						int child = locals[index].get(i);
+						float dis = PApplet.abs(ggg.get(index).iX.value-ggg.get(child).iX.value);
+						if (dis>maxDis)
+							maxDis = dis;
+					}
+				}
+				if (maxDis<1){
+					stateAnimation=1;
 				}
 			}
-			System.out.println("----maxDis="+maxDis);
-			
-			if (maxDis<1){
-				stateAnimation=1;
+			try{
+				if (PopupGroup.items[PopupGroup.s].equals("Similarity") && stateAnimation==1)
+					drawGroups();
+				else{
+					drawGenes();
+				}
 			}
-				
+			catch (Exception e){
+				e.printStackTrace();
+				return;
+			}
 		}
 		
-		try{
-			if (PopupGroup.items[PopupGroup.s].equals("Similarity") && stateAnimation==1)
-				drawGroups();
-			else{
-				drawGenes();
-			}
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			return;
-		}
 		
 		float x2 = this.width-600;
+		float y2 = 140;
 		this.fill(0);
 		this.textAlign(PApplet.LEFT);
-		this.textSize(13);
-		this.text("File: "+currentFile, x2, 80);
+		this.textSize(14);
+		this.text("File: "+currentFile, x2, y2);
 		// find minerID index
 		if (Venn_Overview.minerGlobalIDof!=null){
 			if (currentRelation>=0){
 				this.fill(colorRelations[currentRelation]);
-				this.text("Realationship "+currentRelation+": "+minerList.get(currentRelation), x2+250, 100);
-				this.text("Total genes: "+ggg.size(), x2+250, 120);
-				this.text("Total relations: "+pairs[currentRelation].size(), x2+250, 140);
+				this.text("Realationship "+currentRelation+": "+minerList.get(currentRelation), x2+250, y2+20);
+				this.text("Total genes: "+genes[currentRelation].size(), x2+250, y2+40);
+				this.text("Total relations: "+pairs[currentRelation].size(), x2+250, y2+60);
 			}
 			this.fill(0);
-			this.text("Pathway summary", x2, 100);
-			this.text("Total genes: "+allGenes.size(), x2, 120);
+			this.text("Pathway summary", x2, y2+20);
+			this.text("Total genes: "+allGenes.size(), x2, y2+40);
 			int totalRelations = 0;
 			for (int i=0;i<pairs.length;i++){
 				totalRelations+=pairs[i].size();
 			} 
-			this.text("Total relations: "+totalRelations, x2, 140);
+			this.text("Total relations: "+totalRelations, x2, y2+60);
 		}
-		vennOverview.draw(x2+50,220,10);
-		vennDetail.draw(x2+100,500,10);
+		vennOverview.draw(x2+50,300,10);
+		//vennDetail.draw(x2+100,500,10);
 		
 		// Draw button
 		button.draw();
@@ -408,6 +425,7 @@ public class MainMatrix extends PApplet {
 		popupOrder.draw(this.width-379);
 		popupRelation.draw(this.width-500);
 		check1.draw(this.width-600, 7);
+		check2.draw(this.width-600, 27);
 	}	
 	
 	public void drawGroups() {
@@ -519,48 +537,62 @@ public class MainMatrix extends PApplet {
 				name = locals[index].size()+" genes";
 				this.fill(0);
 			}	
-			if (ww>10){
+			if (ww>8){
 				float xx =  ggg.get(index).iX.value;
 				this.textAlign(PApplet.LEFT);
 				float al = -PApplet.PI/2;
-				this.translate(xx+ww/2+fontSize/2,marginY-8);
+				this.translate(xx+ww/2+fontSize/3,marginY-8);
 				this.rotate(al);
 				this.text(name, 0,0);
 				this.rotate(-al);
-				this.translate(-(xx+ww/2+fontSize/2), -(marginY-8));
+				this.translate(-(xx+ww/2+fontSize/3), -(marginY-8));
 			}
 			float hh =ggg.get(index).iH.value;
-			if (hh>10){
+			if (hh>8){
 				float yy =  ggg.get(index).iY.value;
 				this.textAlign(PApplet.RIGHT);
-				this.text(name, marginX-6, yy+hh/2+fontSize/2.5f);
+				this.text(name, marginX-6, yy+hh/2+fontSize/3);
 			}
 		}
 		
 
 		this.noStroke();
-			for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
-				int indexI = entryI.getKey();
-				// Check if this is grouping
-				float xx =  ggg.get(indexI).iX.value;
-				float ww = ggg.get(indexI).iW.value;
-				for (Map.Entry<Integer, Integer> entryJ : leaderSortedMap.entrySet()) {
-					int indexJ = entryJ.getKey();
-					float yy =  ggg.get(indexJ).iY.value;
-					float hh =ggg.get(indexJ).iH.value;
-					// Draw Rosemary chart
-					if (geneRelationList==null || geneRelationList[indexI][indexJ]==null) continue; // no relation of two genes
-					for (int i2=0;i2<geneRelationList[indexI][indexJ].size();i2++){
-						int localRalationIndex = geneRelationList[indexI][indexJ].get(i2);
-						
-						this.noStroke();
-						this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
-						float alpha = PApplet.PI*2/minerGlobalIDof.length;
-						this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
-					}
+		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
+			int indexI = entryI.getKey();
+			// Check if this is grouping
+			float xx =  ggg.get(indexI).iX.value;
+			float ww = ggg.get(indexI).iW.value;
+			
+			int numEx = locals[indexI].size();
+			
+			for (Map.Entry<Integer, Integer> entryJ : leaderSortedMap.entrySet()) {
+				int indexJ = entryJ.getKey();
+				float yy =  ggg.get(indexJ).iY.value;
+				float hh =ggg.get(indexJ).iH.value;
+				
+				// Draw background
+				if (indexI!=indexJ && check2.s) {
+					int numEy = locals[indexJ].size();
+					int maxNumE = PApplet.max(numEx, numEy);
+					float dense = PApplet.map(maxNumE, 1, maxElement, 1, 80);
+					this.fill(0,dense);
+					this.noStroke();
+					this.rect(xx, yy, ww, hh);
 				}
+				// Draw Rosemary chart
+				if (geneRelationList==null || geneRelationList[indexI][indexJ]==null) continue; // no relation of two genes
+				for (int i2=0;i2<geneRelationList[indexI][indexJ].size();i2++){
+					int localRalationIndex = geneRelationList[indexI][indexJ].get(i2);
+					
+					this.noStroke();
+					this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
+					float alpha = PApplet.PI*2/minerGlobalIDof.length;
+					this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
+				}
+				
+				
 			}
-		
+		}
 	}
 	
 	public void drawGenes() {
@@ -689,7 +721,6 @@ public class MainMatrix extends PApplet {
 				}
 				for (int i2=0;i2<geneRelationList[i][j].size();i2++){
 					int localRalationIndex = geneRelationList[i][j].get(i2);
-					
 					this.noStroke();
 					this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
 					float alpha = PApplet.PI*2/minerGlobalIDof.length;
@@ -733,6 +764,9 @@ public class MainMatrix extends PApplet {
 		}
 		else if (check1.b){
 			check1.mouseClicked();
+		}
+		else if (check2.b){
+			check2.mouseClicked();
 		}
 		else if (popupRelation.b>=0){
 			popupRelation.mouseClicked();
@@ -796,6 +830,7 @@ public class MainMatrix extends PApplet {
 		if (this.key == 'g' || this.key == 'G'){
 			thread3=new Thread(loader3);
 			thread3.start();
+			main.MainMatrix.stateAnimation=0;
 			PopupGroup.s = 2;
 		}
 	}
@@ -809,6 +844,8 @@ public class MainMatrix extends PApplet {
 		}
 		@SuppressWarnings("unchecked")
 		public void run() {
+			isAllowedDrawing =  false;
+			
 			 // Initialize best plots
 			pairs = new ArrayList[minerList.size()];
 			for (int i=0;i<minerList.size();i++){
@@ -822,7 +859,7 @@ public class MainMatrix extends PApplet {
 			allGenes = new ArrayList<String>();
 			ggg = new ArrayList<Gene>();
 			geneRelationList = null;
-
+			leaderSortedMap = null;
 			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
 				 message = "Processing miner ("+processingMiner+"/"+minerList.size()
@@ -833,13 +870,21 @@ public class MainMatrix extends PApplet {
 			System.out.println();
 		
 		
-			vennOverview.compute();
+			
+			vennOverview.initialize();
 			
 			// Compute the summary for each Gene
 			Gene.compute();
 			
 			Gene.computeGeneRalationList();
 			//write();
+			
+			
+			stateAnimation=0;
+			isAllowedDrawing =  true;
+			
+			vennOverview.compute();
+			
 			
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
@@ -852,6 +897,7 @@ public class MainMatrix extends PApplet {
 			if (index>=0)
 				System.out.println("Most similar to BRA1= "+ggg.get(index).name+"	dis="+Gene.computeDis(0,2));
 			*/
+			
 		}
 	}
 	

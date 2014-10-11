@@ -74,11 +74,13 @@ public class PopupGroup{
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("None")){  
-				Gene.orderBySimilarity();
 				main.MainMatrix.stateAnimation=0;
+				Gene.orderBySimilarity();
 			}	
-			else if (items[s].equals("Similarity"))  
+			else if (items[s].equals("Similarity"))  {
+				main.MainMatrix.stateAnimation=0;
 				Gene.groupBySimilarity();
+			}	
 		}
 	}
 	 

@@ -217,7 +217,7 @@ public class MainMatrix extends PApplet {
 	
 
 	public void setup() {
-		//textFont(metaBold,14);
+		textFont(metaBold,14);
 		button = new Button(this);
 		size(1440, 900);
 		//size(2000, 1200);

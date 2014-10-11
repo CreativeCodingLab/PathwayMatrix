@@ -73,14 +73,26 @@ public class PopupOrder{
 	 public void mouseClicked() {
 		if (b<items.length){
 			s = b;
-			if (items[s].equals("Random"))  
+			if (items[s].equals("Random")) { 
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
 				Gene.orderByRandom(parent);
-			else if (items[s].equals("Reading order"))  
+			}	
+			else if (items[s].equals("Reading order"))  {
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
 				Gene.orderByReadingOrder();
-			else if (items[s].equals("Name"))  
+			}	
+			else if (items[s].equals("Name"))  {
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
 				Gene.orderByName();
-			else if (items[s].equals("Similarity"))  
+			}	
+			else if (items[s].equals("Similarity"))  {
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
 				Gene.orderBySimilarity();
+			}	
 		}
 	}
 	 
