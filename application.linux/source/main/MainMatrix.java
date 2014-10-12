@@ -601,7 +601,9 @@ public class MainMatrix extends PApplet {
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int index = entryI.getKey();
 			// Check if this is grouping
+			float xx =  ggg.get(index).iX.value;
 			float yy =  ggg.get(index).iY.value;
+			float ww =  ggg.get(index).iW.value;
 			float hh =ggg.get(index).iH.value;
 			String name = ggg.get(index).name;
 			int numE = locals[index].size();
@@ -622,12 +624,12 @@ public class MainMatrix extends PApplet {
 				// Draw background of element text
 				float step = 50;
 				for (int i=0; i<step;i++){
-					this.stroke(120,10+i*4);
+					this.stroke(180,10+i*4.5f);
 					float hh3 = PApplet.map(i, 0, step, 10, hh2);
 					this.line(marginX-6+i, yy+hh/2-hh3/2, marginX-6+i, yy+hh/2+hh3/2);
 				}
 				this.noStroke();
-				this.fill(120,220);
+				this.fill(180,235);
 				this.rect(marginX-6+step, yy2, 100, hh2+1);
 				
 				
@@ -646,7 +648,41 @@ public class MainMatrix extends PApplet {
 					this.text(entry.getKey(),xx2+step+10,yy2+13+count*13);
 					count++;
 				}
+			}
+			else if (numE>1 && xx<mouseX && mouseX<xx+ww && marginY-wid<=mouseY && mouseY<=marginY){
+				this.textAlign(PApplet.CENTER);
+				float hh2 = (numE)*13+4;
+				float yy2 = marginY;
+				//float yy2 = yy+hh/2-hh2/2;
+				float xx2 = xx+ww/2;
+				float ww2 = 120;
 				
+				
+				// Draw background of element text
+				float step = 30;
+				for (int i=0; i<step;i++){
+					this.stroke(180,10+i*7.5f);
+					float ww3 = PApplet.map(i, 0, step, 10, ww2);
+					this.line(xx2-ww3/2, marginY-8+i, xx2+ww3/2, marginY-8+i);
+				}
+				this.noStroke();
+				this.fill(180,235);
+				this.rect(xx2-60, marginY-8+step, 120, hh2);
+				
+				// Order names
+				Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+				for (int i=0;i<numE;i++){
+					int e = locals[index].get(i);
+					unsortMap.put(ggg.get(e).name, i);
+				}
+				Map<String, Integer> treeMap = new TreeMap<String, Integer>(unsortMap);
+				int count=0;
+				this.fill(0);
+				this.textSize(12);
+				for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
+					this.text(entry.getKey(),xx2,yy2+step+count*13);
+					count++;
+				}
 			}
 		}
 	}
