@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspace Heios/PathwayMatrix/lib/core.jar"/>
-	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspace Heios/PathwayMatrix/lib/biopax-pattern-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspace Heios/PathwayMatrix/lib/cpath-client-4.2.0-SNAPSHOT-fat-jar.jar"/>
-	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspace Heios/PathwayMatrix/lib/paxtools-4.2.1.jar"/>
+	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/biopax-pattern-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/core.jar"/>
+	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/cpath-client-4.2.0-SNAPSHOT-fat-jar.jar"/>
+	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/paxtools-4.2.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

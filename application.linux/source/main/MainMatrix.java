@@ -363,7 +363,6 @@ public class MainMatrix extends PApplet {
 			}
 			
 			// Checking state of group transition
-			System.out.println("stateAnimation="+stateAnimation);
 			if (leaderSortedMap!=null && stateAnimation==0){
 				float maxDis = 0;
 				for (Map.Entry<Integer, Integer> entry : leaderSortedMap.entrySet()) {
@@ -420,12 +419,13 @@ public class MainMatrix extends PApplet {
 		//vennDetail.draw(x2+100,500,10);
 		
 		// Draw button
+		check1.draw(this.width-600, 7);
+		check2.draw(this.width-600, 27);
 		button.draw();
 		popupGroup.draw(this.width-258);
 		popupOrder.draw(this.width-379);
 		popupRelation.draw(this.width-500);
-		check1.draw(this.width-600, 7);
-		check2.draw(this.width-600, 27);
+		
 	}	
 	
 	public void drawGroups() {

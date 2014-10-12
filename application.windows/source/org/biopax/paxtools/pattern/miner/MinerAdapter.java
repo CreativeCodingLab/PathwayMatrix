@@ -473,17 +473,13 @@ public abstract class MinerAdapter implements Miner
 		if (matches.isEmpty()) {
 			return;
 		}
+		
+		/* Remove to run faster
 		if (this instanceof SIFMiner){
 			writeSIFsUsingSIFFramework(matches, out, directed);
 			return;
 		}
-		
-		String mid = getRelationType() == null ? "\t" : "\trelation\t";
-
-		OutputStreamWriter writer = new OutputStreamWriter(out);
-		String header = getHeader();
-		writer.write(header  == null ? label1 + mid + label2 : header);
-
+		*/
 		
 		for (BioPAXElement ele : matches.keySet())	{
 			for (Match m : matches.get(ele)){
@@ -497,11 +493,9 @@ public abstract class MinerAdapter implements Miner
 					storeData(relation, s1, s2);
 					if (!directed)
 						storeData(reverse, s2, s1);
-					writer.write("\n" + relation);
 				}
 			}
 		}
-		writer.flush();
 	}
 
 	/**
@@ -564,23 +558,16 @@ public abstract class MinerAdapter implements Miner
 				}
 			}
 		}
-		OutputStreamWriter writer = new OutputStreamWriter(out);
-
-		boolean first = true;
+		
 		for (SIFInteraction inter : sifMap.keySet())
 		{
-			if (first) first = false;
-			else writer.write("\n");
-
 			String[] s  = inter.toString().split("\t");
 			storeData(s[0]+"\t"+s[2], s[0], s[2]);
 			
 			if (!directed)
 				storeData(s[2]+"\t"+s[0], s[2], s[0]);
 			
-			writer.write(inter.toString());
 		}
-		writer.flush();
 	}
 	
 	public static void storeData(String rel, String gene1, String gene2){
