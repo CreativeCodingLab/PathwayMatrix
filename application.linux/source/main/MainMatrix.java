@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.biopax.paxtools.io.SimpleIOHandler;
 import org.biopax.paxtools.model.BioPAXElement;
@@ -337,7 +338,7 @@ public class MainMatrix extends PApplet {
 		background(255);
 		
 		// Print message
-		if (processingMiner<minerList.size()){
+		if (processingMiner<colorRelations.length){
 			
 			ccc+=10;
 			if (ccc>10000) ccc=0;
@@ -345,7 +346,7 @@ public class MainMatrix extends PApplet {
 			
 			this.fill(colorRelations[processingMiner],100+ccc%155);
 			this.noStroke();
-			this.arc(marginX,this.height-20, 30, 30, 0, PApplet.PI*2*processingMiner/(minerList.size()-1));
+			this.arc(marginX,this.height-20, 30, 30, 0, PApplet.PI*2*(processingMiner+1)/minerList.size());
 			
 			this.fill(colorRelations[processingMiner]);
 			this.textSize(14);
@@ -574,7 +575,9 @@ public class MainMatrix extends PApplet {
 				if (indexI!=indexJ && check2.s) {
 					int numEy = locals[indexJ].size();
 					int maxNumE = PApplet.max(numEx, numEy);
-					float dense = PApplet.map(maxNumE, 1, maxElement, 1, 80);
+					float dense = PApplet.map(maxNumE, 1, maxElement, 10, 70);
+					if (maxNumE==1)
+						dense=0;
 					this.fill(0,dense);
 					this.noStroke();
 					this.rect(xx, yy, ww, hh);
@@ -590,6 +593,59 @@ public class MainMatrix extends PApplet {
 					this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
 				}
 				
+				
+			}
+		}
+		
+		// Draw group names
+		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
+			int index = entryI.getKey();
+			// Check if this is grouping
+			float yy =  ggg.get(index).iY.value;
+			float hh =ggg.get(index).iH.value;
+			String name = ggg.get(index).name;
+			int numE = locals[index].size();
+			
+			
+			
+			// Draw genes in compound
+			float fontSize = PApplet.map(numE, 1, maxElement, 10, 18);
+			this.textSize(fontSize);
+			float wid = 20+this.textWidth(name);
+			if (numE>1 && marginX-wid<=mouseX && mouseX<=marginX && yy<mouseY && mouseY<yy+hh){
+				this.textAlign(PApplet.LEFT);
+				float hh2 = (numE)*13+4;
+				float xx2 = marginX;
+				float yy2 = yy+hh/2-hh2/2;
+				
+				
+				// Draw background of element text
+				float step = 50;
+				for (int i=0; i<step;i++){
+					this.stroke(120,10+i*4);
+					float hh3 = PApplet.map(i, 0, step, 10, hh2);
+					this.line(marginX-6+i, yy+hh/2-hh3/2, marginX-6+i, yy+hh/2+hh3/2);
+				}
+				this.noStroke();
+				this.fill(120,220);
+				this.rect(marginX-6+step, yy2, 100, hh2+1);
+				
+				
+				
+				// Order names
+				Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+				for (int i=0;i<numE;i++){
+					int e = locals[index].get(i);
+					unsortMap.put(ggg.get(e).name, i);
+				}
+				Map<String, Integer> treeMap = new TreeMap<String, Integer>(unsortMap);
+				int count=0;
+				this.fill(0);
+				this.textSize(12);
+				for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
+					this.text(entry.getKey(),xx2+step+10,yy2+13+count*13);
+					count++;
+				}
 				
 			}
 		}
