@@ -333,17 +333,13 @@ public class MainMatrix extends PApplet {
 	}
 		
 	
-	
 	public void draw() {
 		background(255);
 		
 		// Print message
 		if (processingMiner<colorRelations.length){
-			
 			ccc+=10;
 			if (ccc>10000) ccc=0;
-			
-			
 			this.fill(colorRelations[processingMiner],100+ccc%155);
 			this.noStroke();
 			this.arc(marginX,this.height-20, 30, 30, 0, PApplet.PI*2*(processingMiner+1)/minerList.size());
@@ -387,7 +383,10 @@ public class MainMatrix extends PApplet {
 				}
 			}
 			catch (Exception e){
+				System.out.println();
+				System.out.println("*******************Catch ERROR*******************");
 				e.printStackTrace();
+				System.out.println("**************************************************");
 				return;
 			}
 		}
@@ -436,9 +435,6 @@ public class MainMatrix extends PApplet {
 		size = size*0.75f;
 		if (size>100)
 			size=100;
-		
-		
-		
 		
 		// Compute lensing
 		if (check1.s){
@@ -592,12 +588,14 @@ public class MainMatrix extends PApplet {
 					float alpha = PApplet.PI*2/minerGlobalIDof.length;
 					this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
 				}
-				
-				
 			}
 		}
+		drawGenesInGroup(maxElement);
+	}
+	
+	// Draw group names
+	public void drawGenesInGroup(int maxElement) {
 		
-		// Draw group names
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int index = entryI.getKey();
 			// Check if this is grouping
@@ -608,85 +606,106 @@ public class MainMatrix extends PApplet {
 			String name = ggg.get(index).name;
 			int numE = locals[index].size();
 			
-			
-			
 			// Draw genes in compound
 			float fontSize = PApplet.map(numE, 1, maxElement, 10, 18);
 			this.textSize(fontSize);
 			float wid = 20+this.textWidth(name);
+			float ww2 = 136;
 			if (numE>1 && marginX-wid<=mouseX && mouseX<=marginX && yy<mouseY && mouseY<yy+hh){
 				this.textAlign(PApplet.LEFT);
-				float hh2 = (numE)*13+4;
+				float hh2 = (numE+3)*13+12;
 				float xx2 = marginX;
 				float yy2 = yy+hh/2-hh2/2;
-				
 				
 				// Draw background of element text
 				float step = 50;
 				for (int i=0; i<step;i++){
-					this.stroke(180,10+i*4.5f);
+					this.stroke(190,10+i*4.5f);
 					float hh3 = PApplet.map(i, 0, step, 10, hh2);
 					this.line(marginX-6+i, yy+hh/2-hh3/2, marginX-6+i, yy+hh/2+hh3/2);
 				}
 				this.noStroke();
-				this.fill(180,235);
-				this.rect(marginX-6+step, yy2, 100, hh2+1);
+				this.fill(190,235);
+				this.rect(marginX-6+step, yy2+0.5f, ww2, hh2);
 				
-				
-				
-				// Order names
-				Map<String, Integer> unsortMap = new HashMap<String, Integer>();
-				for (int i=0;i<numE;i++){
-					int e = locals[index].get(i);
-					unsortMap.put(ggg.get(e).name, i);
-				}
-				Map<String, Integer> treeMap = new TreeMap<String, Integer>(unsortMap);
-				int count=0;
-				this.fill(0);
-				this.textSize(12);
-				for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
-					this.text(entry.getKey(),xx2+step+10,yy2+13+count*13);
-					count++;
-				}
+				drawElementList(numE, index,xx2+step+10,yy2+13,step, true);
 			}
 			else if (numE>1 && xx<mouseX && mouseX<xx+ww && marginY-wid<=mouseY && mouseY<=marginY){
 				this.textAlign(PApplet.CENTER);
-				float hh2 = (numE)*13+4;
+				float hh2 = (numE+3)*13+12;
 				float yy2 = marginY;
 				//float yy2 = yy+hh/2-hh2/2;
 				float xx2 = xx+ww/2;
-				float ww2 = 120;
 				
 				
 				// Draw background of element text
 				float step = 30;
 				for (int i=0; i<step;i++){
-					this.stroke(180,10+i*7.5f);
+					this.stroke(190,10+i*7.5f);
 					float ww3 = PApplet.map(i, 0, step, 10, ww2);
 					this.line(xx2-ww3/2, marginY-8+i, xx2+ww3/2, marginY-8+i);
 				}
 				this.noStroke();
-				this.fill(180,235);
-				this.rect(xx2-60, marginY-8+step, 120, hh2);
+				this.fill(190,235);
+				this.rect(xx2-ww2/2, marginY-8+step, ww2, hh2);
 				
-				// Order names
-				Map<String, Integer> unsortMap = new HashMap<String, Integer>();
-				for (int i=0;i<numE;i++){
-					int e = locals[index].get(i);
-					unsortMap.put(ggg.get(e).name, i);
-				}
-				Map<String, Integer> treeMap = new TreeMap<String, Integer>(unsortMap);
-				int count=0;
-				this.fill(0);
-				this.textSize(12);
-				for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
-					this.text(entry.getKey(),xx2,yy2+step+count*13);
-					count++;
-				}
+				drawElementList(numE, index,xx2,yy2+step,step, false);
 			}
 		}
 	}
+	public void drawElementList(int numE, int leaderIndex, float xx2, float yy2, float step, boolean isX_Axis){
+		// Order names
+		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+		int index1 = -1;
+		int index2 = -1;
+		for (int i=0;i<numE;i++){
+			int e = locals[leaderIndex].get(i);
+			unsortMap.put(ggg.get(e).name, i);
+			if (i==0)
+				index1 = e;
+			else if (i==1)
+				index2 = e;
+		}
+		Map<String, Integer> treeMap = new TreeMap<String, Integer>(unsortMap);
+		int count=0;
+		this.fill(0);
+		this.textSize(12);
+		for (Map.Entry<String, Integer> entry : treeMap.entrySet()) {
+			this.text(entry.getKey(),xx2,yy2+count*13);
+			count++;
+		}
+		
+		// Draw relation of genes in the group
+		count = 1;
+		float xx3 = xx2;
+		if (isX_Axis)
+			xx3 -=10;
+		this.textSize(13);
+		if (geneRelationList!=null && geneRelationList[index1][index2]!=null){
+			for (int i2=0;i2<geneRelationList[index1][index2].size();i2++){
+				int localRalationIndex = geneRelationList[index1][index2].get(i2);
+				Color c = new Color(colorRelations[minerGlobalIDof[localRalationIndex]]).darker();
+				this.fill(c.getRGB());
+				this.text(minerNames[localRalationIndex], xx3, yy2+13*numE+15*count+3);
+				count++;
+			}
+		}
+		this.fill(0);
+		if (count>1){
+			this.textSize(14);
+			this.text("These genes are:",xx3, yy2+13*numE+3);
+		}	
+		else{
+			this.textSize(13);
+			if (isX_Axis)
+				this.text("No realations between",xx3-10, yy2+13*numE+5);
+			else	
+				this.text("No realations between",xx3, yy2+13*numE+5);
+			this.text("genes in this group",xx3, yy2+13*numE+18);
+		}
+	}
 	
+		
 	public void drawGenes() {
 		// Compute lensing
 		if (check1.s){
@@ -954,7 +973,7 @@ public class MainMatrix extends PApplet {
 			leaderSortedMap = null;
 			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
-				 message = "Processing miner ("+processingMiner+"/"+minerList.size()
+				 message = "Processing realtion ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
 				 computeRelationship(currentFile, processingMiner);
 				
