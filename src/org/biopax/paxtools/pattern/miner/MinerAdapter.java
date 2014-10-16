@@ -474,17 +474,20 @@ public abstract class MinerAdapter implements Miner
 			return;
 		}
 		
-		/* Remove to run faster
-		if (this instanceof SIFMiner){
-			writeSIFsUsingSIFFramework(matches, out, directed);
-			return;
-		}
-		*/
+		// Remove to run faster
+		//if (this instanceof SIFMiner){
+		//	writeSIFsUsingSIFFramework(matches, out, directed);
+		//	return;
+		//}
+		
 		
 		for (BioPAXElement ele : matches.keySet())	{
 			for (Match m : matches.get(ele)){
 				String s1 = getIdentifier(m, label1);
 				String s2 = getIdentifier(m, label2);
+				
+				//if (main.MainMatrix.processingMiner==14)
+					System.out.println(m+" label1="+label1+" label2"+label2+" "+s1+" "+s2);
 				
 				if (s1 != null && s2 != null){
 					String relation = s1 + "\t" + s2;
@@ -511,6 +514,8 @@ public abstract class MinerAdapter implements Miner
 
 		for (List<Match> matchList : matches.values()){
 			for (Match match : matchList){
+				System.out.println(match);
+				
 				SIFInteraction inter = this.createSIFInteraction(match, new IDFetcher(){
 					@Override
 					public String fetchID(BioPAXElement ele){
@@ -561,6 +566,8 @@ public abstract class MinerAdapter implements Miner
 		
 		for (SIFInteraction inter : sifMap.keySet())
 		{
+			System.out.println(" inter.toString()="+ inter.toString());
+			
 			String[] s  = inter.toString().split("\t");
 			storeData(s[0]+"\t"+s[2], s[0], s[2]);
 			

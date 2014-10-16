@@ -827,16 +827,15 @@ public class MainMatrix extends PApplet {
 				float yy =  ggg.get(j).iY.value;
 				float hh =ggg.get(j).iH.value;
 				// Draw Rosemary chart
-				if (geneRelationList==null || geneRelationList[i][j]==null) {
-					continue; // no relation of two genes
-				}
-				for (int i2=0;i2<geneRelationList[i][j].size();i2++){
-					int localRalationIndex = geneRelationList[i][j].get(i2);
-					this.noStroke();
-					this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
-					float alpha = PApplet.PI*2/minerGlobalIDof.length;
-					this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
-				}
+				if (geneRelationList!=null && geneRelationList[i][j]!=null) {
+					for (int i2=0;i2<geneRelationList[i][j].size();i2++){
+						int localRalationIndex = geneRelationList[i][j].get(i2);
+						this.noStroke();
+						this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
+						float alpha = PApplet.PI*2/minerGlobalIDof.length;
+						this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
+					}
+				}	
 			}
 		}
 	}	
