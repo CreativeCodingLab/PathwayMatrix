@@ -13,7 +13,6 @@ package main;
  * for the specific language governing rights and limitations under the License.
  */
 
-import static javax.swing.JOptionPane.showMessageDialog;
 import static main.MainMatrix.geneRelationList;
 import static main.MainMatrix.ggg;
 import static main.MainMatrix.minerList;
@@ -102,6 +101,7 @@ public class MainMatrix extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
+	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	public String currentFile = "./level3/Regulation of DNA Replication.owl";
 	//public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
 	
@@ -300,37 +300,7 @@ public class MainMatrix extends PApplet {
 	}	
 	
 	
-	public void computeRelationship(String fileName, int relID) {
-		File modFile = new File(fileName);
-		File outFile = new File("output.txt");
-		SimpleIOHandler io = new SimpleIOHandler();
-		Model model;
-		try{
-			model = io.convertFromOWL(new FileInputStream(modFile));
-		}
-		catch (FileNotFoundException e){
-			e.printStackTrace();
-			showMessageDialog(this, "File not found: " + modFile.getPath());
-			return;
-		}
-
-		// Search
-		Miner min = minerList.get(relID);
-		Pattern p = min.getPattern();
-		Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
-
-		try{
-			FileOutputStream os = new FileOutputStream(outFile);
-			min.writeResult(matches, os);
-			
-			os.close();
-		}
-		catch (IOException e){
-			e.printStackTrace();
-			showMessageDialog(this, "Error occurred while writing the results");
-			return;
-		}
-	}
+	
 		
 	
 	public void draw() {
@@ -971,15 +941,45 @@ public class MainMatrix extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
+			
+			File modFile = new File(currentFile);
+			File outFile = new File("output.txt");
+			SimpleIOHandler io = new SimpleIOHandler();
+			Model model;
+			try{
+				model = io.convertFromOWL(new FileInputStream(modFile));
+			}
+			catch (FileNotFoundException e){
+				e.printStackTrace();
+				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
+				return;
+			}
+
+			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
 				 message = "Processing realtion ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
-				 computeRelationship(currentFile, processingMiner);
+
+				// Search
+				Miner min = minerList.get(processingMiner);
+				Pattern p = min.getPattern();
+				Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
+				
+				try{
+					FileOutputStream os = new FileOutputStream(outFile);
+					min.writeResult(matches, os);
+					
+					os.close();
+				}
+				catch (IOException e){
+					e.printStackTrace();
+					return;
+				}
 				
 			}
 			System.out.println();
 		
-		
+			
 			
 			vennOverview.initialize();
 			
@@ -1012,7 +1012,6 @@ public class MainMatrix extends PApplet {
 	}
 	
 	
-		
 	
 	//Update genes for drawing
 	public void write(){	

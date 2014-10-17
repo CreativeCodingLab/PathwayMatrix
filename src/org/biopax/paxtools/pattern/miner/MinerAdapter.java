@@ -487,7 +487,7 @@ public abstract class MinerAdapter implements Miner
 				String s2 = getIdentifier(m, label2);
 				
 				//if (main.MainMatrix.processingMiner==14)
-					System.out.println(m+" label1="+label1+" label2"+label2+" "+s1+" "+s2);
+				//	System.out.println(m+" label1="+label1+" label2"+label2+" "+s1+" "+s2);
 				
 				if (s1 != null && s2 != null){
 					String relation = s1 + "\t" + s2;
@@ -566,7 +566,7 @@ public abstract class MinerAdapter implements Miner
 		
 		for (SIFInteraction inter : sifMap.keySet())
 		{
-			System.out.println(" inter.toString()="+ inter.toString());
+			//System.out.println(" inter.toString()="+ inter.toString());
 			
 			String[] s  = inter.toString().split("\t");
 			storeData(s[0]+"\t"+s[2], s[0], s[2]);
