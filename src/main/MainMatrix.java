@@ -242,7 +242,7 @@ public class MainMatrix extends PApplet {
 		minerList.add(new ControlsTransportMiner());
 		minerList.add(new ControlsExpressionMiner());
 		minerList.add(new ControlsExpressionWithConvMiner());
-		//minerList.add(new CSCOThroughDegradationMiner());
+		minerList.add(new CSCOThroughDegradationMiner());
 		minerList.add(new ControlsDegradationIndirectMiner());
 		minerList.add(new ConsumptionControlledByMiner());
 		minerList.add(new ControlsProductionOfMiner());
@@ -957,7 +957,7 @@ public class MainMatrix extends PApplet {
 
 			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
-				 message = "Processing realtion ("+processingMiner+"/"+minerList.size()
+				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
 
 				// Search
@@ -993,7 +993,7 @@ public class MainMatrix extends PApplet {
 			stateAnimation=0;
 			isAllowedDrawing =  true;
 			
-			vennOverview.compute();
+	//		vennOverview.compute();
 			
 			
 			PopupOrder.s =0;
@@ -1007,7 +1007,6 @@ public class MainMatrix extends PApplet {
 			if (index>=0)
 				System.out.println("Most similar to BRA1= "+ggg.get(index).name+"	dis="+Gene.computeDis(0,2));
 			*/
-			
 		}
 	}
 	
