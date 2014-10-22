@@ -32,14 +32,23 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.biopax.paxtools.io.SimpleIOHandler;
+import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
+import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
+import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level3.Protein;
+import org.biopax.paxtools.model.level3.SmallMoleculeReference;
+import org.biopax.paxtools.model.level3.XReferrable;
+import org.biopax.paxtools.model.level3.Xref;
 import org.biopax.paxtools.pattern.Match;
 import org.biopax.paxtools.pattern.Pattern;
 import org.biopax.paxtools.pattern.Searcher;
@@ -62,15 +71,18 @@ import org.biopax.paxtools.pattern.miner.ControlsStateChangeOfMiner;
 import org.biopax.paxtools.pattern.miner.ControlsTransportMiner;
 import org.biopax.paxtools.pattern.miner.ControlsTransportOfChemicalMiner;
 import org.biopax.paxtools.pattern.miner.DirectedRelationMiner;
+import org.biopax.paxtools.pattern.miner.IDFetcher;
 import org.biopax.paxtools.pattern.miner.InComplexWithMiner;
 import org.biopax.paxtools.pattern.miner.InteractsWithMiner;
 import org.biopax.paxtools.pattern.miner.Miner;
 import org.biopax.paxtools.pattern.miner.NeighborOfMiner;
 import org.biopax.paxtools.pattern.miner.ReactsWithMiner;
 import org.biopax.paxtools.pattern.miner.RelatedGenesOfInteractionsMiner;
+import org.biopax.paxtools.pattern.miner.SIFInteraction;
 import org.biopax.paxtools.pattern.miner.UbiquitousIDMiner;
 import org.biopax.paxtools.pattern.miner.UsedToProduceMiner;
 import org.biopax.paxtools.pattern.util.Blacklist;
+import org.biopax.paxtools.pattern.util.HGNC;
 
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 import edu.uic.ncdm.venn.Venn_Overview;
@@ -102,8 +114,8 @@ public class MainMatrix extends PApplet {
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
-	public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	//public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
+	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
+	public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
 	
 	public static Button button;
 	
@@ -798,6 +810,7 @@ public class MainMatrix extends PApplet {
 				float hh =ggg.get(j).iH.value;
 				// Draw Rosemary chart
 				if (geneRelationList!=null && geneRelationList[i][j]!=null) {
+				//	System.out.println(geneRelationList+" " +geneRelationList[i][j]);
 					for (int i2=0;i2<geneRelationList[i][j].size();i2++){
 						int localRalationIndex = geneRelationList[i][j].get(i2);
 						this.noStroke();
@@ -809,7 +822,7 @@ public class MainMatrix extends PApplet {
 			}
 		}
 	}	
-	
+	 
 	
 	public void setValue(Integrator inter, float value) {
 		if (ggg.size()<500){
@@ -922,6 +935,45 @@ public class MainMatrix extends PApplet {
 		public ThreadLoader1(PApplet parent_) {
 			p = parent_;
 		}
+		
+		
+		public String fetchID(BioPAXElement ele){
+			System.out.println("     ele="+ele);
+			if (ele instanceof SmallMoleculeReference){
+				SmallMoleculeReference smr = (SmallMoleculeReference) ele;
+				if (smr.getDisplayName() != null) return smr.getDisplayName();
+				else if (!smr.getName().isEmpty())
+					return smr.getName().iterator().next();
+				else return null;
+			}
+			else if (ele instanceof XReferrable){
+				for (Xref xr : ((XReferrable) ele).getXref())
+				{
+					String db = xr.getDb();
+					if (db != null)
+					{
+						db = db.toLowerCase();
+						if (db.startsWith("hgnc"))
+						{
+							String id = xr.getId();
+							if (id != null)
+							{
+								String symbol = HGNC.getSymbol(id);
+								if (symbol != null && !symbol.isEmpty())
+								{
+									System.out.println("     symbol="+symbol);
+									
+									return symbol;
+								}
+							}
+						}
+					}
+				}
+			}
+			return null;
+		}
+		
+		
 		@SuppressWarnings("unchecked")
 		public void run() {
 			isAllowedDrawing =  false;
@@ -948,6 +1000,45 @@ public class MainMatrix extends PApplet {
 			Model model;
 			try{
 				model = io.convertFromOWL(new FileInputStream(modFile));
+				
+				
+				// Iterate through all BioPAX Elements and print basic info
+				 Set<BioPAXElement> elementSet = model.getObjects();
+				 for (BioPAXElement currentElement : elementSet){
+					  String rdfId = currentElement.getRDFId();
+					  String className = currentElement.getClass().getName();
+					  System.out.println("Element: " + rdfId + ": " + className);
+				 } 
+
+				 
+				 // Get Proteins Only
+				/*
+				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 for (Protein currentProtein : proteinSet)
+				 {
+					 System.out.println(currentProtein.getName() +
+					  ": " + currentProtein.getDisplayName());
+				 
+				 }
+					*/
+				 SimpleInteractionConverter converter =
+					 new SimpleInteractionConverter(new ControlRule());
+					 try {
+						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
+						
+						FileOutputStream out = new FileOutputStream("B.txt");
+						converter.writeInteractionsInSIFNX(model,
+							     out, out, Arrays.asList("Entity/name","Entity/xref"),
+							    Arrays.asList("Entity/xref:PublicationXref"), true);
+						
+						L3ToSBGNPDConverter l = new L3ToSBGNPDConverter();
+						l.writeSBGN(model, new FileOutputStream("C.txt"));
+						
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				 
 			}
 			catch (FileNotFoundException e){
 				e.printStackTrace();
@@ -960,11 +1051,21 @@ public class MainMatrix extends PApplet {
 				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
 
-				// Search
+				
+				 // Search
 				Miner min = minerList.get(processingMiner);
 				Pattern p = min.getPattern();
 				Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
 				
+				
+				/*
+				for (List<Match> matchList : matches.values()){
+					for (Match match : matchList){
+						System.out.println(match);
+					}	
+				}
+				*/
+				 
 				try{
 					FileOutputStream os = new FileOutputStream(outFile);
 					min.writeResult(matches, os);

@@ -475,10 +475,10 @@ public abstract class MinerAdapter implements Miner
 		}
 		
 		// Remove to run faster
-		//if (this instanceof SIFMiner){
-		//	writeSIFsUsingSIFFramework(matches, out, directed);
-		//	return;
-		//}
+		if (this instanceof SIFMiner){
+			writeSIFsUsingSIFFramework(matches, out, directed);
+			return;
+		}
 		
 		
 		for (BioPAXElement ele : matches.keySet())	{
@@ -487,7 +487,7 @@ public abstract class MinerAdapter implements Miner
 				String s2 = getIdentifier(m, label2);
 				
 				//if (main.MainMatrix.processingMiner==14)
-				//	System.out.println(m+" label1="+label1+" label2"+label2+" "+s1+" "+s2);
+				//	System.out.println(" 	label1="+label1+" label2="+label2+" "+s1+" "+s2);
 				
 				if (s1 != null && s2 != null){
 					String relation = s1 + "\t" + s2;
@@ -514,11 +514,11 @@ public abstract class MinerAdapter implements Miner
 
 		for (List<Match> matchList : matches.values()){
 			for (Match match : matchList){
-				System.out.println(match);
 				
 				SIFInteraction inter = this.createSIFInteraction(match, new IDFetcher(){
 					@Override
 					public String fetchID(BioPAXElement ele){
+						//System.out.println("     ele="+ele);
 						if (ele instanceof SmallMoleculeReference){
 							SmallMoleculeReference smr = (SmallMoleculeReference) ele;
 							if (smr.getDisplayName() != null) return smr.getDisplayName();
@@ -541,6 +541,7 @@ public abstract class MinerAdapter implements Miner
 											String symbol = HGNC.getSymbol(id);
 											if (symbol != null && !symbol.isEmpty())
 											{
+											//	System.out.println("     symbol="+symbol);
 												return symbol;
 											}
 										}
