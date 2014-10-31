@@ -46,6 +46,7 @@ import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level3.Protein;
+import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
 import org.biopax.paxtools.model.level3.XReferrable;
 import org.biopax.paxtools.model.level3.Xref;
@@ -178,10 +179,11 @@ public class MainMatrix extends PApplet {
 	public static boolean isAllowedDrawing = false;
 	public static int  ccc = 0; // count to draw progessing bar
 	
-	
-	
 	public PFont metaBold = loadFont("Arial-BoldMT-18.vlw");
 	
+	
+	// New to read data 
+	public static  Map<String,String> mapElement ;
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { MainMatrix.class.getName() });
@@ -938,10 +940,14 @@ public class MainMatrix extends PApplet {
 		
 		
 		public String fetchID(BioPAXElement ele){
-			System.out.println("     ele="+ele);
+		//	if (ele!=null)
+		//		System.out.println("     ele="+ele.toString()+"   "+ele.getRDFId()+"   "+ele.getAnnotations() );
 			if (ele instanceof SmallMoleculeReference){
 				SmallMoleculeReference smr = (SmallMoleculeReference) ele;
-				if (smr.getDisplayName() != null) return smr.getDisplayName();
+				if (smr.getDisplayName() != null) {
+				//	System.out.println("		SmallMoleculeReference = "+smr.getDisplayName());
+					return smr.getDisplayName();
+				}
 				else if (!smr.getName().isEmpty())
 					return smr.getName().iterator().next();
 				else return null;
@@ -959,10 +965,8 @@ public class MainMatrix extends PApplet {
 							if (id != null)
 							{
 								String symbol = HGNC.getSymbol(id);
-								if (symbol != null && !symbol.isEmpty())
-								{
-									System.out.println("     symbol="+symbol);
-									
+								//System.out.println("	symbol = "+symbol);
+								if (symbol != null && !symbol.isEmpty()){
 									return symbol;
 								}
 							}
@@ -973,6 +977,9 @@ public class MainMatrix extends PApplet {
 			return null;
 		}
 		
+		
+		
+			
 		
 		@SuppressWarnings("unchecked")
 		public void run() {
@@ -1000,52 +1007,87 @@ public class MainMatrix extends PApplet {
 			Model model;
 			try{
 				model = io.convertFromOWL(new FileInputStream(modFile));
+				mapElement = new HashMap<String,String>();
 				
+				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 int i2=0;
+				 for (Protein currentProtein : proteinSet){
+					 if (currentProtein.getEntityReference()==null) continue;
+					 mapElement.put(currentProtein.getEntityReference().toString(), currentProtein.getStandardName());
+				//	 System.out.println(i2+"	"+currentProtein.getEntityReference().toString()+"	getStandardName ="+ currentProtein.getStandardName());
+					 i2++;
+				 }
+				 
+				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
+				 i2=0;
+				 for (SmallMolecule currentMolecule : smallMoleculeSet){
+					 if (currentMolecule.getEntityReference()==null) continue;
+					 mapElement.put(currentMolecule.getEntityReference().toString(), currentMolecule.getStandardName());
+				//	  System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
+					 i2++;
+				 }
 				
+				 i2=0;
+				 for (Map.Entry<String, String> entry : mapElement.entrySet()){
+				     System.out.println(i2+ "	MAP entry="+entry.getKey() + "	value=" + entry.getValue());
+				     i2++;
+				 }
+				 
+				/*
 				// Iterate through all BioPAX Elements and print basic info
 				 Set<BioPAXElement> elementSet = model.getObjects();
 				 for (BioPAXElement currentElement : elementSet){
 					  String rdfId = currentElement.getRDFId();
 					  String className = currentElement.getClass().getName();
-					  System.out.println("Element: " + rdfId + ": " + className);
+					  BioPAXElement element2 = model.getByID(rdfId);////fetchID(currentElement);
+					  if (element2!=null)
+					    System.out.println("Element=" + rdfId + "	className=" + className+"	fetchID="+element2);
+					 //  else
+					//	System.out.println("*****Element: " + rdfId + ": " + className+" fetchID="+element2);
+						
 				 } 
-
-				 
 				 // Get Proteins Only
-				/*
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
-				 for (Protein currentProtein : proteinSet)
-				 {
-					 System.out.println(currentProtein.getName() +
+				 int i2=0;
+				 for (Protein currentProtein : proteinSet){
+					 System.out.println(i2+"	"+currentProtein.toString()+"	Proteins ="+currentProtein.getName() +
 					  ": " + currentProtein.getDisplayName());
-				 
+					 i2++;
 				 }
-					*/
+				 /////
 				 SimpleInteractionConverter converter =
 					 new SimpleInteractionConverter(new ControlRule());
 					 try {
 						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
-						
-						FileOutputStream out = new FileOutputStream("B.txt");
-						converter.writeInteractionsInSIFNX(model,
-							     out, out, Arrays.asList("Entity/name","Entity/xref"),
-							    Arrays.asList("Entity/xref:PublicationXref"), true);
-						
-						L3ToSBGNPDConverter l = new L3ToSBGNPDConverter();
-						l.writeSBGN(model, new FileOutputStream("C.txt"));
-						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				 
+				String[] lines = p.loadStrings("A.txt");
+				for (int i=0;i<lines.length;i++){
+					String[] p  = lines[i].split("\t");
+ 					BioPAXElement element1 = model.getByID(p[0]);
+ 					BioPAXElement element2 = model.getByID(p[2]);
+ 					if (lines[i].contains("http://www.pantherdb.or")){
+ 						System.out.println();
+ 						System.out.println(i+"	"+lines[i]);
+ 					String id1 = fetchID(element1);
+ 					String id2 = fetchID(element2);
+ 					
+ 				//	if (id1!=null)
+ 						System.out.println("	ID1="+element1+"	fetchID1="+id1);
+ 				//	if (id2!=null)
+ 	 					System.out.println("	ID2="+element2+"	fetchID2="+id2);
+ 					}
+ 					
+				}
+				*/
 			}
 			catch (FileNotFoundException e){
 				e.printStackTrace();
 				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
 				return;
 			}
-
 			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
 				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
@@ -1057,21 +1099,29 @@ public class MainMatrix extends PApplet {
 				Pattern p = min.getPattern();
 				Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
 				
-				
-				/*
 				for (List<Match> matchList : matches.values()){
 					for (Match match : matchList){
-						System.out.println(match);
+						
+						String s1 = mapElement.get(match.getFirst().toString());
+						String s2 = mapElement.get(match.getLast().toString());
+						
+				//		System.out.println(match);
+				//		System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+mapElement.get(match.getFirst().toString()));
+				//		System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+mapElement.get(match.getLast().toString()));
+						if (s1!=null && s2!=null)
+							org.biopax.paxtools.pattern.miner.MinerAdapter.storeData(s1+"\t"+s2, s1, s2);
+						else{
+							
+						}
 					}	
 				}
-				*/
 				 
 				try{
 					FileOutputStream os = new FileOutputStream(outFile);
 					min.writeResult(matches, os);
 					
 					os.close();
-				}
+ 				}
 				catch (IOException e){
 					e.printStackTrace();
 					return;
@@ -1080,8 +1130,6 @@ public class MainMatrix extends PApplet {
 			}
 			System.out.println();
 		
-			
-			
 			vennOverview.initialize();
 			
 			// Compute the summary for each Gene
@@ -1090,24 +1138,13 @@ public class MainMatrix extends PApplet {
 			Gene.computeGeneRalationList();
 			//write();
 			
-			
 			stateAnimation=0;
 			isAllowedDrawing =  true;
 			
 	//		vennOverview.compute();
-			
-			
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
 			PopupGroup.s = 0;
-			
-			/*
-			 System.out.println("BRCA1 NBN= "+Gene.computeDis(0,1));
-			 System.out.println("ADP ATM= "+Gene.computeDis(6,3));
-			int index =  Gene.getSimilarGene(0, new ArrayList<Integer>());
-			if (index>=0)
-				System.out.println("Most similar to BRA1= "+ggg.get(index).name+"	dis="+Gene.computeDis(0,2));
-			*/
 		}
 	}
 	

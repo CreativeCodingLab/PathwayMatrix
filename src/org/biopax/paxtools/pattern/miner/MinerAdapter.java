@@ -473,6 +473,7 @@ public abstract class MinerAdapter implements Miner
 		if (matches.isEmpty()) {
 			return;
 		}
+		/*
 		
 		// Remove to run faster
 		if (this instanceof SIFMiner){
@@ -487,7 +488,7 @@ public abstract class MinerAdapter implements Miner
 				String s2 = getIdentifier(m, label2);
 				
 				//if (main.MainMatrix.processingMiner==14)
-				//	System.out.println(" 	label1="+label1+" label2="+label2+" "+s1+" "+s2);
+					System.out.println(" 	label1="+label1+" label2="+label2+" "+s1+" "+s2);
 				
 				if (s1 != null && s2 != null){
 					String relation = s1 + "\t" + s2;
@@ -498,7 +499,7 @@ public abstract class MinerAdapter implements Miner
 						storeData(reverse, s2, s1);
 				}
 			}
-		}
+		}*/
 	}
 
 	/**
