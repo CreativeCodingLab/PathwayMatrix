@@ -45,6 +45,9 @@ import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
 import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level2.biochemicalReaction;
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
+import org.biopax.paxtools.model.level3.EntityReference;
 import org.biopax.paxtools.model.level3.Protein;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
@@ -183,7 +186,9 @@ public class MainMatrix extends PApplet {
 	
 	
 	// New to read data 
-	public static  Map<String,String> mapElement ;
+	public static  Map<String,String> mapElementRef;
+	public static  Map<String,String> mapElementGenericRef;
+	public static  Map<String,String> mapElementRDFId;
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { MainMatrix.class.getName() });
@@ -251,12 +256,13 @@ public class MainMatrix extends PApplet {
 		//minerList.add(new CSCOBothControllerAndParticipantMiner());
 		//minerList.add(new CSCOThroughControllingSmallMoleculeMiner());
 		//minerList.add(new CSCOThroughBindingSmallMoleculeMiner());
+		//minerList.add(new CSCOThroughDegradationMiner());
 		//minerList.add(new ControlsStateChangeDetailedMiner());
 		//minerList.add(new ControlsPhosphorylationMiner());
+		
 		minerList.add(new ControlsTransportMiner());
 		minerList.add(new ControlsExpressionMiner());
 		minerList.add(new ControlsExpressionWithConvMiner());
-		minerList.add(new CSCOThroughDegradationMiner());
 		minerList.add(new ControlsDegradationIndirectMiner());
 		minerList.add(new ConsumptionControlledByMiner());
 		minerList.add(new ControlsProductionOfMiner());
@@ -269,8 +275,8 @@ public class MainMatrix extends PApplet {
 		minerList.add(new NeighborOfMiner());
 		minerList.add(new ReactsWithMiner());
 		minerList.add(new UsedToProduceMiner());
-		minerList.add(new RelatedGenesOfInteractionsMiner());
-		minerList.add(new UbiquitousIDMiner());
+		//minerList.add(new RelatedGenesOfInteractionsMiner()); Genes related to Biochemical reactions which involves multiple proteins/complex input and output
+		//minerList.add(new UbiquitousIDMiner());
 	
 		colorRelations =  new int[minerList.size()];
 		for (int i=0; i<minerList.size();i++){
@@ -1007,29 +1013,68 @@ public class MainMatrix extends PApplet {
 			Model model;
 			try{
 				model = io.convertFromOWL(new FileInputStream(modFile));
-				mapElement = new HashMap<String,String>();
+				mapElementRef = new HashMap<String,String>();
+				mapElementGenericRef = new HashMap<String,String>();
+				mapElementRDFId = new HashMap<String,String>();
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
 				 int i2=0;
 				 for (Protein currentProtein : proteinSet){
 					 if (currentProtein.getEntityReference()==null) continue;
-					 mapElement.put(currentProtein.getEntityReference().toString(), currentProtein.getStandardName());
-				//	 System.out.println(i2+"	"+currentProtein.getEntityReference().toString()+"	getStandardName ="+ currentProtein.getStandardName());
+					 Object[] s =   currentProtein.getGenericEntityReferences().toArray();
+					 for (int i=0;i<s.length;i++){
+						 mapElementGenericRef.put(s[i].toString(), currentProtein.getDisplayName());
+					 }
+					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					// System.out.println(i2+"	"+currentProtein.getEntityReference().toString()+"	getStandardName ="+ currentProtein.getStandardName());
+					// System.out.println("			getRDFId ="+ currentProtein.getRDFId());
+					// System.out.println("			getGenericEntityReferences ="+ currentProtein.getGenericEntityReferences());
+								
 					 i2++;
 				 }
-				 
+				
+				 //Set<BiochemicalReaction> smallMoleculeSet = model.getObjects(BiochemicalReaction.class);
+					
 				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
 				 i2=0;
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
 					 if (currentMolecule.getEntityReference()==null) continue;
-					 mapElement.put(currentMolecule.getEntityReference().toString(), currentMolecule.getStandardName());
-				//	  System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
+					 Object[] s =   currentMolecule.getGenericEntityReferences().toArray();
+					 for (int i=0;i<s.length;i++){
+						 mapElementGenericRef.put(s[i].toString(), currentMolecule.getDisplayName());
+					 }
+					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
+					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
 					 i2++;
 				 }
-				
+				 
+				 /*
+				 Set<BiochemicalReaction> biochemicalReactionSet = model.getObjects(BiochemicalReaction.class);
 				 i2=0;
-				 for (Map.Entry<String, String> entry : mapElement.entrySet()){
-				     System.out.println(i2+ "	MAP entry="+entry.getKey() + "	value=" + entry.getValue());
+				 for (BiochemicalReaction current : biochemicalReactionSet){
+					 //if (currentMolecule.getEntityReference()==null) continue;
+					 //mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getStandardName());
+					 //mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getStandardName());
+					  System.out.println(i2+"	getLeft() = "+current.getLeft()+"	getRight ="+ current.getRight());
+					 i2++;
+				 }*/
+				
+				 
+				 i2=0;
+				 for (Map.Entry<String, String> entry : mapElementGenericRef.entrySet()){
+				     System.out.println(i2+ "	mapElementGenericRef="+entry.getKey() + "	value=" + entry.getValue());
+				     i2++;
+				 }
+				 i2=0;
+				 for (Map.Entry<String, String> entry : mapElementRef.entrySet()){
+				     System.out.println(i2+ "	MAPRef entry="+entry.getKey() + "	value=" + entry.getValue());
+				     i2++;
+				 }
+				 i2=0;
+				 for (Map.Entry<String, String> entry : mapElementRDFId.entrySet()){
+				     System.out.println(i2+ "	mapElementRDFId entry="+entry.getKey() + "	value=" + entry.getValue());
 				     i2++;
 				 }
 				 
@@ -1102,16 +1147,35 @@ public class MainMatrix extends PApplet {
 				for (List<Match> matchList : matches.values()){
 					for (Match match : matchList){
 						
-						String s1 = mapElement.get(match.getFirst().toString());
-						String s2 = mapElement.get(match.getLast().toString());
+						String s1 = mapElementGenericRef.get(match.getFirst().toString());
+						if (s1==null)
+							s1 = mapElementRef.get(match.getFirst().toString());
+						if (s1==null)
+							s1 = mapElementRDFId.get(match.getFirst().toString());
 						
-				//		System.out.println(match);
-				//		System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+mapElement.get(match.getFirst().toString()));
-				//		System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+mapElement.get(match.getLast().toString()));
+						String s2 = mapElementGenericRef.get(match.getLast().toString());
+						if (s2==null)
+							s2 = mapElementRef.get(match.getLast().toString());
+						if (s2==null)
+							s2 = mapElementRDFId.get(match.getLast().toString());
+						
+						if (processingMiner==0){
+							//System.out.println(match);
+							//System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+mapElement.get(match.getFirst().toString()));
+							//System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+mapElement.get(match.getLast().toString()));
+							//System.out.println();
+						}
 						if (s1!=null && s2!=null)
 							org.biopax.paxtools.pattern.miner.MinerAdapter.storeData(s1+"\t"+s2, s1, s2);
 						else{
-							
+						/*	System.out.println();
+							System.out.println("	NULLLLLLLLL");
+							System.out.println(match);
+							System.out.println();
+							System.out.println(match);
+							System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+s1);
+							System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+s2);
+							*/
 						}
 					}	
 				}
