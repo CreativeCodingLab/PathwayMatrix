@@ -258,6 +258,36 @@ public class Gene {
 		}
 	}
 	
+	// Order by Complex
+	public static void orderByComplex(){	
+		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+		for (int i=0;i<ggg.size();i++){
+			unsortMap.put(ggg.get(i).name, ggg.get(i).order);
+		}
+		
+		Map<String, Integer> sortedMap = sortByComparator(unsortMap);
+		
+		
+		Map.Entry<String, Integer> firstEntry = null;
+		for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+			firstEntry = entry;
+			break;
+		}
+		int index1 = sortedMap.get(firstEntry.getKey());
+		int orderReading1 = index1;
+		
+		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
+		for (int i=0;i<ggg.size();i++){
+			ggg.get(index1).order=i;
+			processedGenes.add(orderReading1);
+			if (i==ggg.size()-1) break;
+			int similarIndex =  getSimilarGene(orderReading1,processedGenes);
+			index1 = similarIndex;
+			orderReading1 = index1;
+		}
+	}
+	
+	
 	public static int getSimilarGene(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
 		int minIndex = -1;
@@ -290,6 +320,8 @@ public class Gene {
 		return dis;
 	}
 	
+	
+	
 	public static float computeDisOfArrayList(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
 		if (a1==null && a2==null) return 0;
 		else if (a1==null) return a2.size();
@@ -305,6 +337,42 @@ public class Gene {
 		// main.MainViewer.popupOrder.slider.val=0    We consider total number of element;
 		// main.MainViewer.popupOrder.slider.val=2    We consider only the different;
 	}
+	
+	/*
+	public static float computeDisOfArrayListComplex(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
+		int inComplexMinerID = -1;
+		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
+			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
+			if (main.MainMatrix.minerList.get(globalMinerId).toString().contains("in-complex-with")){
+				inComplexMinerID = localMinerID;
+			}
+		}	
+		if (a1==null && a2==null) return 0;
+		else if (a1==null) {
+			if (a2.contains(inComplexMinerID))
+				return 1;
+			else 
+				return 0;
+			
+		}
+		else if (a2==null){
+			if (a1.contains(inComplexMinerID))
+				return 1;
+			else 
+				return 0;
+		}
+		else{
+			if (a1.contains(inComplexMinerID) && a2.contains(inComplexMinerID)){
+				System.out.println("aaaaaaaaaaa");
+				return -val;
+			}	
+			else if (!a1.contains(inComplexMinerID) && !a2.contains(inComplexMinerID))
+				return 0;
+			else
+				return 1;
+		}
+	}
+	*/
 	
 // ************************ grouping
 	// Group by similarity

@@ -15,7 +15,7 @@ public class PopupOrder{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"Random","Reading order", "Name", "Similarity"}; 
+	public static String[] items={"Random","Reading order", "Name", "Similarity", "Complex"}; 
 	public static int s=1;
 	public Slider slider;
 
@@ -89,6 +89,11 @@ public class PopupOrder{
 				Gene.orderByName();
 			}	
 			else if (items[s].equals("Similarity"))  {
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
+				Gene.orderBySimilarity();
+			}	
+			else if (items[s].equals("Complex"))  {
 				main.MainMatrix.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderBySimilarity();
