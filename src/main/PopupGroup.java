@@ -10,7 +10,7 @@ public class PopupGroup{
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
-	public int w1 = 120;
+	public int w1 = 100;
 	public int w = 300;
 	public int h;
 	public int itemH = 20;

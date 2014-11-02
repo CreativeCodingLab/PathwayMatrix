@@ -47,7 +47,9 @@ import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
 import org.biopax.paxtools.model.level2.biochemicalReaction;
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
+import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.EntityReference;
+import org.biopax.paxtools.model.level3.PhysicalEntity;
 import org.biopax.paxtools.model.level3.Protein;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 import org.biopax.paxtools.model.level3.SmallMoleculeReference;
@@ -163,6 +165,7 @@ public class MainMatrix extends PApplet {
 	public int bX,bY;
 	
 	// Order genes
+	public static PopupComplex popupComplex;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
 	public static PopupGroup popupGroup;
@@ -189,6 +192,8 @@ public class MainMatrix extends PApplet {
 	public static  Map<String,String> mapElementRef;
 	public static  Map<String,String> mapElementGenericRef;
 	public static  Map<String,String> mapElementRDFId;
+	public static  Map<String,String> mapPhysicalEntity;
+	public static Set<Complex> complexSet; 
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { MainMatrix.class.getName() });
@@ -308,6 +313,7 @@ public class MainMatrix extends PApplet {
 		
 		button = new Button(this);
 		popupRelation = new PopupRelation(this);
+		popupComplex = new PopupComplex(this);
 		popupOrder  = new PopupOrder(this);
 		popupGroup  = new PopupGroup(this);
 		check1 = new CheckBox(this, "Lensing");
@@ -386,7 +392,7 @@ public class MainMatrix extends PApplet {
 		float y2 = 140;
 		this.fill(0);
 		this.textAlign(PApplet.LEFT);
-		this.textSize(14);
+		this.textSize(13);
 		this.text("File: "+currentFile, x2, y2);
 		// find minerID index
 		if (Venn_Overview.minerGlobalIDof!=null){
@@ -409,13 +415,14 @@ public class MainMatrix extends PApplet {
 		//vennDetail.draw(x2+100,500,10);
 		
 		// Draw button
+		this.textSize(13);
 		check1.draw(this.width-600, 7);
 		check2.draw(this.width-600, 27);
 		button.draw();
-		popupGroup.draw(this.width-258);
-		popupOrder.draw(this.width-379);
-		popupRelation.draw(this.width-500);
-		
+		popupGroup.draw(this.width-100);
+		popupOrder.draw(this.width-202);
+		popupRelation.draw(this.width-304);
+		popupComplex.draw(this.width-406);
 	}	
 	
 	public void drawGroups() {
@@ -872,6 +879,9 @@ public class MainMatrix extends PApplet {
 		else if (popupRelation.b>=0){
 			popupRelation.mouseClicked();
 		}
+		else if (popupComplex.b>=0){
+			popupComplex.mouseClicked();
+		}
 		else if (popupOrder.b>=0){
 			popupOrder.mouseClicked();
 		}
@@ -1033,8 +1043,6 @@ public class MainMatrix extends PApplet {
 								
 					 i2++;
 				 }
-				
-				 //Set<BiochemicalReaction> smallMoleculeSet = model.getObjects(BiochemicalReaction.class);
 					
 				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
 				 i2=0;
@@ -1050,15 +1058,61 @@ public class MainMatrix extends PApplet {
 					 i2++;
 				 }
 				 
+				 
+				 /*
+				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
+				 i2=0;
+				 for (PhysicalEntity current : physicalEntitySet){
+					// Object[] s =   current.getRDFId().toArray();
+					 
+					 System.out.println(i2+" PhysicalEntity() = "+current.getDisplayName());
+					  
+					 System.out.println("	PhysicalEntity() = "+current.getRDFId()+"	PhysicalEntity ="+ current.getComment());
+					 i2++;
+				 }*/
+				 
 				 /*
 				 Set<BiochemicalReaction> biochemicalReactionSet = model.getObjects(BiochemicalReaction.class);
 				 i2=0;
 				 for (BiochemicalReaction current : biochemicalReactionSet){
-					 //if (currentMolecule.getEntityReference()==null) continue;
-					 //mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getStandardName());
-					 //mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getStandardName());
-					  System.out.println(i2+"	getLeft() = "+current.getLeft()+"	getRight ="+ current.getRight());
+					  System.out.println(i2+" getDisplayName() = "+current.getDisplayName());
+					  Object[] s = current.getLeft().toArray();
+					  for (int i=0;i<s.length;i++){
+						  System.out.println("***** Left="+getProteinName(s[i].toString()));
+					  }
+
+					  Object[] s2 = current.getRight().toArray();
+					  for (int i=0;i<s2.length;i++){
+						  System.out.println("***** Right="+getProteinName(s2[i].toString()));
+					  }
+							
+					 System.out.println("	getLeft() = "+current.getLeft()+"	getRight ="+ current.getRight());
 					 i2++;
+				 }*/
+				 
+				 complexSet = model.getObjects(Complex.class);
+				 i2=0;
+				 for (Complex current : complexSet){
+					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
+					 
+					  Object[] s2 = current.getComponent().toArray();
+					  for (int i=0;i<s2.length;i++){
+						  if (getProteinName(s2[i].toString())!=null)
+							  System.out.println(" ***** = "+getProteinName(s2[i].toString()));
+						  else
+							  System.out.println(" ****2 = "+s2[i].toString());
+					 }
+							
+					 i2++;
+				 }
+				 
+				 /*
+				 Set<BiochemicalReaction> biochemicalReactionSet = model.getObjects(BiochemicalReaction.class);
+				 i2=0;
+				 for (BiochemicalReaction current : biochemicalReactionSet){
+					  System.out.println(i2+" getDisplayName() = "+current.getDisplayName());
+					 System.out.println("	getLeft() = "+current.getLeft()+"	getRight ="+ current.getRight());
+					 i2++; 
 				 }*/
 				
 				 
@@ -1078,28 +1132,8 @@ public class MainMatrix extends PApplet {
 				     i2++;
 				 }
 				 
-				/*
+				/* SIF
 				// Iterate through all BioPAX Elements and print basic info
-				 Set<BioPAXElement> elementSet = model.getObjects();
-				 for (BioPAXElement currentElement : elementSet){
-					  String rdfId = currentElement.getRDFId();
-					  String className = currentElement.getClass().getName();
-					  BioPAXElement element2 = model.getByID(rdfId);////fetchID(currentElement);
-					  if (element2!=null)
-					    System.out.println("Element=" + rdfId + "	className=" + className+"	fetchID="+element2);
-					 //  else
-					//	System.out.println("*****Element: " + rdfId + ": " + className+" fetchID="+element2);
-						
-				 } 
-				 // Get Proteins Only
-				 Set<Protein> proteinSet = model.getObjects(Protein.class);
-				 int i2=0;
-				 for (Protein currentProtein : proteinSet){
-					 System.out.println(i2+"	"+currentProtein.toString()+"	Proteins ="+currentProtein.getName() +
-					  ": " + currentProtein.getDisplayName());
-					 i2++;
-				 }
-				 /////
 				 SimpleInteractionConverter converter =
 					 new SimpleInteractionConverter(new ControlRule());
 					 try {
@@ -1119,13 +1153,7 @@ public class MainMatrix extends PApplet {
  					String id1 = fetchID(element1);
  					String id2 = fetchID(element2);
  					
- 				//	if (id1!=null)
- 						System.out.println("	ID1="+element1+"	fetchID1="+id1);
- 				//	if (id2!=null)
- 	 					System.out.println("	ID2="+element2+"	fetchID2="+id2);
  					}
- 					
-				}
 				*/
 			}
 			catch (FileNotFoundException e){
@@ -1138,7 +1166,6 @@ public class MainMatrix extends PApplet {
 				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
 
-				
 				 // Search
 				Miner min = minerList.get(processingMiner);
 				Pattern p = min.getPattern();
@@ -1146,36 +1173,20 @@ public class MainMatrix extends PApplet {
 				
 				for (List<Match> matchList : matches.values()){
 					for (Match match : matchList){
+						String s1 = getProteinName(match.getFirst().toString());
+						String s2 = getProteinName(match.getLast().toString());
 						
-						String s1 = mapElementGenericRef.get(match.getFirst().toString());
-						if (s1==null)
-							s1 = mapElementRef.get(match.getFirst().toString());
-						if (s1==null)
-							s1 = mapElementRDFId.get(match.getFirst().toString());
-						
-						String s2 = mapElementGenericRef.get(match.getLast().toString());
-						if (s2==null)
-							s2 = mapElementRef.get(match.getLast().toString());
-						if (s2==null)
-							s2 = mapElementRDFId.get(match.getLast().toString());
-						
-						if (processingMiner==0){
-							//System.out.println(match);
-							//System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+mapElement.get(match.getFirst().toString()));
-							//System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+mapElement.get(match.getLast().toString()));
-							//System.out.println();
-						}
 						if (s1!=null && s2!=null)
 							org.biopax.paxtools.pattern.miner.MinerAdapter.storeData(s1+"\t"+s2, s1, s2);
 						else{
-						/*	System.out.println();
+							System.out.println();
 							System.out.println("	NULLLLLLLLL");
 							System.out.println(match);
 							System.out.println();
 							System.out.println(match);
 							System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+s1);
 							System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+s2);
-							*/
+							
 						}
 					}	
 				}
@@ -1212,7 +1223,15 @@ public class MainMatrix extends PApplet {
 		}
 	}
 	
-	
+	public String getProteinName(String name){	
+		String s1 = mapElementGenericRef.get(name);
+		if (s1==null)
+			s1 = mapElementRef.get(name);
+		if (s1==null)
+			s1 = mapElementRDFId.get(name);
+		return s1;
+	}
+		
 	
 	//Update genes for drawing
 	public void write(){	
