@@ -571,39 +571,15 @@ public abstract class MinerAdapter implements Miner
 			//System.out.println(" inter.toString()="+ inter.toString());
 			
 			String[] s  = inter.toString().split("\t");
-			storeData(s[0]+"\t"+s[2], s[0], s[2]);
+		//	storeData(s[0]+"\t"+s[2], s[0], s[2]);
 			
-			if (!directed)
-				storeData(s[2]+"\t"+s[0], s[2], s[0]);
+		//	if (!directed)
+		//		storeData(s[2]+"\t"+s[0], s[2], s[0]);
 			
 		}
 	}
 	
-	public static void storeData(String rel, String gene1, String gene2){
-		// Store results for visualization
-		
-		if (!main.MainMatrix.pairs[main.MainMatrix.processingMiner].contains(rel)){
-			main.MainMatrix.pairs[main.MainMatrix.processingMiner].add(rel);
-		}	
-		if (!main.MainMatrix.genes[main.MainMatrix.processingMiner].contains(gene1)){
-			main.MainMatrix.genes[main.MainMatrix.processingMiner].add(gene1);
-		}
-		if (!main.MainMatrix.genes[main.MainMatrix.processingMiner].contains(gene2)){
-			main.MainMatrix.genes[main.MainMatrix.processingMiner].add(gene2);
-		}
-		
-		// Global data 
-		if (!main.MainMatrix.allGenes.contains(gene1)){
-			main.MainMatrix.allGenes.add(gene1);
-			main.MainMatrix.ggg.add(new Gene(gene1,main.MainMatrix.ggg.size()));
-		}
-		if (!main.MainMatrix.allGenes.contains(gene2)){
-			main.MainMatrix.allGenes.add(gene2);
-			main.MainMatrix.ggg.add(new Gene(gene2, main.MainMatrix.ggg.size()));
-		}
-		
-			
-	}
+	
 			
 			
 	
@@ -699,7 +675,7 @@ public abstract class MinerAdapter implements Miner
 
 				
 				String[] s  = line.split("\t");
-				storeData(s[0]+"\t"+s[2], s[0], s[2]);
+				//storeData(s[0]+"\t"+s[2], s[0], s[2]);
 				
 				boolean directed =  false;
 				if (this.getName().equals("controls-state-change-detailed"))
@@ -707,8 +683,8 @@ public abstract class MinerAdapter implements Miner
 				if (this.getName().equals("ubiquitous-molecule-lister"))
 					directed = false;
 					
-				if (!directed)
-					storeData(s[2]+"\t"+s[0], s[2], s[0]);
+				//if (!directed)
+				//	storeData(s[2]+"\t"+s[0], s[2], s[0]);
 				
 				
 				if (!mem.contains(line))

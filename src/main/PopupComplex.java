@@ -15,7 +15,7 @@ public class PopupComplex{
 	public int h = 28;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static int s;
+	public static int s=-1;
 	public static int orderByRelation = -1;
 	
 	public PopupComplex(PApplet parent_){
@@ -39,11 +39,12 @@ public class PopupComplex{
 					max = sqrt;
 			}
 			int i=0;
+			parent.textSize(12);
 			for (Complex current : main.MainMatrix.complexSet){
 				//int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
-				if (s>=0){
+				if (i==s){
 					parent.noStroke();
-					parent.fill(0);
+					parent.fill(100);
 					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
 				
 					parent.fill(255);
@@ -56,10 +57,10 @@ public class PopupComplex{
 				}
 				parent.textAlign(PApplet.LEFT);
 				parent.text(current.getDisplayName(),x+50,y+itemH*(i+1));
-				float r = PApplet.map(PApplet.sqrt(current.getComponent().size()), 0, max, 0, 22);
+				float r = PApplet.map(PApplet.sqrt(current.getComponent().size()), 0, max, 0, 20);
 				
 				parent.noStroke();
-				parent.fill(main.MainMatrix.colorRelations[i]);
+				parent.fill(100,200,0);
 				parent.ellipse(x+30,y+itemH*(i)+15, r, r);
 			
 				// Order By drawing
@@ -71,32 +72,6 @@ public class PopupComplex{
 				}
 				i++;
 			}	
-			
-			/*
-			float y=600;
-			parent.fill(0);
-			parent.textSize(18);
-			parent.text("Color legend:",x+50,y);
-			y +=8;
-			for (int i=0;i<items.length;i++){
-				if (main.MainViewer.pairs[i].size()==0) continue;
-				y +=itemH+4;
-				
-				int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
-				if (s[i]){
-					parent.noStroke();
-					parent.fill(0);
-					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-				
-					parent.fill(edu.uic.ncdm.venn.Venn_Overview.getMinerColor(index).getRGB());
-				}
-				
-				parent.fill(edu.uic.ncdm.venn.Venn_Overview.getMinerColor(index).getRGB());
-				
-				parent.textAlign(PApplet.LEFT);
-				parent.text(items[i],x+50,y);
-			}
-			*/	
 		}
 		else{
 			parent.fill(125,125,125);
