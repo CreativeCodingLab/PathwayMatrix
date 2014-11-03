@@ -1,11 +1,11 @@
 package main;
 import java.awt.Color;
 
-import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
 
 import processing.core.PApplet;
 
-public class PopupComplex{
+public class PopupReaction{
 	public static boolean sAll = false;
 	public static int b = -1000;
 	public PApplet parent;
@@ -20,9 +20,10 @@ public class PopupComplex{
 	public static int s=-100;
 	public static int orderByRelation = -100;
 	public static float maxSize = 0;
-	public static int[] sizes;
+	public static int[] sizeL;
+	public static int[] sizeR;
 	
-	public PopupComplex(PApplet parent_){
+	public PopupReaction(PApplet parent_){
 		parent = parent_;
 	}
 	
@@ -30,13 +31,16 @@ public class PopupComplex{
 		int i=0;
 		y2=20;
 		maxSize =0;
-		sizes = new int[main.MainMatrix.complexSet.size()];
+		sizeL = new int[main.MainMatrix.reactionSet.size()];
+		sizeR = new int[main.MainMatrix.reactionSet.size()];
 		s=-400;
-		for (Complex current : main.MainMatrix.complexSet){
-			int size = main.MainMatrix.getAllGenesInComplexById(i).size();
-			sizes[i] = size;
-			if (size>maxSize)
-				maxSize = size;
+		for (BiochemicalReaction current : main.MainMatrix.reactionSet){
+			sizeL[i] = current.getLeft().size();
+			sizeR[i] = current.getRight().size();
+			if (sizeL[i]>maxSize)
+				maxSize = sizeL[i];
+			if (sizeR[i]>maxSize)
+				maxSize = sizeR[i];
 			i++;
 		}
 		
@@ -50,13 +54,13 @@ public class PopupComplex{
 		parent.rect(x,y,w1,25);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
-		parent.text("Complex",x+w1/2,y+18);
+		parent.text("Reaction",x+w1/2,y+18);
 	
 		
 		if (b>=-1){
 			parent.fill(100);
 			parent.stroke(0);
-			h=main.MainMatrix.complexSet.size()*itemH+20;
+			h=main.MainMatrix.reactionSet.size()*itemH+20;
 			parent.rect(x, y2-itemH-4, w,h+itemH);
 			
 			int i=0;
@@ -76,10 +80,10 @@ public class PopupComplex{
 				parent.fill(0);
 			}
 			parent.textAlign(PApplet.LEFT);
-			parent.text("All complexes",x+50,y2-1);
+			parent.text("All Biochemical Reaction",x+50,y2-1);
 			
 			parent.textSize(12);
-			for (Complex current : main.MainMatrix.complexSet){
+			for (BiochemicalReaction current : main.MainMatrix.reactionSet){
 				//int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
 				if (i==s){
 					parent.noStroke();
@@ -96,20 +100,15 @@ public class PopupComplex{
 				}
 				parent.textAlign(PApplet.LEFT);
 				parent.text(current.getDisplayName(),x+50,y2+itemH*(i+1));
-				float r = PApplet.map(PApplet.sqrt(sizes[i]), 0, PApplet.sqrt(maxSize), 0, 18);
+				float rL = PApplet.map(PApplet.sqrt(sizeL[i]), 0, PApplet.sqrt(maxSize), 0, 16);
+				float rR = PApplet.map(PApplet.sqrt(sizeR[i]), 0, PApplet.sqrt(maxSize), 0, 16);
 				
 				parent.noStroke();
-				if (i==s){
-					parent.fill(255,0,0);
-				}
-				else if (i==b){
-					parent.fill(255);
-				}
-				else{
-					parent.fill(0);
-				}
-				parent.ellipse(x+30,y2+itemH*(i)+13, r, r);
-			
+				parent.fill(200,0,0);
+				parent.ellipse(x+22,y2+itemH*(i)+13, rL, rL);
+				parent.fill(0,200,0);
+				parent.ellipse(x+36,y2+itemH*(i)+13, rR, rR);
+				
 				// Order By drawing
 				if (i==orderByRelation){
 					parent.fill(255);
@@ -142,7 +141,7 @@ public class PopupComplex{
 	}
 	 
 	public void checkBrushing() {
-		if (main.MainMatrix.complexSet==null) return;
+		if (main.MainMatrix.reactionSet==null) return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		if (b==-100){
@@ -152,7 +151,7 @@ public class PopupComplex{
 			}	
 		}
 		else{
-			for (int i=0; i<main.MainMatrix.complexSet.size(); i++){
+			for (int i=0; i<main.MainMatrix.reactionSet.size(); i++){
 				if (x<=mX && mX<=x+w && y2-itemH-5<=mY && mY<=y2+4){
 					b =-1;
 					return;
