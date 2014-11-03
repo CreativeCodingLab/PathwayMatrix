@@ -6,7 +6,8 @@ import org.biopax.paxtools.model.level3.Complex;
 import processing.core.PApplet;
 
 public class PopupComplex{
-	public static int b = -1;
+	public static boolean sAll = false;
+	public static int b = -1000;
 	public PApplet parent;
 	public float x = 800;
 	public static int y = 0;
@@ -16,8 +17,8 @@ public class PopupComplex{
 	public int h = 28;
 	public int itemH = 18;
 	public Color cGray  = new Color(240,240,240);
-	public static int s=-1;
-	public static int orderByRelation = -1;
+	public static int s=-100;
+	public static int orderByRelation = -100;
 	public static float maxSize = 0;
 	public static int[] sizes;
 	
@@ -27,9 +28,10 @@ public class PopupComplex{
 	
 	public void setItems(){
 		int i=0;
-		y2=0;
+		y2=20;
 		maxSize =0;
 		sizes = new int[main.MainMatrix.complexSet.size()];
+		s=-400;
 		for (Complex current : main.MainMatrix.complexSet){
 			int size = main.MainMatrix.getAllGenesInComplexById(i).size();
 			sizes[i] = size;
@@ -51,13 +53,31 @@ public class PopupComplex{
 		parent.text("Complex",x+w1/2,y+18);
 	
 		
-		if (b>=0){
+		if (b>=-1){
 			parent.fill(100);
 			parent.stroke(0);
 			h=main.MainMatrix.complexSet.size()*itemH+20;
-			parent.rect(x, y2-2, w,h);
+			parent.rect(x, y2-itemH-4, w,h+itemH);
 			
 			int i=0;
+			parent.textSize(13);
+			
+			// Draw another button
+			if (sAll){
+				parent.noStroke();
+				parent.fill(0);
+				parent.rect(x+10,y2-itemH+3,w-25,itemH);
+				parent.fill(180);
+			}
+			else if (b==-1){
+				parent.fill(255);
+			}
+			else{
+				parent.fill(0);
+			}
+			parent.textAlign(PApplet.LEFT);
+			parent.text("All complexes",x+50,y2-1);
+			
 			parent.textSize(12);
 			for (Complex current : main.MainMatrix.complexSet){
 				//int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
@@ -108,14 +128,23 @@ public class PopupComplex{
 			orderByRelation=b;
 			Gene.orderByRelation(orderByRelation);
 		}
-		s = b;
-	 	
+		
+		if (b==-1){
+			sAll = !sAll;
+		}
+		else{
+			if (b!=s)
+				s = b;
+			else
+				s =-200;
+		}
+		
 	}
 	 
 	public void checkBrushing() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (b==-1){
+		if (b==-100){
 			if (x<mX && mX<x+w1 && y<=mY && mY<=itemH+5){
 				b =100;
 				return;
@@ -123,13 +152,17 @@ public class PopupComplex{
 		}
 		else{
 			for (int i=0; i<main.MainMatrix.complexSet.size(); i++){
+				if (x<=mX && mX<=x+w && y2-itemH-5<=mY && mY<=y2+4){
+					b =-1;
+					return;
+				}
 				if (x<=mX && mX<=x+w && y2+itemH*i<=mY && mY<=y2+itemH*(i+1)+6){
 					b =i;
 					return;
 				}	
 			}
 		}
-		b =-1;
+		b =-100;
 	}
 	
 }

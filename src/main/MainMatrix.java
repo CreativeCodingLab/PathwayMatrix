@@ -820,49 +820,34 @@ public class MainMatrix extends PApplet {
 		
 		
 		// All complexes
-		for (int i=0;i<ggg.size();i++){
-			// Check if this is grouping
-			float xx =  ggg.get(i).iX.value;
-			float ww = ggg.get(i).iW.value;
-			for (int j=0;j<ggg.size();j++){
-				float yy =  ggg.get(j).iY.value;
-				float hh =ggg.get(j).iH.value;
-				
-				if (gene_gene_InComplex[i][j]>0){
-					float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
-					float sat = 50+sat2;
-					this.fill(0,sat);
-					this.noStroke();
-					this.rect(xx, yy, ww, hh);
+		if (PopupComplex.sAll || PopupComplex.b==-1){
+			for (int i=0;i<ggg.size();i++){
+				// Check if this is grouping
+				float xx =  ggg.get(i).iX.value;
+				float ww = ggg.get(i).iW.value;
+				for (int j=0;j<ggg.size();j++){
+					float yy =  ggg.get(j).iY.value;
+					float hh =ggg.get(j).iH.value;
+					
+					if (gene_gene_InComplex[i][j]>0){
+						float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
+						float sat = 50+sat2;
+						this.fill(0,sat);
+						this.noStroke();
+						this.rect(xx, yy, ww, hh);
+					}
 				}
-			}
-		}	
+			}	
+		}
 		
-		
-		// Complex
+		// brushingComplex &&&&&& selectedComplex
+		int brushingComplex = PopupComplex.b;
+		if (brushingComplex>=0){
+			drawComplex(brushingComplex,200,100,0);
+		}
 		int selectedComplex = PopupComplex.s;
 		if (selectedComplex>=0){
-			ArrayList<String> a = getAllGenesInComplexById(selectedComplex);
-			for (int i=0;i<a.size();i++){
-				if (gggHash.get(a.get(i))==null)  // Exception *******************************
-					continue;
-				int indexI = gggHash.get(a.get(i));
-				float xx =  ggg.get(indexI).iX.value;
-				float ww = ggg.get(indexI).iW.value;
-				for (int j=0;j<a.size();j++){
-					if (gggHash.get(a.get(j))==null) // Exception *******************************
-						continue;
-					
-					int indexJ = gggHash.get(a.get(j));
-					float yy =  ggg.get(indexJ).iY.value;
-					float hh =ggg.get(indexJ).iH.value;
-						
-					this.fill(255,0,0,200);
-					this.noStroke();
-					this.rect(xx, yy, ww, hh);
-				
-				}
-			}
+			drawComplex(selectedComplex,255,0,0);
 		}
 		
 		
@@ -888,6 +873,30 @@ public class MainMatrix extends PApplet {
 			}
 		}
 	}	
+	public void drawComplex(int complex, int r, int g, int b) {
+		ArrayList<String> a = getAllGenesInComplexById(complex);
+		for (int i=0;i<a.size();i++){
+			if (gggHash.get(a.get(i))==null)  // Exception *******************************
+				continue;
+			int indexI = gggHash.get(a.get(i));
+			float xx =  ggg.get(indexI).iX.value;
+			float ww = ggg.get(indexI).iW.value;
+			for (int j=0;j<a.size();j++){
+				if (gggHash.get(a.get(j))==null) // Exception *******************************
+					continue;
+				
+				int indexJ = gggHash.get(a.get(j));
+				float yy =  ggg.get(indexJ).iY.value;
+				float hh =ggg.get(indexJ).iH.value;
+					
+				this.fill(r,g,b,200);
+				this.noStroke();
+				this.rect(xx, yy, ww, hh);
+			
+			}
+		}
+	}
+		
 	/*
 	public static boolean isInTheSameComplex(int g1, int g2, int c1) {
 		ArrayList<String> a = getAllGenesInComplexById(c1);
@@ -939,7 +948,7 @@ public class MainMatrix extends PApplet {
 		else if (popupRelation.b>=0){
 			popupRelation.mouseClicked();
 		}
-		else if (popupComplex.b>=0){
+		else if (PopupComplex.b>=-1){
 			popupComplex.mouseClicked();
 		}
 		else if (popupOrder.b>=0){
@@ -1459,8 +1468,9 @@ public class MainMatrix extends PApplet {
 	
 	void mouseWheel(int delta) {
 		if (PopupComplex.b>=0){
-			PopupComplex.y2 += delta;
-			
+			PopupComplex.y2 -= delta/2;
+			if (PopupComplex.y2>20)
+				PopupComplex.y2 = 20;
 		}
 	}
 
