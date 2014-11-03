@@ -19,6 +19,8 @@ import edu.uic.ncdm.venn.Venn_Overview;
 import static main.MainMatrix.pairs;
 import static main.MainMatrix.ggg;
 import static main.MainMatrix.geneRelationList;
+import static main.MainMatrix.gene_gene_InComplex;
+import static main.MainMatrix.maxGeneInComplex;
 import static main.MainMatrix.leaderSortedMap;
 import static main.MainMatrix.locals;
 import static edu.uic.ncdm.venn.Venn_Overview.numMinerContainData;
@@ -66,7 +68,7 @@ public class Gene {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void computeGeneRalationList(){
+	public static void computeGeneRelationList(){
 		geneRelationList = new ArrayList[ggg.size()][ggg.size()];
 		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
 			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
@@ -76,6 +78,23 @@ public class Gene {
 						if (geneRelationList[i][j]==null)
 							geneRelationList[i][j] = new ArrayList<Integer>();
 						geneRelationList[i][j].add(localMinerID);
+					}
+				}
+			}
+		 }	
+	 }	 
+	
+	public static void computeGeneGeneInComplex(){
+		maxGeneInComplex = 0;
+		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
+		for (int c=0;c<main.MainMatrix.complexSet.size();c++){
+			ArrayList<String> a = main.MainMatrix.getAllGenesInComplexById(c);
+			for (int i=0;i<ggg.size();i++){
+				for (int j=0;j<ggg.size();j++){
+					if (a.indexOf(ggg.get(i).name)>=0 && a.indexOf(ggg.get(j).name)>=0){
+						gene_gene_InComplex[i][j]++;
+						if (gene_gene_InComplex[i][j]>maxGeneInComplex)
+							maxGeneInComplex = gene_gene_InComplex[i][j];
 					}
 				}
 			}
@@ -281,12 +300,30 @@ public class Gene {
 			ggg.get(index1).order=i;
 			processedGenes.add(orderReading1);
 			if (i==ggg.size()-1) break;
-			int similarIndex =  getSimilarGene(orderReading1,processedGenes);
+			int similarIndex =  getSimilarGeneComplex(orderReading1,processedGenes);
 			index1 = similarIndex;
 			orderReading1 = index1;
 		}
+		
+	}
+	public static int getSimilarGeneComplex(int orderReading1, ArrayList<Integer> a){
+		float minDis = Float.POSITIVE_INFINITY;
+		int minIndex = -1;
+		for (int i=0;i<ggg.size();i++){
+			int orderReading2 = i;
+			if (orderReading1==orderReading2) continue;
+			if (a.contains(orderReading2)) continue;
+			float dis = -gene_gene_InComplex[orderReading1][orderReading2];
+			if (dis<minDis){
+				minDis = dis;
+				minIndex = i;
+			}
+		}
+		return minIndex;
 	}
 	
+		
+		
 	
 	public static int getSimilarGene(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
@@ -320,8 +357,7 @@ public class Gene {
 		return dis;
 	}
 	
-	
-	
+
 	public static float computeDisOfArrayList(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
 		if (a1==null && a2==null) return 0;
 		else if (a1==null) return a2.size();

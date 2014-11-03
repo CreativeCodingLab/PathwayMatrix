@@ -58,7 +58,7 @@ public class PopupOrder{
 			}	
 			
 			if (items[s].equals("Similarity")) 
-				slider.draw(x+130, y+itemH*items.length-14);
+				slider.draw(x+110, y+itemH*4-14);
 			
 		}
 		else{
@@ -96,7 +96,7 @@ public class PopupOrder{
 			else if (items[s].equals("Complex"))  {
 				main.MainMatrix.stateAnimation=0;
 				main.PopupGroup.s=0;
-				Gene.orderBySimilarity();
+				Gene.orderByComplex();
 			}	
 		}
 	}

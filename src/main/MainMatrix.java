@@ -129,6 +129,8 @@ public class MainMatrix extends PApplet {
 	public static ArrayList<String>[] pairs;
 	public static ArrayList<String>[] genes;
 	public static ArrayList<Integer>[][] geneRelationList;
+	public static int[][] gene_gene_InComplex; 
+	public static int maxGeneInComplex; 
 	
 	// Global data
 	public static ArrayList<String> allGenes = new ArrayList<String>();
@@ -194,6 +196,7 @@ public class MainMatrix extends PApplet {
 	public static  Map<String,String> mapElementRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
 	public static Set<Complex> complexSet; 
+	
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { MainMatrix.class.getName() });
@@ -323,6 +326,13 @@ public class MainMatrix extends PApplet {
 		vennDetail = new Venn_Detail(this);
 		thread1=new Thread(loader1);
 		thread1.start();
+		
+		// enable the mouse wheel, for zooming
+		addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+			public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+				mouseWheel(evt.getWheelRotation());
+			}
+		});
 	}	
 	
 	
@@ -383,7 +393,6 @@ public class MainMatrix extends PApplet {
 				System.out.println();
 				System.out.println("*******************Catch ERROR*******************");
 				e.printStackTrace();
-				System.out.println("**************************************************");
 				return;
 			}
 		}
@@ -412,18 +421,27 @@ public class MainMatrix extends PApplet {
 			} 
 			this.text("Total relations: "+totalRelations, x2, y2+60);
 		}
-		vennOverview.draw(x2+50,300,10);
-		//vennDetail.draw(x2+100,500,10);
 		
 		// Draw button
-		this.textSize(13);
-		check1.draw(this.width-600, 7);
-		check2.draw(this.width-600, 27);
-		button.draw();
-		popupGroup.draw(this.width-100);
-		popupOrder.draw(this.width-202);
-		popupRelation.draw(this.width-304);
-		popupComplex.draw(this.width-406);
+		try{
+			vennOverview.draw(x2+50,300,10);
+			//vennDetail.draw(x2+100,500,10);
+			
+			this.textSize(13);
+			check1.draw(this.width-600, 7);
+			check2.draw(this.width-600, 27);
+			button.draw();
+			popupGroup.draw(this.width-100);
+			popupOrder.draw(this.width-202);
+			popupRelation.draw(this.width-304);
+			popupComplex.draw(this.width-406);
+		}
+		catch (Exception e){
+			System.out.println();
+			System.out.println("*******************Catch ERROR in Draw buttons*******************");
+			e.printStackTrace();
+			return;
+		}
 	}	
 	
 	public void drawGroups() {
@@ -801,6 +819,26 @@ public class MainMatrix extends PApplet {
 		}
 		
 		
+		// All complexes
+		for (int i=0;i<ggg.size();i++){
+			// Check if this is grouping
+			float xx =  ggg.get(i).iX.value;
+			float ww = ggg.get(i).iW.value;
+			for (int j=0;j<ggg.size();j++){
+				float yy =  ggg.get(j).iY.value;
+				float hh =ggg.get(j).iH.value;
+				
+				if (gene_gene_InComplex[i][j]>0){
+					float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
+					float sat = 50+sat2;
+					this.fill(0,sat);
+					this.noStroke();
+					this.rect(xx, yy, ww, hh);
+				}
+			}
+		}	
+		
+		
 		// Complex
 		int selectedComplex = PopupComplex.s;
 		if (selectedComplex>=0){
@@ -819,7 +857,7 @@ public class MainMatrix extends PApplet {
 					float yy =  ggg.get(indexJ).iY.value;
 					float hh =ggg.get(indexJ).iH.value;
 						
-					this.fill(0,40);
+					this.fill(255,0,0,200);
 					this.noStroke();
 					this.rect(xx, yy, ww, hh);
 				
@@ -850,14 +888,15 @@ public class MainMatrix extends PApplet {
 			}
 		}
 	}	
-	public boolean isInTheSameComplex(int g1, int g2, int c1) {
+	/*
+	public static boolean isInTheSameComplex(int g1, int g2, int c1) {
 		ArrayList<String> a = getAllGenesInComplexById(c1);
 		if (a.indexOf(ggg.get(g1).name)>=0 && a.indexOf(ggg.get(g2).name)>=0){
 			return true;
 		}
 		return false;
 		
-	}
+	}*/
 		 
 	
 	public void setValue(Integrator inter, float value) {
@@ -1237,16 +1276,20 @@ public class MainMatrix extends PApplet {
 			}
 			System.out.println();
 		
+			popupComplex.setItems();
 			vennOverview.initialize();
+			
+			
+			stateAnimation=0;
+			isAllowedDrawing =  true;  //******************* Start drawing **************
 			
 			// Compute the summary for each Gene
 			Gene.compute();
 			
-			Gene.computeGeneRalationList();
+			Gene.computeGeneRelationList();
+			Gene.computeGeneGeneInComplex();
 			//write();
 			
-			stateAnimation=0;
-			isAllowedDrawing =  true;
 			
 			//vennOverview.compute();
 			PopupOrder.s =0;
@@ -1254,6 +1297,7 @@ public class MainMatrix extends PApplet {
 			PopupGroup.s = 0;
 		}
 	}
+	
 	public static void storeData(String rel, String gene1, String gene2){
 		// Store results for visualization
 		
@@ -1413,7 +1457,13 @@ public class MainMatrix extends PApplet {
 		}
 	}	
 	
-	
+	void mouseWheel(int delta) {
+		if (PopupComplex.b>=0){
+			PopupComplex.y2 += delta;
+			
+		}
+	}
+
 	
 	
 }
