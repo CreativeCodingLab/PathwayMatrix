@@ -577,15 +577,15 @@ public class MainMatrix extends PApplet {
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int indexI = entryI.getKey();
 			// Check if this is grouping
-			float yy =  ggg.get(indexI).iX.value;
-			float hh = ggg.get(indexI).iW.value;
+			float yy =  ggg.get(indexI).iY.value;
+			float hh = ggg.get(indexI).iH.value;
 			
 			int numEx = locals[indexI].size();
 			
 			for (Map.Entry<Integer, Integer> entryJ : leaderSortedMap.entrySet()) {
 				int indexJ = entryJ.getKey();
-				float xx =  ggg.get(indexJ).iY.value;
-				float ww =ggg.get(indexJ).iH.value;
+				float xx =  ggg.get(indexJ).iX.value;
+				float ww =ggg.get(indexJ).iW.value;
 				
 				// Draw background
 				if (indexI!=indexJ && check2.s) {
@@ -827,12 +827,11 @@ public class MainMatrix extends PApplet {
 		if (PopupComplex.sAll || PopupComplex.b==-1){
 			for (int i=0;i<ggg.size();i++){
 				// Check if this is grouping
-				float yy =  ggg.get(i).iX.value;
-				float hh = ggg.get(i).iW.value;
+				float yy =  ggg.get(i).iY.value;
+				float hh = ggg.get(i).iH.value;
 				for (int j=0;j<ggg.size();j++){
-					float xx =  ggg.get(j).iY.value;
-					float ww =ggg.get(j).iH.value;
-					
+					float xx =  ggg.get(j).iX.value;
+					float ww =ggg.get(j).iW.value;
 					if (gene_gene_InComplex[i][j]>0){
 						float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
 						float sat = 50+sat2;
@@ -863,11 +862,11 @@ public class MainMatrix extends PApplet {
 		this.noStroke();
 		for (int i=0;i<ggg.size();i++){
 			// Check if this is grouping
-			float yy =  ggg.get(i).iX.value;
-			float hh = ggg.get(i).iW.value;
+			float yy =  ggg.get(i).iY.value;
+			float hh = ggg.get(i).iH.value;
 			for (int j=0;j<ggg.size();j++){
-				float xx =  ggg.get(j).iY.value;
-				float ww =ggg.get(j).iH.value;
+				float xx =  ggg.get(j).iX.value;
+				float ww =ggg.get(j).iW.value;
 				
 				if (geneRelationList!=null && geneRelationList[i][j]!=null) {
 				//	System.out.println(geneRelationList+" " +geneRelationList[i][j]);
@@ -888,15 +887,15 @@ public class MainMatrix extends PApplet {
 			if (gggHash.get(a.get(i))==null)  // Exception *******************************
 				continue;
 			int indexI = gggHash.get(a.get(i));
-			float yy =  ggg.get(indexI).iX.value;
-			float hh = ggg.get(indexI).iW.value;
+			float yy =  ggg.get(indexI).iY.value;
+			float hh = ggg.get(indexI).iH.value;
 			for (int j=0;j<a.size();j++){
 				if (gggHash.get(a.get(j))==null) // Exception *******************************
 					continue;
 				
 				int indexJ = gggHash.get(a.get(j));
-				float xx =  ggg.get(indexJ).iY.value;
-				float ww =ggg.get(indexJ).iH.value;
+				float xx =  ggg.get(indexJ).iX.value;
+				float ww =ggg.get(indexJ).iW.value;
 					
 				this.fill(r,g,b,200);
 				this.noStroke();
