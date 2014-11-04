@@ -431,14 +431,14 @@ public class MainMatrix extends PApplet {
 			//vennDetail.draw(x2+100,500,10);
 			
 			this.textSize(13);
-			check1.draw(this.width-600, 7);
-			check2.draw(this.width-600, 27);
+			check1.draw(this.width-600, 50);
+			check2.draw(this.width-600, 70);
 			button.draw();
 			popupGroup.draw(this.width-100);
 			popupOrder.draw(this.width-202);
 			popupRelation.draw(this.width-304);
-			popupComplex.draw(this.width-406);
-			popupReaction.draw(this.width-508);
+			popupReaction.draw(this.width-406);
+			popupComplex.draw(this.width-508);
 		}
 		catch (Exception e){
 			System.out.println();
@@ -1350,7 +1350,7 @@ public class MainMatrix extends PApplet {
 				 }*/
 				 
 				 complexSet = model.getObjects(Complex.class);
-				 i2=0;
+				/* i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 ArrayList<String> components = getComplexById(i2);
@@ -1359,7 +1359,7 @@ public class MainMatrix extends PApplet {
 						 }
 					 i2++;
 				 }
-				 i2=0;
+				 i2=0;*/
 				 
 				 /*
 				 for (Complex current : complexSet){
@@ -1656,9 +1656,9 @@ public class MainMatrix extends PApplet {
 	
 	void mouseWheel(int delta) {
 		if (PopupComplex.b>=0){
-			PopupComplex.y2 -= delta/2;
-			if (PopupComplex.y2>20)
-				PopupComplex.y2 = 20;
+		//	PopupComplex.y2 -= delta/2;
+		//	if (PopupComplex.y2>20)
+		//		PopupComplex.y2 = 20;
 		}
 	}
 

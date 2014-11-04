@@ -15,21 +15,22 @@ import org.biopax.paxtools.model.level3.Complex;
 import processing.core.PApplet;
 
 public class PopupComplex{
+	public static boolean bPopup = false;
 	public static boolean sAll = false;
 	public static int b = -1000;
 	public PApplet parent;
 	public float x = 800;
-	public static int y = 0;
-	public static int y2 = 0;
+	public static float yBegin = 25;
+	public static float yBeginList = 70;
 	public int w1 = 100;
-	public int w = 500;
+	public int w = 600;
 	public int h = 28;
-	public int itemH = 18;
+	public float itemH1 = 18;
 	public Color cGray  = new Color(240,240,240);
 	public static int s=-100;
-	public static int orderByRelation = -100;
 	public static float maxSize = 0;
-	
+	public Integrator[] iX, iY;
+	                  
 	public static Map<String, Integer> itemHash =  new HashMap<String, Integer>();
 	
 	public PopupComplex(PApplet parent_){
@@ -38,7 +39,6 @@ public class PopupComplex{
 	
 	public void setItems(){
 		int i=0;
-		y2=20;
 		maxSize =0;
 		Map<String, Integer> unsortMap  =  new HashMap<String, Integer>();
 		s=-400;
@@ -52,6 +52,14 @@ public class PopupComplex{
 			i++;
 		}
 		itemHash = sortByComparator(unsortMap);
+		
+		// positions of items
+		iX = new Integrator[itemHash.size()];
+		iY = new Integrator[itemHash.size()];
+		for (i=0;i<itemHash.size();i++){
+			iX[i] = new Integrator(x, 0.5f,0.1f);
+			iY[i] = new Integrator(20, 0.5f,0.1f);
+		}
 	}
 		
 	// Sort decreasing order
@@ -82,26 +90,36 @@ public class PopupComplex{
 		checkBrushing();
 		parent.textSize(13);
 		parent.fill(125,125,125);
-		parent.rect(x,y,w1,25);
+		parent.rect(x,0,w1,25);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
-		parent.text("Complex",x+w1/2,y+18);
+		parent.text("Complex",x+w1/2,18);
 	
+		// Compute positions
+		itemH1 = (parent.height-yBeginList)/(itemHash.size());
+		if (itemH1>20)
+			itemH1 =20;
+		for (int i=0;i<itemHash.size();i++){
+			iY[i].target(yBeginList+i*itemH1);
+		}
 		
-		if (b>=-1){
+		for (int i=0;i<itemHash.size();i++){
+			iY[i].update();
+		}
+		
+		
+		if (bPopup == true || b>=-1){
 			parent.fill(100);
 			parent.stroke(0);
-			h=itemHash.size()*itemH+20;
-			parent.rect(x, y2-itemH-4, w,h+itemH);
+			parent.rect(x, yBegin, w,iY[itemHash.size()-1].value-10);
 			
 			int i=0;
-			parent.textSize(13);
 			
 			// Draw another button
 			if (sAll){
 				parent.noStroke();
 				parent.fill(0);
-				parent.rect(x+10,y2-itemH+3,w-25,itemH);
+				parent.rect(x+10,30,200,19);
 				parent.fill(180);
 			}
 			else if (b==-1){
@@ -110,15 +128,18 @@ public class PopupComplex{
 			else{
 				parent.fill(0);
 			}
+			parent.textSize(13);
 			parent.textAlign(PApplet.LEFT);
-			parent.text("All complexes",x+50,y2-1);
+			parent.text("All complexes",x+50,45);
 			
-			parent.textSize(12);
 			for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
+				float textSixe = PApplet.map(itemH1, 0, 20, 5, 13);
+				parent.textSize(textSixe);
+				
 				if (i==s){
 					parent.noStroke();
 					parent.fill(0);
-					parent.rect(x+10,y2+itemH*(i)+4,w-25,itemH+1);
+					parent.rect(x+10,iY[i].value-itemH1,w-25,itemH1);
 				
 					parent.fill(255,0,0);
 				}
@@ -129,7 +150,7 @@ public class PopupComplex{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey(),x+50,y2+itemH*(i+1));
+				parent.text(entry.getKey(),x+50,iY[i].value-itemH1/4);
 				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, 18);
 				
 				parent.noStroke();
@@ -142,15 +163,8 @@ public class PopupComplex{
 				else{
 					parent.fill(0);
 				}
-				parent.ellipse(x+30,y2+itemH*(i)+13, r, r);
+				parent.ellipse(x+30,iY[i].value-itemH1/2, r, r);
 			
-				// Order By drawing
-				if (i==orderByRelation){
-					parent.fill(255);
-					parent.rect(x+330,y2+itemH*(i)+14, 9, 8);
-					parent.rect(x+340,y2+itemH*(i)+6, 9, 16);
-					parent.rect(x+350,y2+itemH*(i)-2, 9, 24);
-				}
 				i++;
 			}	
 		}
@@ -203,8 +217,8 @@ public class PopupComplex{
 			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
 			 if (indexSet2>=0){
 					 int indexHash2 = getIndexInHash(indexSet2);
-					 float yy1 =  y2+itemH*indexHash+12;
-					 float yy2 =  y2+itemH*indexHash2+12;
+					 float yy1 =  iY[indexHash].value+12;
+					 float yy2 =  iY[indexHash2].value+12;
 			
 					 float xx = x+30;
 					 float yy = (yy1+yy2)/2;
@@ -226,8 +240,8 @@ public class PopupComplex{
 			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
 			 if (indexSet2>=0){
 					 int indexHash2 = getIndexInHash(indexSet2);
-					 float yy1 =  y2+itemH*indexHash+12;
-					 float yy2 =  y2+itemH*indexHash2+12;
+					 float yy1 =  iY[indexHash].value;
+					 float yy2 =  iY[indexHash2].value;
 			
 					 float xx = x+30;
 					 float yy = (yy1+yy2)/2;
@@ -341,10 +355,6 @@ public class PopupComplex{
 	}
 		
 	 public void mouseClicked() {
-		if (parent.key=='r' || parent.key=='R'){
-			orderByRelation=b;
-			Gene.orderByRelation(orderByRelation);
-		}
 		if (b==-1){
 			sAll = !sAll;
 		}
@@ -361,24 +371,23 @@ public class PopupComplex{
 		if (itemHash==null) return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (b==-100){
-			if (x<mX && mX<x+w1 && y<=mY && mY<=itemH+5){
-				b =100;
+		if (x<mX && mX<x+w1 && 0<=mY && mY<=yBegin){
+			bPopup=true;
+			return;
+		}	
+		else{
+			if (x<mX && mX<x+w1 && 30<=mY && mY<=50){
+				b=-1;
 				return;
 			}	
-		}
-		else{
 			for (int i=0; i<itemHash.size(); i++){
-				if (x<=mX && mX<=x+w && y2-itemH-5<=mY && mY<=y2+4){
-					b =-1;
-					return;
-				}
-				if (x<=mX && mX<=x+w && y2+itemH*i<=mY && mY<=y2+itemH*(i+1)+6){
+				if (x<=mX && mX<=x+w && iY[i].value-itemH1<=mY && mY<=iY[i].value){
 					b =i;
 					return;
 				}	
 			}
 		}
+		bPopup=false;		
 		b =-100;
 	}
 	
