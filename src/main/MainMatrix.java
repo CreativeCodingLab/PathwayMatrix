@@ -844,7 +844,7 @@ public class MainMatrix extends PApplet {
 		}
 		
 		// brushingComplex &&&&&& selectedComplex
-		int brushingComplex = PopupComplex.b;
+		int brushingComplex = popupComplex.getIndexInSet(PopupComplex.b);
 		if (brushingComplex>=0){
 			drawComplex(brushingComplex,200,100,0);
 		}
@@ -1322,7 +1322,7 @@ public class MainMatrix extends PApplet {
 				 }*/
 				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				 i2=0;
+				 /*i2=0;
 				 for (BiochemicalReaction current : reactionSet){
 					  System.out.println(i2+" getDisplayName() = "+current.getDisplayName());
 					  Object[] s = current.getLeft().toArray();
@@ -1347,20 +1347,21 @@ public class MainMatrix extends PApplet {
 					 System.out.println("  getLeft() = "+current.getLeft());
 					 System.out.println("  getRight ="+ current.getRight());
 					 i2++;
-				 }
+				 }*/
 				 
 				 complexSet = model.getObjects(Complex.class);
-				 /*
 				 i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 ArrayList<String> components = getComplexById(i2);
 					 for (int i=0;i<components.size();i++){
-						 System.out.println(" **** = "+components.get(i));
+						 System.out.println("	"+components.get(i));
 						 }
 					 i2++;
 				 }
 				 i2=0;
+				 
+				 /*
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 ArrayList<String> components = getAllGenesInComplexById(i2);
@@ -1369,9 +1370,7 @@ public class MainMatrix extends PApplet {
 					 }
 					 i2++;
 				 }
-				 
-				 
-				  
+				 */
 				 
 				 /*
 				 Set<BiochemicalReaction> biochemicalReactionSet = model.getObjects(BiochemicalReaction.class);
@@ -1488,7 +1487,7 @@ public class MainMatrix extends PApplet {
 			//write();
 			
 			
-			//vennOverview.compute();
+			vennOverview.compute();
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
 			PopupGroup.s = 0;

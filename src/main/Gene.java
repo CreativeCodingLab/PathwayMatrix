@@ -183,7 +183,7 @@ public class Gene {
 	}
 	
 	
-	private static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap) {
+	public static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap) {
 		// Convert Map to List
 		List<Map.Entry<String, Integer>> list = 
 			new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
