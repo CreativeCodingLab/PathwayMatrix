@@ -25,12 +25,13 @@ public class PopupComplex{
 	public int w1 = 100;
 	public int w = 600;
 	public int h = 28;
-	public float itemH1 = 18;
-	public Color cGray  = new Color(240,240,240);
 	public static int s=-100;
 	public static float maxSize = 0;
-	public Integrator[] iX, iY;
-	                  
+	public Integrator[] iX, iY, iH;
+	public int[] hightlightList;
+	public float maxH = 20;
+	
+	
 	public static Map<String, Integer> itemHash =  new HashMap<String, Integer>();
 	
 	public PopupComplex(PApplet parent_){
@@ -56,10 +57,18 @@ public class PopupComplex{
 		// positions of items
 		iX = new Integrator[itemHash.size()];
 		iY = new Integrator[itemHash.size()];
+		iH = new Integrator[itemHash.size()];
 		for (i=0;i<itemHash.size();i++){
 			iX[i] = new Integrator(x, 0.5f,0.1f);
 			iY[i] = new Integrator(20, 0.5f,0.1f);
+			iH[i] = new Integrator(10, 0.5f,0.1f);
 		}
+		
+		hightlightList =  new int[itemHash.size()];
+		for (i=0;i<itemHash.size();i++){
+			hightlightList[i] = -1;
+		}
+			
 	}
 		
 	// Sort decreasing order
@@ -95,23 +104,35 @@ public class PopupComplex{
 		parent.textAlign(PApplet.CENTER);
 		parent.text("Complex",x+w1/2,18);
 	
+		//
+		if (hightlightList==null) return;
+			
+		int countLitems = 0;
+		for (int i=0;i<hightlightList.length;i++){
+			if (hightlightList[i]>=1){
+				countLitems++;
+			}
+		}
+			
 		// Compute positions
-		itemH1 = (parent.height-yBeginList)/(itemHash.size());
-		if (itemH1>20)
-			itemH1 =20;
+		float itemH2 = (parent.height-yBeginList)/(itemHash.size());
+		if (itemH2>maxH)
+			itemH2 =maxH;
 		for (int i=0;i<itemHash.size();i++){
-			iY[i].target(yBeginList+i*itemH1);
+			iY[i].target(yBeginList+i*itemH2);
+			iH[i].target(itemH2);
 		}
 		
 		for (int i=0;i<itemHash.size();i++){
 			iY[i].update();
+			iH[i].update();
 		}
 		
 		
 		if (bPopup == true || b>=-1){
 			parent.fill(100);
 			parent.stroke(0);
-			parent.rect(x, yBegin, w,iY[itemHash.size()-1].value-10);
+			parent.rect(x-200, yBegin, w+200,iY[itemHash.size()-1].value-10);
 			
 			int i=0;
 			
@@ -133,13 +154,13 @@ public class PopupComplex{
 			parent.text("All complexes",x+50,45);
 			
 			for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
-				float textSixe = PApplet.map(itemH1, 0, 20, 5, 13);
+				float textSixe = PApplet.map(iH[i].value, 0, 20, 5, 13);
 				parent.textSize(textSixe);
 				
 				if (i==s){
 					parent.noStroke();
 					parent.fill(0);
-					parent.rect(x+10,iY[i].value-itemH1,w-25,itemH1);
+					parent.rect(x+10,iY[i].value-iH[i].value,w-25,iH[i].value);
 				
 					parent.fill(255,0,0);
 				}
@@ -150,8 +171,8 @@ public class PopupComplex{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey(),x+50,iY[i].value-itemH1/4);
-				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, 18);
+				parent.text(entry.getKey(),x+50,iY[i].value-iH[i].value/4);
+				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				
 				parent.noStroke();
 				if (i==s){
@@ -163,7 +184,7 @@ public class PopupComplex{
 				else{
 					parent.fill(0);
 				}
-				parent.ellipse(x+30,iY[i].value-itemH1/2, r, r);
+				parent.ellipse(x+30,iY[i].value-iH[i].value/2, r, r);
 			
 				i++;
 			}	
@@ -172,12 +193,13 @@ public class PopupComplex{
 		if (b>=0){
 			int indexSet = getIndexInSet(b);
 			
-			drawRelationship(indexSet,b);
+			drawRelationship(indexSet,b, 200,100,0,150, true,0);
 		}
 		else if (b==-1){
 			int i=0;
 			for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
-				drawRelationship2(i,b);
+				int indexSet = getIndexInSet(i);
+				drawRelationship(indexSet,i, 0,0,0,100, false, 0);
 				i++;
 			}
 				
@@ -210,46 +232,38 @@ public class PopupComplex{
 		 }
 		 return -11;
 	 }
-			
-	 public void drawRelationship2(int indexSet, int indexHash) {
-		 ArrayList<String> components = main.MainMatrix.getComplexById(indexSet);
-		 for (int i=0;i<components.size();i++){
-			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
-			 if (indexSet2>=0){
-					 int indexHash2 = getIndexInHash(indexSet2);
-					 float yy1 =  iY[indexHash].value+12;
-					 float yy2 =  iY[indexHash2].value+12;
-			
-					 float xx = x+30;
-					 float yy = (yy1+yy2)/2;
-					 parent.noFill();
-				
-				parent.stroke(0,80);
-				parent.strokeWeight(8);
-				parent.arc(xx, yy, yy2-yy1,yy2-yy1, PApplet.PI/2, 3*PApplet.PI/2);
-				drawRelationship2(indexSet2, indexHash2);
-			}
-		 }
-		 
-		 parent.strokeWeight(1);
-	 }	
 	
-	 public void drawRelationship(int indexSet, int indexHash) {
+	 public void drawRelationship(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
 		 ArrayList<String> components = main.MainMatrix.getComplexById(indexSet);
 		 for (int i=0;i<components.size();i++){
 			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
 			 if (indexSet2>=0){
-					 int indexHash2 = getIndexInHash(indexSet2);
-					 float yy1 =  iY[indexHash].value;
-					 float yy2 =  iY[indexHash2].value;
-			
-					 float xx = x+30;
-					 float yy = (yy1+yy2)/2;
-					 parent.noFill();
+				int indexHash2 = getIndexInHash(indexSet2);
+				float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
+				float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
+		
+				float xx = x+30;
+				float yy = (yy1+yy2)/2;
+				parent.noFill();
 				
-				parent.stroke(200,100,0,150);
-				parent.strokeWeight(8);
+				float size = PApplet.sqrt(main.MainMatrix.getAllGenesInComplexById(indexSet2).size());
+				float thickness = PApplet.map(size, 0, PApplet.sqrt(maxSize), 0, maxH/2);
+				
+				int g2 = g+30*level;
+				if (g2>255)
+					g2=255;
+				int b2 = b+30*level;
+				if (b2>255)
+					b2=255;
+				
+				parent.strokeWeight(thickness);
+				parent.stroke(r,g2,b2,alpha);
+				
 				parent.arc(xx, yy, yy2-yy1,yy2-yy1, PApplet.PI/2, 3*PApplet.PI/2);
+				
+				if (recursive){
+					drawRelationship(indexSet2,indexHash2, r,g,b,150, true, level+1);
+				}
 			}
 		 }
 		 
@@ -368,7 +382,7 @@ public class PopupComplex{
 	}
 	 
 	public void checkBrushing() {
-		if (itemHash==null) return;
+		if (itemHash==null || iH==null || iH.length==0) return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		if (x<mX && mX<x+w1 && 0<=mY && mY<=yBegin){
@@ -376,13 +390,14 @@ public class PopupComplex{
 			return;
 		}	
 		else{
-			if (x<mX && mX<x+w1 && 30<=mY && mY<=50){
+			if (x<mX && mX<x+w1 && yBegin<=mY && mY<=iY[0].value-iH[0].value){
 				b=-1;
 				return;
 			}	
 			for (int i=0; i<itemHash.size(); i++){
-				if (x<=mX && mX<=x+w && iY[i].value-itemH1<=mY && mY<=iY[i].value){
+				if (x<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					b =i;
+					hightlightList[i] = 1; 
 					return;
 				}	
 			}
