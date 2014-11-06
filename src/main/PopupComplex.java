@@ -32,7 +32,7 @@ public class PopupComplex{
 	public float maxH = 20;
 	
 	
-	public static Map<String, Integer> itemHash =  new HashMap<String, Integer>();
+	public static Map<Complex, Integer> itemHash =  new HashMap<Complex, Integer>();
 	
 	public PopupComplex(PApplet parent_){
 		parent = parent_;
@@ -41,13 +41,11 @@ public class PopupComplex{
 	public void setItems(){
 		int i=0;
 		maxSize =0;
-		Map<String, Integer> unsortMap  =  new HashMap<String, Integer>();
+		Map<Complex, Integer> unsortMap  =  new HashMap<Complex, Integer>();
 		s=-400;
 		for (Complex current : main.MainMatrix.complexSet){
 			int size = main.MainMatrix.getAllGenesInComplexById(i).size();
-			String name = current.getDisplayName();
-			
-			unsortMap.put(name, size);
+			unsortMap.put(current, size);
 			if (size>maxSize)
 				maxSize = size;
 			i++;
@@ -72,23 +70,23 @@ public class PopupComplex{
 	}
 		
 	// Sort decreasing order
-	public static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap) {
+	public static Map<Complex, Integer> sortByComparator(Map<Complex, Integer> unsortMap) {
 		// Convert Map to List
-		List<Map.Entry<String, Integer>> list = 
-			new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+		List<Map.Entry<Complex, Integer>> list = 
+			new LinkedList<Map.Entry<Complex, Integer>>(unsortMap.entrySet());
  
 		// Sort list with comparator, to compare the Map values
-		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-			public int compare(Map.Entry<String, Integer> o1,
-                                           Map.Entry<String, Integer> o2) {
+		Collections.sort(list, new Comparator<Map.Entry<Complex, Integer>>() {
+			public int compare(Map.Entry<Complex, Integer> o1,
+                                           Map.Entry<Complex, Integer> o2) {
 				return -(o1.getValue()).compareTo(o2.getValue());
 			}
 		});
  
 		// Convert sorted map back to a Map
-		Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
-		for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
-			Map.Entry<String, Integer> entry = it.next();
+		Map<Complex, Integer> sortedMap = new LinkedHashMap<Complex, Integer>();
+		for (Iterator<Map.Entry<Complex, Integer>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<Complex, Integer> entry = it.next();
 			sortedMap.put(entry.getKey(), entry.getValue());
 		}
 		return sortedMap;
@@ -130,9 +128,9 @@ public class PopupComplex{
 		
 		
 		if (bPopup == true || b>=-1){
-			parent.fill(100);
-			parent.stroke(0);
-			parent.rect(x-200, yBegin, w+200,iY[itemHash.size()-1].value-10);
+			parent.fill(200);
+			parent.stroke(0,150);
+			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
 			
 			int i=0;
 			
@@ -153,8 +151,8 @@ public class PopupComplex{
 			parent.textAlign(PApplet.LEFT);
 			parent.text("All complexes",x+50,45);
 			
-			for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
-				float textSixe = PApplet.map(iH[i].value, 0, 20, 5, 13);
+			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
+				float textSixe = PApplet.map(iH[i].value, 0, 20, 2, 13);
 				parent.textSize(textSixe);
 				
 				if (i==s){
@@ -171,7 +169,7 @@ public class PopupComplex{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey(),x+50,iY[i].value-iH[i].value/4);
+				parent.text(entry.getKey().getDisplayName(),x+50,iY[i].value-iH[i].value/4);
 				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				
 				parent.noStroke();
@@ -185,55 +183,85 @@ public class PopupComplex{
 					parent.fill(0);
 				}
 				parent.ellipse(x+30,iY[i].value-iH[i].value/2, r, r);
-			
+				
+				// Draw structures
+				if (i==b){
+					int indexSet = getIndexInSet(b);
+					drawRelationshipDownStream(indexSet,b, 255,0,50,150, true,0);
+					drawRelationshipUpStream(entry,indexSet,b, 255,50,0,150, true,0);
+				}
 				i++;
 			}	
 		}
-		// Draw structures
-		if (b>=0){
-			int indexSet = getIndexInSet(b);
-			
-			drawRelationship(indexSet,b, 200,100,0,150, true,0);
-		}
-		else if (b==-1){
+		 if (b==-1){
 			int i=0;
-			for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
+			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
 				int indexSet = getIndexInSet(i);
-				drawRelationship(indexSet,i, 0,0,0,100, false, 0);
+				drawRelationshipDownStream(indexSet,i, 0,0,0,80, false, 0);
 				i++;
 			}
 				
 		}
 			
 	}
-	 public int getIndexSetByName(String name) {
-		 if (name.contains("Complex")){
-			 int i=0;
-			 for (Complex current : main.MainMatrix.complexSet){
-				 if (current.getDisplayName().equals(name)){
-					 return i;
-				 }
-			 }
-			i++;		
-		 }
-		 return -33;
-	 }
-	 
-	 public int getIndexHashByName(String name) {
-		 if (name.contains("Complex")){
-			 int i=0;
-			 for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
-				System.out.println(entry.getKey()+" name="+name); 
-				 if (entry.getKey().equals(name)){
-				  return i;
-				 }
-			 }
-			i++;		
-		 }
-		 return -11;
-	 }
 	
-	 public void drawRelationship(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
+	 
+	 public ArrayList<Integer> getUpSreamSetId(Map.Entry<Complex, Integer> entry, int indexSet, int indexHash) {
+		 ArrayList<Integer> results = new ArrayList<Integer>();
+		 int indexHashParent=0;
+		 for (Map.Entry<Complex, Integer> entryParent : itemHash.entrySet()) {
+			 if (indexHashParent<indexHash){
+				 int indexSetParent = getIndexInSet(indexHashParent);
+				 ArrayList<String> components = main.MainMatrix.getComplexById(indexSetParent);
+				 //System.out.println("    components="+components+"	"+entry.getKey().getRDFId());
+				 if (components.contains(entry.getKey().getRDFId()))
+					 results.add(indexSetParent);
+			 }
+			 indexHashParent++;
+		 }
+		 return results;
+	 }
+		 
+	
+	 // UP STREAM
+	 public void drawRelationshipUpStream(Map.Entry<Complex, Integer> entry, int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
+		 ArrayList<Integer> parentSetIDs = getUpSreamSetId(entry,indexSet,indexHash);
+		 for (int i=0;i<parentSetIDs.size();i++){
+		 	int indexHash2 = getIndexInHash(parentSetIDs.get(i));
+			float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
+			float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
+			float xx = x+30;
+			float yy = (yy1+yy2)/2;
+			parent.noFill();
+			
+			float num = main.MainMatrix.getAllGenesInComplexById(indexSet).size();
+			float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
+			int g2 = g+40*level;
+			if (g2>255)
+				g2=255;
+			int b2 = b+0*level;
+			if (b2>255)
+				b2=255;
+			
+			//System.out.println("    parentSetIDs="+parentSetIDs+"	thickness="+thickness);
+			parent.noFill();
+			parent.strokeWeight(thickness);
+			parent.stroke(r,g2,b2,alpha);
+			parent.arc(xx, yy, yy1-yy2,yy1-yy2, PApplet.PI/2, 3*PApplet.PI/2);
+			
+			if (recursive){
+				int indexSet2 = parentSetIDs.get(i);
+				drawRelationshipUpStream(getEntryHashId(indexHash2), indexSet2,indexHash2, r,g,b,150, true, level+1);
+			}
+			
+		 }
+		 parent.strokeWeight(1);
+	 }	 
+
+	 
+	 
+	// DOWN STREAM
+	public void drawRelationshipDownStream(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
 		 ArrayList<String> components = main.MainMatrix.getComplexById(indexSet);
 		 for (int i=0;i<components.size();i++){
 			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
@@ -241,101 +269,73 @@ public class PopupComplex{
 				int indexHash2 = getIndexInHash(indexSet2);
 				float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
 				float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
-		
 				float xx = x+30;
 				float yy = (yy1+yy2)/2;
 				parent.noFill();
 				
-				float size = PApplet.sqrt(main.MainMatrix.getAllGenesInComplexById(indexSet2).size());
-				float thickness = PApplet.map(size, 0, PApplet.sqrt(maxSize), 0, maxH/2);
-				
-				int g2 = g+30*level;
+				float num = main.MainMatrix.getAllGenesInComplexById(indexSet2).size();
+				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
+				int g2 = g+0*level;
 				if (g2>255)
 					g2=255;
-				int b2 = b+30*level;
+				int b2 = b+40*level;
 				if (b2>255)
 					b2=255;
 				
+				parent.noFill();
 				parent.strokeWeight(thickness);
 				parent.stroke(r,g2,b2,alpha);
-				
 				parent.arc(xx, yy, yy2-yy1,yy2-yy1, PApplet.PI/2, 3*PApplet.PI/2);
 				
 				if (recursive){
-					drawRelationship(indexSet2,indexHash2, r,g,b,150, true, level+1);
+					drawRelationshipDownStream(indexSet2,indexHash2, r,g,b,150, true, level+1);
 				}
 			}
 		 }
-		 
 		 parent.strokeWeight(1);
-	 	
-		/* int max = 0;
-			for (int i=0;i<numTop;i++){
-				for (int j=i+1;j<numTop;j++){
-					if (rel[i][j]>max)
-						max = rel[i][j];
-				}
-			}*/	
-			/*
-			 for (int i=0;i<numTop;i++){
-				float y1 = wc.words[i].y-wc.words[i].font_size/3.5f;
-				for (int j=i+1;j<numTop;j++){
-					float y2 = wc.words[j].y-wc.words[j].font_size/3.5f;
-					float xx = wc.x1;
-					float yy = (y1+y2)/2;
-					this.noFill();
-					
-					float maxWeight = max;
-					if (max<=5){
-						maxWeight = 6;
-					}
-					
-					float wei = PApplet.map(rel[i][j], 0, maxWeight, 0, 191);
-					this.stroke(color.getRed(),color.getGreen(),color.getBlue(),wei);
-					this.strokeWeight(wei/20);
-					this.arc(xx, yy, y2-y1,y2-y1, PI/2, 3*PI/2);
-				}
-			}*/
-			// Draw relationship of brushing term
-		 /*
-			 int brushing = wc.b;
-			 if (brushing>=0){
-			 	float y1 = wc.words[brushing].y-wc.words[brushing].font_size/3.5f;
-				for (int j=0;j<numTop;j++){
-					if (j==brushing) continue;
-					float y2 = wc.words[j].y-wc.words[j].font_size/3.5f;
-					float xx = wc.x1;
-					float yy = (y1+y2)/2;
-					this.noFill();
-					
-					float maxWeight = max;
-					if (max<=5){
-						maxWeight = 6;
-					}
-					if (j>brushing){
-						float wei = PApplet.map(rel[brushing][j], 0, maxWeight, 0, 191);
-						this.stroke(255,wei+64);
-						this.strokeWeight(wei/20);
-						this.arc(xx, yy, y2-y1,y2-y1, PI/2, 3*PI/2);
-					}
-					else{
-						float wei = PApplet.map(rel[j][brushing], 0, maxWeight, 0, 191);
-						this.stroke(255,wei+64);
-						this.strokeWeight(wei/20);
-						this.arc(xx, yy, y1-y2,y1-y2, PI/2, 3*PI/2);
-					}
-				}
-			 } 
-		*/ 
 	 }
 		
+	
+	public Map.Entry<Complex, Integer> getEntryHashId(int hashID) {
+	 	 int i=0;
+	 	 for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
+			if (i==hashID){
+				return entry;
+			}
+			i++;
+		 }
+		 return null;
+	 }
+	
+	 public int getIndexSetByName(String name) {
+	 	 int i=0;
+		 for (Complex current : main.MainMatrix.complexSet){
+			 if (current.getDisplayName().equals(name)){
+				 return i;
+			 }
+		 }
+		i++;		
+		 return -33;
+	 }
+	 
+	 public int getIndexHashByName(String name) {
+	 	 int i=0;
+		 for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
+			 if (entry.getKey().getDisplayName().equals(name)){
+			  return i;
+			 }
+		 }
+		i++;		
+		 return -11;
+	 }
+	 
 	
 	public int getIndexInSet(int brushing) {
 		String name = "";
 		int i=0;
-		for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
+		for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
 			if (i==brushing){
-				name = entry.getKey();
+				name = entry.getKey().getDisplayName();
 			}
 			i++;
 		}	
@@ -359,8 +359,8 @@ public class PopupComplex{
 		}
 		
 		i=0;
-		for (Map.Entry<String, Integer> entry : itemHash.entrySet()) {
-			if (entry.getKey().equals(name)){
+		for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
+			if (entry.getKey().getDisplayName().equals(name)){
 				return i;
 			}
 			i++;

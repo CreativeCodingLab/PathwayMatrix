@@ -121,7 +121,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
+	public String currentFile = "../level3RAS/Rb-E2FpathwayReactome.owl";
 	
 	public static Button button;
 	
@@ -848,7 +848,7 @@ public class MainMatrix extends PApplet {
 		if (brushingComplex>=0){
 			drawComplex(brushingComplex,200,100,0);
 		}
-		int selectedComplex = PopupComplex.s;
+		int selectedComplex = popupComplex.getIndexInSet(PopupComplex.s);
 		if (selectedComplex>=0){
 			drawComplex(selectedComplex,255,0,0);
 		}
@@ -1272,6 +1272,7 @@ public class MainMatrix extends PApplet {
 			SimpleIOHandler io = new SimpleIOHandler();
 			Model model;
 			try{
+				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
 				mapElementRef = new HashMap<String,String>();
 				mapElementGenericRef = new HashMap<String,String>();
@@ -1350,7 +1351,7 @@ public class MainMatrix extends PApplet {
 				 }*/
 				 
 				 complexSet = model.getObjects(Complex.class);
-				/* i2=0;
+				 i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 ArrayList<String> components = getComplexById(i2);
@@ -1359,7 +1360,7 @@ public class MainMatrix extends PApplet {
 						 }
 					 i2++;
 				 }
-				 i2=0;*/
+				 i2=0;
 				 
 				 /*
 				 for (Complex current : complexSet){
@@ -1487,7 +1488,7 @@ public class MainMatrix extends PApplet {
 			//write();
 			
 			
-			vennOverview.compute();
+			//vennOverview.compute();
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
 			PopupGroup.s = 0;
@@ -1559,15 +1560,18 @@ public class MainMatrix extends PApplet {
 				  for (int i=0;i<s2.length;i++){
 					  if (getProteinName(s2[i].toString())!=null)
 						  components.add(getProteinName(s2[i].toString()));
-					  else if (s2[i].toString().contains("Complex")){
+					  else {
 						  int id4 =  getComplex_RDFId_to_id(s2[i].toString());
-						  ArrayList<String> s4 = getAllGenesInComplexById(id4);
-						  for (int k=0;k<s4.size();k++){
-							  components.add(s4.get(k));
+						 
+						  if (id4>=0){
+							  ArrayList<String> s4 = getAllGenesInComplexById(id4);
+							  for (int k=0;k<s4.size();k++){
+								  components.add(s4.get(k));
+							  }
 						  }
+						  else
+							  components.add(s2[i].toString());
 					  }
-					  else
-						  components.add(s2[i].toString());
 				 }
 				  found = true;
 			 }
@@ -1592,9 +1596,6 @@ public class MainMatrix extends PApplet {
 		 }
 		return idddd;
 	}
-	
-	
-		
 	
 	//Update genes for drawing
 	public void write(){	
