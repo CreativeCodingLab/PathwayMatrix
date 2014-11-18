@@ -111,24 +111,25 @@ public class PopupComplex{
 				countLitems++;
 			}
 		}
-			
-		// Compute positions
-		float itemH2 = (parent.height-yBeginList)/(itemHash.size());
-		if (itemH2>maxH)
-			itemH2 =maxH;
-		for (int i=0;i<itemHash.size();i++){
-			iY[i].target(yBeginList+i*itemH2);
-			iH[i].target(itemH2);
-		}
-		
-		for (int i=0;i<itemHash.size();i++){
-			iY[i].update();
-			iH[i].update();
-		}
-		
-		
 		if (bPopup == true || b>=-1){
+			
+			// Compute positions
+			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
+			if (itemH2>maxH)
+				itemH2 =maxH;
+			for (int i=0;i<itemHash.size();i++){
+				iY[i].target(yBeginList+i*itemH2);
+				iH[i].target(itemH2);
+			}
+			
+			for (int i=0;i<itemHash.size();i++){
+				iY[i].update();
+				iH[i].update();
+			}
+		
+		
 			parent.fill(200);
+			///parent.fill(255);
 			parent.stroke(0,150);
 			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
 			
@@ -163,7 +164,7 @@ public class PopupComplex{
 					parent.fill(255,0,0);
 				}
 				else if (i==b){
-					parent.fill(200,100,0);
+					parent.fill(200,0,0);
 				}
 				else{
 					parent.fill(0);
@@ -389,7 +390,7 @@ public class PopupComplex{
 			bPopup=true;
 			return;
 		}	
-		else{
+		else if (bPopup){
 			if (x<mX && mX<x+w1 && yBegin<=mY && mY<=iY[0].value-iH[0].value){
 				b=-1;
 				return;

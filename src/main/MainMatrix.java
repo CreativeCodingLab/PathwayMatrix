@@ -121,7 +121,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "../level3RAS/Rb-E2FpathwayReactome.owl";
+	public String currentFile = "../level3RAS/RAF-Cascade.owl";
 	
 	public static Button button;
 	
@@ -319,7 +319,7 @@ public class MainMatrix extends PApplet {
 		button = new Button(this);
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
-		popupReaction =  new PopupReaction(this);
+		popupReaction = new PopupReaction(this);
 		popupOrder  = new PopupOrder(this);
 		popupGroup  = new PopupGroup(this);
 		check1 = new CheckBox(this, "Lensing");
@@ -437,8 +437,8 @@ public class MainMatrix extends PApplet {
 			popupGroup.draw(this.width-100);
 			popupOrder.draw(this.width-202);
 			popupRelation.draw(this.width-304);
-			popupReaction.draw(this.width-406);
-			popupComplex.draw(this.width-508);
+			popupComplex.draw(this.width-406);
+			popupReaction.draw(this.width-508);
 		}
 		catch (Exception e){
 			System.out.println();
@@ -853,11 +853,16 @@ public class MainMatrix extends PApplet {
 			drawComplex(selectedComplex,255,0,0);
 		}
 		
-		// brushing Biochemical Reaction 
-		int brushingReaction = PopupReaction.b;
+		// brushingReaction &&&&&& selectedReaction
+		/*int brushingReaction = popupReaction2.getIndexInSet(PopupComplex.b);
 		if (brushingReaction>=0){
-			drawReaction(brushingReaction,200,100,0);
+			drawComplex(brushingComplex,200,100,0);
 		}
+		int selectedRection = popupReaction2.getIndexInSet(PopupComplex.s);
+		if (selectedRection>=0){
+			drawComplex(selectedComplex,255,0,0);
+		}*/
+		
 		
 		this.noStroke();
 		for (int i=0;i<ggg.size();i++){
@@ -881,6 +886,7 @@ public class MainMatrix extends PApplet {
 			}
 		}
 	}	
+	
 	public void drawComplex(int complex, int r, int g, int b) {
 		ArrayList<String> a = getAllGenesInComplexById(complex);
 		for (int i=0;i<a.size();i++){
@@ -1266,7 +1272,6 @@ public class MainMatrix extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
-			
 			File modFile = new File(currentFile);
 			File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
@@ -1288,11 +1293,7 @@ public class MainMatrix extends PApplet {
 					 }
 					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName().replace("phospho-", ""));
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName().replace("phospho-", ""));
-					// System.out.println(i2+"	"+currentProtein.getEntityReference().toString()+"	getStandardName ="+ currentProtein.getStandardName());
-					// System.out.println("			getRDFId ="+ currentProtein.getRDFId());
-					// System.out.println("			getGenericEntityReferences ="+ currentProtein.getGenericEntityReferences());
-								
-					 i2++;
+					i2++;
 				 }
 					
 				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
@@ -1322,34 +1323,6 @@ public class MainMatrix extends PApplet {
 					 i2++;
 				 }*/
 				 
-				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				 /*i2=0;
-				 for (BiochemicalReaction current : reactionSet){
-					  System.out.println(i2+" getDisplayName() = "+current.getDisplayName());
-					  Object[] s = current.getLeft().toArray();
-					  for (int i=0;i<s.length;i++){
-						  String name = getProteinName(s[i].toString());
-						  if (name!=null)
-							  System.out.println("	Left "+i+" = "+name);
-						  else{
-							  System.out.println("	Left "+i+" = "+s[i]);
-						  }
-					  }
-
-					  Object[] s2 = current.getRight().toArray();
-					  for (int i=0;i<s2.length;i++){
-						  String name = getProteinName(s2[i].toString());
-						  if (name!=null)
-							  System.out.println("	Right "+i+" = "+name);
-						  else{
-							  System.out.println("	Right "+i+" = "+s2[i]);
-						  }
-					  }
-					 System.out.println("  getLeft() = "+current.getLeft());
-					 System.out.println("  getRight ="+ current.getRight());
-					 i2++;
-				 }*/
-				 
 				 complexSet = model.getObjects(Complex.class);
 				 i2=0;
 				 for (Complex current : complexSet){
@@ -1361,6 +1334,55 @@ public class MainMatrix extends PApplet {
 					 i2++;
 				 }
 				 i2=0;
+				 
+				 
+				 reactionSet = model.getObjects(BiochemicalReaction.class);
+				 i2=0;
+				 for (BiochemicalReaction current : reactionSet){
+					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
+					  Object[] s = current.getLeft().toArray();
+					  for (int i=0;i<s.length;i++){
+						  String name = getProteinName(s[i].toString());
+						  if (name!=null)
+							  System.out.println("	Left "+(i+1)+" = "+name);
+						  else{
+							  if (s[i].toString().contains("Complex")){
+								  System.out.println("	Left "+(i+1)+" = "+s[i]);
+								  int id = getComplex_RDFId_to_id(s[i].toString());
+								  ArrayList<String> components = getAllGenesInComplexById(id);
+									 for (int k=0;k<components.size();k++){
+										 System.out.println("		 contains "+components.get(k));
+								  }
+							  }
+							  else
+								  System.out.println("	Left "+(i+1)+" = "+s[i]);
+						  }
+					  }
+
+					  Object[] s2 = current.getRight().toArray();
+					  for (int i=0;i<s2.length;i++){
+						  String name = getProteinName(s2[i].toString());
+						  if (name!=null)
+							  System.out.println("	Right "+(i+1)+" = "+name);
+						  else{
+							  if (s2[i].toString().contains("Complex")){
+								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
+								  int id = getComplex_RDFId_to_id(s2[i].toString());
+								  ArrayList<String> components = getAllGenesInComplexById(id);
+									 for (int k=0;k<components.size();k++){
+										 System.out.println("		 contains "+components.get(k));
+								  }
+							  }
+							  else		
+								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
+						  }
+					  }
+					// System.out.println("  		getLeft() = "+current.getLeft());
+					// System.out.println("  		getRight() ="+ current.getRight());
+					 i2++;
+				 }
+				 
+				 
 				 
 				 /*
 				 for (Complex current : complexSet){
@@ -1488,7 +1510,7 @@ public class MainMatrix extends PApplet {
 			//write();
 			
 			
-			//vennOverview.compute();
+			vennOverview.compute();
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
 			PopupGroup.s = 0;
@@ -1518,7 +1540,6 @@ public class MainMatrix extends PApplet {
 			allGenes.add(gene2);
 			gggHash.put(gene2,ggg.size());
 			ggg.add(new Gene(gene2, ggg.size()));
-			
 		}
 	}
 	
