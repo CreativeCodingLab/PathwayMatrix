@@ -1293,7 +1293,8 @@ public class MainMatrix extends PApplet {
 					 }
 					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName().replace("phospho-", ""));
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName().replace("phospho-", ""));
-					i2++;
+					 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getEntityReference());
+					 i2++;
 				 }
 					
 				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
@@ -1510,7 +1511,7 @@ public class MainMatrix extends PApplet {
 			//write();
 			
 			
-			vennOverview.compute();
+			//vennOverview.compute();
 			PopupOrder.s =0;
 			Gene.orderByRandom(p);
 			PopupGroup.s = 0;

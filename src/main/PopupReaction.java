@@ -79,6 +79,15 @@ public class PopupReaction{
 			iP[p] =   new Integrator(20, 0.5f,0.1f);
 		}
 	}
+	
+	public int getProteinIndex(String s){
+		for (int p=0; p<proteins.length;p++){
+			if (s.contains(proteins[p])){
+				return p;
+			}
+		}
+		return -1;
+	}
 		
 	// Sort decreasing order
 	public static Map<BiochemicalReaction, Integer> sortByComparator(Map<BiochemicalReaction, Integer> unsortMap) {
@@ -114,7 +123,10 @@ public class PopupReaction{
 		parent.text("Reaction",x+w1/2,18);
 	
 		if (hightlightList==null) return;
-			
+	
+		x=x-800;
+		
+		
 		int countLitems = 0;
 		for (int i=0;i<hightlightList.length;i++){
 			if (hightlightList[i]>=1){
@@ -122,7 +134,7 @@ public class PopupReaction{
 			}
 		}
 		
-		if (bPopup == true || b>=-1){
+		//if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -141,10 +153,11 @@ public class PopupReaction{
 			parent.fill(200);
 			///parent.fill(255);
 			parent.stroke(0,150);
-			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
+			parent.rect(x-260, yBegin, w+1000,iY[itemHash.size()-1].value+100);
 			
-			int i=0;
 			
+			
+			float xRect = x+300;
 			// Draw another button
 			if (sAll){
 				parent.noStroke();
@@ -159,9 +172,10 @@ public class PopupReaction{
 				parent.fill(0);
 			}
 			parent.textSize(13);
-			parent.textAlign(PApplet.LEFT);
-			parent.text("All complexes",x+50,45);
+			parent.textAlign(PApplet.CENTER);
+			parent.text("All Reactions",xRect,45);
 			
+			int i=0;
 			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
 				float textSixe = PApplet.map(iH[i].value, 0, 20, 2, 13);
 				parent.textSize(textSixe);
@@ -169,8 +183,7 @@ public class PopupReaction{
 				if (i==s){
 					parent.noStroke();
 					parent.fill(0);
-					parent.rect(x+10,iY[i].value-iH[i].value,w-25,iH[i].value);
-				
+					parent.rect(xRect-10,iY[i].value-iH[i].value,w-25,iH[i].value);
 					parent.fill(255,0,0);
 				}
 				else if (i==b){
@@ -179,8 +192,8 @@ public class PopupReaction{
 				else{
 					parent.fill(0);
 				}
-				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey().getDisplayName(),x+50,iY[i].value-iH[i].value/4);
+				parent.textAlign(PApplet.CENTER);
+				//parent.text(entry.getKey().getDisplayName(),xRect,iY[i].value-iH[i].value/4);
 				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				
 				parent.noStroke();
@@ -193,7 +206,7 @@ public class PopupReaction{
 				else{
 					parent.fill(0);
 				}
-				parent.ellipse(x+30,iY[i].value-iH[i].value/2, r, r);
+				parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
 				
 				// Draw structures
 				if (i==b){
@@ -205,6 +218,9 @@ public class PopupReaction{
 			
 			// Draw proteins
 			float h3 = (parent.height-yBeginList)/(proteins.length);
+			float xL = x;
+			float xR = x+600;
+			
 			if (h3>maxH)
 				h3 =maxH;
 			for (int p=0; p<proteins.length;p++){
@@ -215,9 +231,86 @@ public class PopupReaction{
 				float y3 = iP[p].value;
 				parent.fill(0);
 				parent.textAlign(PApplet.RIGHT);
-				parent.text(proteins[p], x-100,y3);
+				parent.text(proteins[p], xL,y3);
+				
+				parent.textAlign(PApplet.LEFT);
+				parent.text(proteins[p], xR,y3);
+		
 			}
-		}
+		//}
+			
+			int i2=0;
+			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+				 //for (BiochemicalReaction current : main.MainMatrix.reactionSet){
+				//System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
+				
+				BiochemicalReaction rect = entry.getKey();
+				Object[] s = rect.getLeft().toArray();
+				  for (int i3=0;i3<s.length;i3++){
+					  String name = main.MainMatrix.getProteinName(s[i3].toString());
+					  if (name!=null){
+						 // System.out.println("	Left "+(i3+1)+" = "+name);
+						  int pIndex = getProteinIndex(name);
+						  if (pIndex>=0){
+							  parent.stroke(200,0,0);
+							  parent.line(xL, iP[pIndex].value-h3/4f, xRect, iY[i2].value-iH[i2].value/2);
+						  }
+					  }	  
+					  else{
+						  if (s[i3].toString().contains("Complex")){
+							//  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
+							  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
+							  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+							  for (int k=0;k<components.size();k++){
+								//	 System.out.println("		 contains "+components.get(k));
+								  
+								  int pIndex = getProteinIndex(components.get(k));
+								  if (pIndex>=0){
+									  parent.stroke(0,0,150);
+									  parent.line(xL, iP[pIndex].value-h3/4f, xRect, iY[i2].value-iH[i2].value/2);
+								  }
+							  }
+						  }
+						  //else
+						//	  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
+					  }
+				  }
+
+				  Object[] s2 = rect.getRight().toArray();
+				  for (int i3=0;i3<s2.length;i3++){
+					  String name = main.MainMatrix.getProteinName(s2[i3].toString());
+					  if (name!=null){
+						  //System.out.println("	Right "+(i3+1)+" = "+name);
+						  int pIndex = getProteinIndex(name);
+						  if (pIndex>=0){
+							  parent.stroke(200,0,0);
+							  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-h3/4f);
+						  }
+					  }
+					  else{
+						  if (s2[i3].toString().contains("Complex")){
+						//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
+							  int id = main.MainMatrix.getComplex_RDFId_to_id(s2[i3].toString());
+							  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+							  for (int k=0;k<components.size();k++){
+								//	 System.out.println("		 contains "+components.get(k));
+								  int pIndex = getProteinIndex(components.get(k));
+								  if (pIndex>=0){
+									  parent.stroke(0,0,150);
+									  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR, iP[pIndex].value-h3/4f);
+								  }
+							  }
+						  }
+						 // else		
+						//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
+					  }
+				  }
+				// System.out.println("  		getLeft() = "+current.getLeft());
+				// System.out.println("  		getRight() ="+ current.getRight());
+				 i2++;
+			 }
+			
+			
 		/* if (b==-1){
 			int i=0;
 			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
@@ -231,7 +324,7 @@ public class PopupReaction{
 	}
 	
 	
-	 
+	
 	 
 	// DOWN STREAM
 	public void drawRelationshipDownStream(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
