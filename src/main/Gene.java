@@ -236,6 +236,7 @@ public class Gene {
 			mapGene.put(ggg.get(i).name, i);
 		}
 		
+		/*
 		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
 		for (int i=0;i<ggg.size();i++){
 			unsortMap.put(ggg.get(i).name, 0);
@@ -264,16 +265,30 @@ public class Gene {
 			break;
 		}
 		int index1 = mapGene.get(firstEntry.getKey());
-		int orderReading1 = index1;
+		int orderReading1 = index1;*/
+		
 		
 		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
+		
+		int currentIndex = 0;
+		int newOrder = 0;
 		for (int i=0;i<ggg.size();i++){
-			ggg.get(index1).order=i;
-			processedGenes.add(orderReading1);
+			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedGenes.add(i);
+				ggg.get(i).order = newOrder;
+				newOrder++;
+				currentIndex = i;
+			}
+		}
+		for (int i=0;i<ggg.size();i++){
 			if (i==ggg.size()-1) break;
-			int similarIndex =  getSimilarGene(orderReading1,processedGenes);
-			index1 = similarIndex;
-			orderReading1 = index1;
+			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)) continue;
+			
+			int similarIndex =  getSimilarGene(currentIndex,processedGenes);
+			ggg.get(similarIndex).order=newOrder;
+			newOrder++;
+			currentIndex = similarIndex;
+			processedGenes.add(currentIndex);
 		}
 	}
 	

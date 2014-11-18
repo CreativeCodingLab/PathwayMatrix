@@ -30,7 +30,7 @@ public class PopupReaction{
 	public static float maxSize = 0;
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
-	public float maxH = 20;
+	public float maxH = 22;
 	
 	public static Map<BiochemicalReaction, Integer> itemHash =  new HashMap<BiochemicalReaction, Integer>();
 	
@@ -134,7 +134,7 @@ public class PopupReaction{
 			}
 		}
 		
-		//if (bPopup == true || b>=-1){
+		if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -150,7 +150,7 @@ public class PopupReaction{
 			}
 		
 		
-			parent.fill(200);
+			parent.fill(220,245);
 			///parent.fill(255);
 			parent.stroke(0,150);
 			parent.rect(x-260, yBegin, w+1000,iY[itemHash.size()-1].value+100);
@@ -177,7 +177,7 @@ public class PopupReaction{
 			
 			int i=0;
 			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-				float textSixe = PApplet.map(iH[i].value, 0, 20, 2, 13);
+				float textSixe = PApplet.map(iH[i].value, 0, maxH, 2, 13);
 				parent.textSize(textSixe);
 				
 				if (i==s){
@@ -229,7 +229,16 @@ public class PopupReaction{
 			}
 			for (int p=0; p<proteins.length;p++){
 				float y3 = iP[p].value;
+				float textSixe = PApplet.map(h3, 0, maxH, 2, 13);
+				parent.textSize(textSixe);
+				
 				parent.fill(0);
+				if (main.MainMatrix.isSmallMolecule(proteins[p])){
+					parent.fill(80);
+					parent.textSize(textSixe*3/4f);
+					
+				}	
+					
 				parent.textAlign(PApplet.RIGHT);
 				parent.text(proteins[p], xL,y3);
 				
@@ -309,7 +318,7 @@ public class PopupReaction{
 				// System.out.println("  		getRight() ="+ current.getRight());
 				 i2++;
 			 }
-			
+		}	
 			
 		/* if (b==-1){
 			int i=0;

@@ -195,6 +195,7 @@ public class MainMatrix extends PApplet {
 	public static  Map<String,String> mapElementRef;
 	public static  Map<String,String> mapElementGenericRef;
 	public static  Map<String,String> mapElementRDFId;
+	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
 	public static Set<Complex> complexSet; 
 	public static Set<BiochemicalReaction> reactionSet; 
@@ -1282,7 +1283,8 @@ public class MainMatrix extends PApplet {
 				mapElementRef = new HashMap<String,String>();
 				mapElementGenericRef = new HashMap<String,String>();
 				mapElementRDFId = new HashMap<String,String>();
-				
+				mapSmallMoleculeRDFId =  new HashMap<String,String>();
+					
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
 				 int i2=0;
 				 for (Protein currentProtein : proteinSet){
@@ -1307,6 +1309,7 @@ public class MainMatrix extends PApplet {
 					 }
 					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
 					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
 					 i2++;
 				 }
@@ -1520,7 +1523,6 @@ public class MainMatrix extends PApplet {
 	
 	public static void storeData(String rel, String gene1, String gene2){
 		// Store results for visualization
-		
 		if (!pairs[processingMiner].contains(rel)){
 			pairs[processingMiner].add(rel);
 		}	
@@ -1551,6 +1553,13 @@ public class MainMatrix extends PApplet {
 		if (s1==null)
 			s1 = mapElementRDFId.get(name);
 		return s1;
+	}
+	
+	public static boolean isSmallMolecule(String name){	
+		if (mapSmallMoleculeRDFId.containsValue(name))
+			return true;
+		else
+			return false;
 	}
 	
 	
