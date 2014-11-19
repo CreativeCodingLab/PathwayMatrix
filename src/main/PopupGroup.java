@@ -62,7 +62,8 @@ public class PopupGroup{
 			
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
+			parent.textSize(13);
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
 			parent.textAlign(PApplet.CENTER);

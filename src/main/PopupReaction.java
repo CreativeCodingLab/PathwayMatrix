@@ -1,5 +1,4 @@
 package main;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,6 +30,7 @@ public class PopupReaction{
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
 	public float maxH = 22;
+	float hProtein = 0;
 	
 	public static Map<BiochemicalReaction, Integer> itemHash =  new HashMap<BiochemicalReaction, Integer>();
 	
@@ -78,6 +78,7 @@ public class PopupReaction{
 			proteins[p] =  main.MainMatrix.ggg.get(p).name;
 			iP[p] =   new Integrator(20, 0.5f,0.1f);
 		}
+		updateProteinPositions();
 	}
 	
 	public int getProteinIndex(String s){
@@ -88,6 +89,17 @@ public class PopupReaction{
 		}
 		return -1;
 	}
+	
+	public void updateProteinPositions(){
+		hProtein = (parent.height-yBeginList)/(proteins.length);
+		if (hProtein>maxH)
+			hProtein =maxH;
+		for (int p=0; p<proteins.length;p++){
+			int order = main.MainMatrix.ggg.get(p).order;
+			iP[p].target(yBeginList+hProtein*order);
+		}
+	}
+		
 		
 	// Sort decreasing order
 	public static Map<BiochemicalReaction, Integer> sortByComparator(Map<BiochemicalReaction, Integer> unsortMap) {
@@ -116,7 +128,7 @@ public class PopupReaction{
 		x = x_;
 		checkBrushing();
 		parent.textSize(13);
-		parent.fill(125,125,125);
+		parent.fill(150);
 		parent.rect(x,0,w1,25);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
@@ -134,7 +146,7 @@ public class PopupReaction{
 			}
 		}
 		
-		if (bPopup == true || b>=-1){
+		//if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -217,19 +229,15 @@ public class PopupReaction{
 			}	
 			
 			// Draw proteins
-			float h3 = (parent.height-yBeginList)/(proteins.length);
 			float xL = x;
 			float xR = x+600;
-			
-			if (h3>maxH)
-				h3 =maxH;
 			for (int p=0; p<proteins.length;p++){
-				iP[p].target(yBeginList+h3*p);
 				iP[p].update();
 			}
+			
 			for (int p=0; p<proteins.length;p++){
 				float y3 = iP[p].value;
-				float textSixe = PApplet.map(h3, 0, maxH, 2, 13);
+				float textSixe = PApplet.map(hProtein, 0, maxH, 2, 13);
 				parent.textSize(textSixe);
 				
 				parent.fill(0);
@@ -246,7 +254,7 @@ public class PopupReaction{
 				parent.text(proteins[p], xR,y3);
 		
 			}
-		//}
+		
 			
 			int i2=0;
 			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
@@ -262,7 +270,7 @@ public class PopupReaction{
 						  int pIndex = getProteinIndex(name);
 						  if (pIndex>=0){
 							  parent.stroke(200,0,0);
-							  parent.line(xL, iP[pIndex].value-h3/4f, xRect, iY[i2].value-iH[i2].value/2);
+							  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
 						  }
 					  }	  
 					  else{
@@ -276,7 +284,7 @@ public class PopupReaction{
 								  int pIndex = getProteinIndex(components.get(k));
 								  if (pIndex>=0){
 									  parent.stroke(0,0,150);
-									  parent.line(xL, iP[pIndex].value-h3/4f, xRect, iY[i2].value-iH[i2].value/2);
+									  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
 								  }
 							  }
 						  }
@@ -293,7 +301,7 @@ public class PopupReaction{
 						  int pIndex = getProteinIndex(name);
 						  if (pIndex>=0){
 							  parent.stroke(200,0,0);
-							  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-h3/4f);
+							  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-hProtein/4f);
 						  }
 					  }
 					  else{
@@ -306,7 +314,7 @@ public class PopupReaction{
 								  int pIndex = getProteinIndex(components.get(k));
 								  if (pIndex>=0){
 									  parent.stroke(0,0,150);
-									  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR, iP[pIndex].value-h3/4f);
+									  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR, iP[pIndex].value-hProtein/4f);
 								  }
 							  }
 						  }
@@ -318,7 +326,7 @@ public class PopupReaction{
 				// System.out.println("  		getRight() ="+ current.getRight());
 				 i2++;
 			 }
-		}	
+		//}	
 			
 		/* if (b==-1){
 			int i=0;

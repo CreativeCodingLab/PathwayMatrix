@@ -13,12 +13,6 @@ package main;
  * for the specific language governing rights and limitations under the License.
  */
 
-import static main.MainMatrix.geneRelationList;
-import static main.MainMatrix.ggg;
-import static main.MainMatrix.minerList;
-import static main.MainMatrix.minerNames;
-import static main.MainMatrix.pairs;
-
 import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -436,10 +430,11 @@ public class MainMatrix extends PApplet {
 			check2.draw(this.width-600, 70);
 			button.draw();
 			popupGroup.draw(this.width-100);
-			popupOrder.draw(this.width-202);
 			popupRelation.draw(this.width-304);
 			popupComplex.draw(this.width-406);
 			popupReaction.draw(this.width-508);
+			popupOrder.draw(this.width-202);
+			
 		}
 		catch (Exception e){
 			System.out.println();

@@ -31,6 +31,7 @@ public class PopupRelation{
 	public void draw(float x_){
 		x = x_;
 		checkBrushing();
+		parent.textSize(13);
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
@@ -102,7 +103,7 @@ public class PopupRelation{
 			*/	
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
 			parent.textAlign(PApplet.CENTER);

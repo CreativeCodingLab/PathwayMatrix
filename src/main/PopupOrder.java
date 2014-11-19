@@ -31,7 +31,9 @@ public class PopupOrder{
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
+			parent.textSize(13);
 			h=items.length*itemH+40;
+			parent.noStroke();
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
@@ -62,10 +64,12 @@ public class PopupOrder{
 			
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
+			parent.noStroke();
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
 			parent.textAlign(PApplet.CENTER);
+			parent.textSize(13);
 			parent.text("Order by",x+w1/2,y+18);
 		}	
 	}
@@ -98,6 +102,7 @@ public class PopupOrder{
 				main.PopupGroup.s=0;
 				Gene.orderByComplex();
 			}	
+			main.MainMatrix.popupReaction.updateProteinPositions();
 		}
 	}
 	 

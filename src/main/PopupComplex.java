@@ -96,7 +96,7 @@ public class PopupComplex{
 		x = x_;
 		checkBrushing();
 		parent.textSize(13);
-		parent.fill(125,125,125);
+		parent.fill(150);
 		parent.rect(x,0,w1,25);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
