@@ -548,7 +548,7 @@ public class MainMatrix extends PApplet {
 			int numE = locals[index].size();
 			float ww = ggg.get(index).iW.value;
 			String name = ggg.get(index).name;
-			this.fill(70);
+			this.fill(50);
 			float fontSize = PApplet.map(numE, 1, maxElement, 10, 18);
 			this.textSize(fontSize);
 			if (locals[index].size()>1){
@@ -556,6 +556,8 @@ public class MainMatrix extends PApplet {
 				this.fill(0);
 			}	
 			if (ww>8){
+				if (isSmallMolecule(name))
+					this.fill(100);
 				float xx =  ggg.get(index).iX.value;
 				this.textAlign(PApplet.LEFT);
 				float al = -PApplet.PI/2;
@@ -567,6 +569,8 @@ public class MainMatrix extends PApplet {
 			}
 			float hh =ggg.get(index).iH.value;
 			if (hh>8){
+				if (isSmallMolecule(name))
+					this.fill(100);
 				float yy =  ggg.get(index).iY.value;
 				this.textAlign(PApplet.RIGHT);
 				this.text(name, marginX-6, yy+hh/2+fontSize/3);
@@ -616,7 +620,6 @@ public class MainMatrix extends PApplet {
 	
 	// Draw group names
 	public void drawGenesInGroup(int maxElement) {
-		
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int index = entryI.getKey();
 			// Check if this is grouping
@@ -803,8 +806,13 @@ public class MainMatrix extends PApplet {
 			float ww = ggg.get(i).iW.value;
 			if (ww>10){
 				float xx =  ggg.get(i).iX.value;
-				
-				this.fill(50,50,50);
+				this.fill(50);
+				this.textSize(13);
+				if (isSmallMolecule(ggg.get(i).name)){
+					this.fill(100);
+					this.textSize(10);
+				}	
+					
 				this.textAlign(PApplet.LEFT);
 				float al = -PApplet.PI/2;
 				this.translate(xx+ww/2+5,marginY-8);
@@ -816,8 +824,12 @@ public class MainMatrix extends PApplet {
 			float hh =ggg.get(i).iH.value;
 			if (hh>10){
 				float yy =  ggg.get(i).iY.value;
-				this.fill(50,50,50);
-				
+				this.fill(50);
+				this.textSize(13);
+				if (isSmallMolecule(ggg.get(i).name)){
+					this.fill(100);
+					this.textSize(10);
+				}	
 				this.textAlign(PApplet.RIGHT);
 				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
 			}

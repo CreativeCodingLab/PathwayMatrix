@@ -229,68 +229,155 @@ public class Gene {
 	
 	
 	
-	// Order by similarity
+	// Order by similarity *********** SMALL MOLECULES are first
 	public static void orderBySimilarity(){	
-		Map<String, Integer> mapGene = new HashMap<String, Integer>();
-		for (int i=0;i<ggg.size();i++){
-			mapGene.put(ggg.get(i).name, i);
+		int maxminIndex = -1;
+		double maxRelation = -100;
+		
+		// Find the smallest molecule
+		for (int p=0;p<ggg.size();p++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+				int count = getNumberRelationOfProtein(p);
+				if (count>maxRelation){
+					maxRelation = count;
+					maxminIndex = p;
+				}	
+			}
+		}
+		System.out.println("maxminIndex="+maxminIndex + " 	count="+getNumberRelationOfProtein(maxminIndex));
+		
+		// Find the smallest protein
+		double minRelation = Double.POSITIVE_INFINITY;
+		if (maxminIndex<0){
+			for (int p=0;p<ggg.size();p++){
+				if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+					continue;
+				}
+				int count = getNumberRelationOfProtein(p);
+				if (count<minRelation){
+					minRelation = count;
+					maxminIndex = p;
+				}	
+			}
 		}
 		
-		/*
-		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
-		for (int i=0;i<ggg.size();i++){
-			unsortMap.put(ggg.get(i).name, 0);
-		}
+		// Process small molecules
+		ArrayList<Integer> processedProteins =  new ArrayList<Integer>();
+		int beginIndex = maxminIndex;
+		int order = 0;
+		ggg.get(beginIndex).order=order;
+		order++;
+		processedProteins.add(beginIndex);
 		
-		for (int m=0;m<pairs.length;m++){
-			for (int i=0;i<pairs[m].size();i++){
-				String pair = pairs[m].get(i);
-				String gene1 = pair.split("\t")[0];
-				String gene2 = pair.split("\t")[1];
-				int c = unsortMap.get(gene1);
-				c++;
-				unsortMap.put(gene1, c);
-				c = unsortMap.get(gene2);
-				c++;
-				unsortMap.put(gene2, c);
+		// Eliminate proteins
+		for (int i=0;i<ggg.size();i++){
+			if (!main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedProteins.add(i);
 			}
 		}	
-		
-		Map<String, Integer> sortedMap = sortByComparator(unsortMap);
-		
-		
-		Map.Entry<String, Integer> firstEntry = null;
-		for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
-			firstEntry = entry;
-			break;
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedProteins);
+			if (similarIndex<0) break;  // can not find more small molecules
+			
+			ggg.get(similarIndex).order=order;
+			System.out.println("	"+i+"  beginMolecule="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedProteins.add(similarIndex);
 		}
-		int index1 = mapGene.get(firstEntry.getKey());
-		int orderReading1 = index1;*/
-		
 		
 		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
 		
-		int currentIndex = 0;
-		int newOrder = 0;
+		// Eliminate small molecules
 		for (int i=0;i<ggg.size();i++){
 			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
 				processedGenes.add(i);
-				ggg.get(i).order = newOrder;
-				newOrder++;
-				currentIndex = i;
 			}
 		}
+		
 		for (int i=0;i<ggg.size();i++){
-			if (i==ggg.size()-1) break;
-			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)) continue;
+			int similarIndex =  getSimilarGene(beginIndex, processedGenes);
+			if (similarIndex<0) break;  // can not find more protein
 			
-			int similarIndex =  getSimilarGene(currentIndex,processedGenes);
-			ggg.get(similarIndex).order=newOrder;
-			newOrder++;
-			currentIndex = similarIndex;
-			processedGenes.add(currentIndex);
+			ggg.get(similarIndex).order=order;
+			//System.out.println("	"+i+"  beginIndex="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedGenes.add(similarIndex);
 		}
+		
+		
+		
 	}
+	
+	// Order by similarity *********** SMALL MOLECULES are last
+	/*
+	public static void orderBySimilarity(){	
+		int minIndex = -1;
+		double minRelation = Double.POSITIVE_INFINITY;
+		// Find the smallest protein
+		for (int p=0;p<ggg.size();p++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+				continue;
+			}
+			int count = getNumberRelationOfProtein(p);
+			if (count<minRelation){
+				minRelation = count;
+				minIndex = p;
+			}	
+		}
+		
+		System.out.println("	minIndex = "+minIndex);
+		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
+		int beginIndex = minIndex;
+		int order = 0;
+			
+		ggg.get(beginIndex).order=order;
+		order++;
+		processedGenes.add(beginIndex);
+		// Eliminate small molecules
+		for (int i=0;i<ggg.size();i++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedGenes.add(i);
+				System.out.println("   isSmallMolecule ="+ggg.get(i).name);
+			}
+		}
+		
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedGenes);
+			if (similarIndex<0) break;  // can not find more protein
+			
+			ggg.get(similarIndex).order=order;
+			System.out.println("	"+i+"  beginIndex="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedGenes.add(similarIndex);
+		}
+		
+		// Process small molecules
+		ArrayList<Integer> processedProteins =  new ArrayList<Integer>();
+		for (int i=0;i<ggg.size();i++){
+			if (!main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedProteins.add(i);
+			}
+		}	
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedProteins);
+			if (similarIndex<0) break;  // can not find more small molecules
+			
+			ggg.get(similarIndex).order=order;
+			System.out.println("	"+i+"  beginMolecule="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedProteins.add(similarIndex);
+		}
+		
+	}
+	*/
 	
 	// Order by Complex
 	public static void orderByComplex(){	
@@ -298,7 +385,6 @@ public class Gene {
 		for (int i=0;i<ggg.size();i++){
 			unsortMap.put(ggg.get(i).name, ggg.get(i).order);
 		}
-		
 		Map<String, Integer> sortedMap = sortByComparator(unsortMap);
 		
 		
@@ -319,8 +405,19 @@ public class Gene {
 			index1 = similarIndex;
 			orderReading1 = index1;
 		}
-		
 	}
+	public static int getNumberRelationOfProtein(int p){
+		int count=0;
+		for (int i=0;i<ggg.size();i++){
+			if (geneRelationList[p][i]!=null)
+				count+=geneRelationList[p][i].size();
+			if (geneRelationList[i][p]!=null)
+				count+=geneRelationList[i][p].size();
+		}
+		return count;
+	}
+		
+	
 	public static int getSimilarGeneComplex(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
 		int minIndex = -1;
