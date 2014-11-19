@@ -37,8 +37,12 @@ public class PopupReaction{
 	public String[] proteins = null;
 	public Integrator[] iP;
 	
+	public static CheckBox checkGroup;
+	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
+		checkGroup = new CheckBox(parent, "Lensing");
+		
 		// Proteins list
 	}
 	
@@ -146,7 +150,7 @@ public class PopupReaction{
 			}
 		}
 		
-		//if (bPopup == true || b>=-1){
+		if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -165,7 +169,7 @@ public class PopupReaction{
 			parent.fill(220,245);
 			///parent.fill(255);
 			parent.stroke(0,150);
-			parent.rect(x-260, yBegin, w+1000,iY[itemHash.size()-1].value+100);
+			parent.rect(x-260, yBegin, w+1000,parent.height);
 			
 			
 			
@@ -260,6 +264,9 @@ public class PopupReaction{
 		
 			}
 			drawReactions(xL, xL2, xRect, xR, xR2);
+			checkGroup.draw((int) (xR+200), 50);
+			
+		}	
 	}
 	
 	
@@ -283,6 +290,9 @@ public class PopupReaction{
 					  if (pIndex>=0){
 						  parent.stroke(200,0,0,sat);
 						  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
+					  }
+					  else{
+						  System.out.println("CAN NOT find protein = "+name+"	s[i3]="+s[i3]);
 					  }
 				  }	  
 				  else{
@@ -473,7 +483,7 @@ public class PopupReaction{
 				return;
 			}	
 			for (int i=0; i<itemHash.size(); i++){
-				if (x<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
+				if (x<=mX && mX<=x+w*2 && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					b =i;
 					hightlightList[i] = 1; 
 					return;

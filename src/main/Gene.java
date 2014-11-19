@@ -49,8 +49,8 @@ public class Gene {
 	
 	public static void compute(){
 		 hGenes = new Hashtable<String,int[]>();
-		 for (int i=0; i<main.MainMatrix.allGenes.size();i++){
-			 hGenes.put(main.MainMatrix.allGenes.get(i), new int[numMinerContainData]);
+		 for (int i=0; i<main.MainMatrix.ggg.size();i++){
+			 hGenes.put(main.MainMatrix.ggg.get(i).name, new int[numMinerContainData]);
 		 }
 		 maxRelationOfGenes = -1;
 		 for (int j=0; j<numMinerContainData;j++){
@@ -244,7 +244,6 @@ public class Gene {
 				}	
 			}
 		}
-		System.out.println("maxminIndex="+maxminIndex + " 	count="+getNumberRelationOfProtein(maxminIndex));
 		
 		// Find the smallest protein
 		double minRelation = Double.POSITIVE_INFINITY;
@@ -280,8 +279,6 @@ public class Gene {
 			if (similarIndex<0) break;  // can not find more small molecules
 			
 			ggg.get(similarIndex).order=order;
-			System.out.println("	"+i+"  beginMolecule="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
-			
 			order++;
 			beginIndex = similarIndex;
 			processedProteins.add(similarIndex);
