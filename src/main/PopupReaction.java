@@ -169,7 +169,7 @@ public class PopupReaction{
 			
 			
 			
-			float xRect = x+300;
+			float xRect = x+400;
 			// Draw another button
 			if (sAll){
 				parent.noStroke();
@@ -220,20 +220,25 @@ public class PopupReaction{
 				}
 				parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
 				
-				// Draw structures
-				if (i==b){
-					int indexSet = getIndexInSet(b);
-					drawRelationshipDownStream(indexSet,b, 255,0,50,150, true,0);
-				}
 				i++;
 			}	
 			
 			// Draw proteins
 			float xL = x;
-			float xR = x+600;
-			for (int p=0; p<proteins.length;p++){
+			float xL2 = xL+200;
+			float xR = x+800;
+			float xR2 = xR-200;
+			 for (int p=0; p<proteins.length;p++){
 				iP[p].update();
 			}
+			
+			parent.fill(0);
+			parent.textSize(13);
+			parent.textAlign(PApplet.CENTER);
+			parent.text("Input Proteins", xL, 45);
+			parent.text("Input Complexes", xL2, 45);
+			parent.text("Output Complexes", xR2, 45);
+			parent.text("Output Proteins", xR, 45);
 			
 			for (int p=0; p<proteins.length;p++){
 				float y3 = iP[p].value;
@@ -254,128 +259,118 @@ public class PopupReaction{
 				parent.text(proteins[p], xR,y3);
 		
 			}
-		
-			
-			int i2=0;
-			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-				 //for (BiochemicalReaction current : main.MainMatrix.reactionSet){
-				//System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
-				
-				BiochemicalReaction rect = entry.getKey();
-				Object[] s = rect.getLeft().toArray();
-				  for (int i3=0;i3<s.length;i3++){
-					  String name = main.MainMatrix.getProteinName(s[i3].toString());
-					  if (name!=null){
-						 // System.out.println("	Left "+(i3+1)+" = "+name);
-						  int pIndex = getProteinIndex(name);
-						  if (pIndex>=0){
-							  parent.stroke(200,0,0);
-							  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
-						  }
-					  }	  
-					  else{
-						  if (s[i3].toString().contains("Complex")){
-							//  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
-							  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
-							  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
-							  for (int k=0;k<components.size();k++){
-								//	 System.out.println("		 contains "+components.get(k));
-								  
-								  int pIndex = getProteinIndex(components.get(k));
-								  if (pIndex>=0){
-									  parent.stroke(0,0,150);
-									  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
-								  }
-							  }
-						  }
-						  //else
-						//	  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
-					  }
-				  }
-
-				  Object[] s2 = rect.getRight().toArray();
-				  for (int i3=0;i3<s2.length;i3++){
-					  String name = main.MainMatrix.getProteinName(s2[i3].toString());
-					  if (name!=null){
-						  //System.out.println("	Right "+(i3+1)+" = "+name);
-						  int pIndex = getProteinIndex(name);
-						  if (pIndex>=0){
-							  parent.stroke(200,0,0);
-							  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-hProtein/4f);
-						  }
-					  }
-					  else{
-						  if (s2[i3].toString().contains("Complex")){
-						//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
-							  int id = main.MainMatrix.getComplex_RDFId_to_id(s2[i3].toString());
-							  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
-							  for (int k=0;k<components.size();k++){
-								//	 System.out.println("		 contains "+components.get(k));
-								  int pIndex = getProteinIndex(components.get(k));
-								  if (pIndex>=0){
-									  parent.stroke(0,0,150);
-									  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR, iP[pIndex].value-hProtein/4f);
-								  }
-							  }
-						  }
-						 // else		
-						//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
-					  }
-				  }
-				// System.out.println("  		getLeft() = "+current.getLeft());
-				// System.out.println("  		getRight() ="+ current.getRight());
-				 i2++;
-			 }
-		//}	
-			
-		/* if (b==-1){
-			int i=0;
-			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-				int indexSet = getIndexInSet(i);
-				drawRelationshipDownStream(indexSet,i, 0,0,0,80, false, 0);
-				i++;
-			}
-				
-		}*/
-			
+			drawReactions(xL, xL2, xRect, xR, xR2);
 	}
 	
 	
 	
 	 
-	// DOWN STREAM
-	public void drawRelationshipDownStream(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
-		 ArrayList<String> components = main.MainMatrix.getComplexById(indexSet);
-		 for (int i=0;i<components.size();i++){
-			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
-			 if (indexSet2>=0){
-				int indexHash2 = getIndexInHash(indexSet2);
-				float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
-				float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
-				float xx = x+30;
-				float yy = (yy1+yy2)/2;
-				parent.noFill();
-				
-				float num = main.MainMatrix.getAllGenesInComplexById(indexSet2).size();
-				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
-				int g2 = g+0*level;
-				if (g2>255)
-					g2=255;
-				int b2 = b+40*level;
-				if (b2>255)
-					b2=255;
-				
-				parent.noFill();
-				parent.strokeWeight(thickness);
-				parent.stroke(r,g2,b2,alpha);
-				parent.arc(xx, yy, yy2-yy1,yy2-yy1, PApplet.PI/2, 3*PApplet.PI/2);
-				
-				if (recursive){
-					drawRelationshipDownStream(indexSet2,indexHash2, r,g,b,150, true, level+1);
-				}
-			}
+	// draw Reactions links
+	public void drawReactions(float xL, float xL2, float xRect, float xR, float xR2) {
+		int i2=0;
+		float sat =200;
+		for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+			 //for (BiochemicalReaction current : main.MainMatrix.reactionSet){
+			//System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
+			
+			BiochemicalReaction rect = entry.getKey();
+			Object[] s = rect.getLeft().toArray();
+			  for (int i3=0;i3<s.length;i3++){
+				  String name = main.MainMatrix.getProteinName(s[i3].toString());
+				  if (name!=null){
+					 // System.out.println("	Left "+(i3+1)+" = "+name);
+					  int pIndex = getProteinIndex(name);
+					  if (pIndex>=0){
+						  parent.stroke(200,0,0,sat);
+						  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
+					  }
+				  }	  
+				  else{
+					  if (s[i3].toString().contains("Complex")){
+						//  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
+						  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
+						  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+						  
+						  float yL2 = 0;
+						  int numAvailableComponents = 0;
+						  for (int k=0;k<components.size();k++){
+							  int pIndex = getProteinIndex(components.get(k));
+							  if (pIndex>=0){
+								  yL2+= iP[pIndex].value-hProtein/4f;
+								  numAvailableComponents++;
+							  }	  
+						  }
+						  if (numAvailableComponents==0)
+							  yL2 =iY[i2].value-iH[i2].value/2;
+						  else 	  
+							  yL2 /= numAvailableComponents;
+						  for (int k=0;k<components.size();k++){
+							//	 System.out.println("		 contains "+components.get(k));
+							  int pIndex = getProteinIndex(components.get(k));
+							  if (pIndex>=0){
+								  parent.stroke(0,100,150,sat);
+								  parent.line(xL, iP[pIndex].value-hProtein/4f, xL2, yL2);
+							  }
+						  }
+						  parent.stroke(0,0,150,sat);
+						  parent.line(xL2, yL2, xRect, iY[i2].value-iH[i2].value/2);
+					  }
+					  //else
+					//	  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
+				  }
+			  }
+
+			  Object[] s2 = rect.getRight().toArray();
+			  for (int i3=0;i3<s2.length;i3++){
+				  String name = main.MainMatrix.getProteinName(s2[i3].toString());
+				  if (name!=null){
+					  //System.out.println("	Right "+(i3+1)+" = "+name);
+					  int pIndex = getProteinIndex(name);
+					  if (pIndex>=0){
+						  parent.stroke(200,0,0);
+						  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-hProtein/4f);
+					  }
+				  }
+				  else{
+					  if (s2[i3].toString().contains("Complex")){
+					//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
+						  int id = main.MainMatrix.getComplex_RDFId_to_id(s2[i3].toString());
+						  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+						  float yR2 = 0;
+						  int numAvailableComponents = 0;
+						  for (int k=0;k<components.size();k++){
+							  int pIndex = getProteinIndex(components.get(k));
+							  if (pIndex>=0){
+								  yR2+= iP[pIndex].value-hProtein/4f;
+								  numAvailableComponents++;
+							  }	  
+						  }
+						  if (numAvailableComponents==0)
+							  yR2 =iY[i2].value-iH[i2].value/2;
+						  else 	  
+							  yR2 /= numAvailableComponents;
+						  
+						  parent.stroke(0,0,150,sat);
+						  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR2, yR2);
+					
+						  for (int k=0;k<components.size();k++){
+							//	 System.out.println("		 contains "+components.get(k));
+							  int pIndex = getProteinIndex(components.get(k));
+							  if (pIndex>=0){
+								  parent.stroke(0,100,150,sat);
+								  parent.line(xR2, yR2, xR, iP[pIndex].value-hProtein/4f);
+							  }
+						  }
+							
+					  }
+					 // else		
+					//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
+				  }
+			  }
+			// System.out.println("  		getLeft() = "+current.getLeft());
+			// System.out.println("  		getRight() ="+ current.getRight());
+			 i2++;
 		 }
-		 parent.strokeWeight(1);
 	 }
 		
 	
