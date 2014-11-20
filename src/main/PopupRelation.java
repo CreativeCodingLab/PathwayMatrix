@@ -45,12 +45,10 @@ public class PopupRelation{
 					max = sqrt;
 			}
 			for (int i=0;i<items.length;i++){
-				//int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
 				if (s[i]){
 					parent.noStroke();
 					parent.fill(0);
 					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-				
 					parent.fill(main.MainMatrix.colorRelations[i]);
 				}
 				else if (i==b){
