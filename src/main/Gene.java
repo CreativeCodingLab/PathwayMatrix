@@ -88,7 +88,7 @@ public class Gene {
 		maxGeneInComplex = 0;
 		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
 		for (int c=0;c<main.MainMatrix.complexSet.size();c++){
-			ArrayList<String> a = main.MainMatrix.getAllGenesInComplexById(c);
+			ArrayList<String> a = main.MainMatrix.proteinsInComplex[c];
 			for (int i=0;i<ggg.size();i++){
 				for (int j=0;j<ggg.size();j++){
 					if (a.indexOf(ggg.get(i).name)>=0 && a.indexOf(ggg.get(j).name)>=0){

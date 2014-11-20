@@ -115,7 +115,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "../level3RAS/RAF-Cascade.owl";
+	public String currentFile = "../level3RAS/Rb-E2FpathwayReactome.owl";
 	
 	public static Button button;
 	
@@ -190,7 +190,10 @@ public class MainMatrix extends PApplet {
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
 	public static Set<Complex> complexSet; 
+	public static  Map<String,Integer> mapComplexRDFId_index;
 	public static Set<BiochemicalReaction> reactionSet; 
+	
+	public static ArrayList<String>[] proteinsInComplex; 
 	
 	
 	public static void main(String args[]){
@@ -435,8 +438,6 @@ public class MainMatrix extends PApplet {
 			
 		}
 		catch (Exception e){
-			System.out.println();
-			System.out.println("*******************Catch ERROR in Draw buttons*******************");
 			e.printStackTrace();
 			return;
 		}
@@ -894,7 +895,7 @@ public class MainMatrix extends PApplet {
 	}	
 	
 	public void drawComplex(int complex, int r, int g, int b) {
-		ArrayList<String> a = getAllGenesInComplexById(complex);
+		ArrayList<String> a = proteinsInComplex[complex];
 		for (int i=0;i<a.size();i++){
 			int indexI = getProteinOrderByName(a.get(i));
 			if (indexI<0) { // Exception *******************************
@@ -986,7 +987,6 @@ public class MainMatrix extends PApplet {
 			if (PopupReaction.checkGroup.s){
 				
 			}
-				
 		}
 		else if (PopupReaction.bPopup){
 			popupReaction.mouseClicked();
@@ -1063,49 +1063,6 @@ public class MainMatrix extends PApplet {
 			p = parent_;
 		}
 		
-		
-		public String fetchID(BioPAXElement ele){
-		//	if (ele!=null)
-		//		System.out.println("     ele="+ele.toString()+"   "+ele.getRDFId()+"   "+ele.getAnnotations() );
-			if (ele instanceof SmallMoleculeReference){
-				SmallMoleculeReference smr = (SmallMoleculeReference) ele;
-				if (smr.getDisplayName() != null) {
-				//	System.out.println("		SmallMoleculeReference = "+smr.getDisplayName());
-					return smr.getDisplayName();
-				}
-				else if (!smr.getName().isEmpty())
-					return smr.getName().iterator().next();
-				else return null;
-			}
-			else if (ele instanceof XReferrable){
-				for (Xref xr : ((XReferrable) ele).getXref())
-				{
-					String db = xr.getDb();
-					if (db != null)
-					{
-						db = db.toLowerCase();
-						if (db.startsWith("hgnc"))
-						{
-							String id = xr.getId();
-							if (id != null)
-							{
-								String symbol = HGNC.getSymbol(id);
-								//System.out.println("	symbol = "+symbol);
-								if (symbol != null && !symbol.isEmpty()){
-									return symbol;
-								}
-							}
-						}
-					}
-				}
-			}
-			return null;
-		}
-		
-		
-		
-			
-		
 		@SuppressWarnings("unchecked")
 		public void run() {
 			isAllowedDrawing =  false;
@@ -1131,7 +1088,7 @@ public class MainMatrix extends PApplet {
 				mapElementGenericRef = new HashMap<String,String>();
 				mapElementRDFId = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
-					
+				mapComplexRDFId_index =  new HashMap<String,Integer>();
 					
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
@@ -1191,6 +1148,8 @@ public class MainMatrix extends PApplet {
 				 i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
+					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
+					 
 					 ArrayList<String> components = getComplexById(i2);
 					 for (int i=0;i<components.size();i++){
 						 System.out.println("	"+components.get(i));
@@ -1199,6 +1158,8 @@ public class MainMatrix extends PApplet {
 				 }
 				 i2=0;
 				 
+				 proteinsInComplex = new ArrayList[complexSet.size()];
+				 computeProteinsInComplex();
 				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
 				 i2=0;
@@ -1210,10 +1171,10 @@ public class MainMatrix extends PApplet {
 						  if (name!=null)
 							  System.out.println("	Left "+(i+1)+" = "+name);
 						  else{
-							  if (s[i].toString().contains("Complex")){
+							  if (mapComplexRDFId_index.get(s[i].toString())!=null){
 								  System.out.println("	Left "+(i+1)+" = "+s[i]);
-								  int id = getComplex_RDFId_to_id(s[i].toString());
-								  ArrayList<String> components = getAllGenesInComplexById(id);
+								  int id = mapComplexRDFId_index.get(s[i].toString());
+								  ArrayList<String> components = proteinsInComplex[id];
 									 for (int k=0;k<components.size();k++){
 										 System.out.println("		 contains "+components.get(k));
 								  }
@@ -1229,10 +1190,10 @@ public class MainMatrix extends PApplet {
 						  if (name!=null)
 							  System.out.println("	Right "+(i+1)+" = "+name);
 						  else{
-							  if (s2[i].toString().contains("Complex")){
+							 if (mapComplexRDFId_index.get(s2[i].toString())!=null){
 								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
-								  int id = getComplex_RDFId_to_id(s2[i].toString());
-								  ArrayList<String> components = getAllGenesInComplexById(id);
+								  int id = mapComplexRDFId_index.get(s2[i].toString());
+								  ArrayList<String> components = proteinsInComplex[id];
 									 for (int k=0;k<components.size();k++){
 										 System.out.println("		 contains "+components.get(k));
 								  }
@@ -1394,7 +1355,18 @@ public class MainMatrix extends PApplet {
 		 }
 		 return components;
 	}
-	public static ArrayList<String> getAllGenesInComplexById(int id){	
+	
+	public static void computeProteinsInComplex(){	
+		int i2=0;
+		for (Complex current : complexSet){
+			proteinsInComplex[i2] = getProteinsInComplexById(i2);
+			i2++;
+		}
+			
+		
+	}
+		
+	public static ArrayList<String> getProteinsInComplexById(int id){	
 		ArrayList<String> components = new ArrayList<String>(); 
 		int i2=0;
 		
@@ -1406,16 +1378,18 @@ public class MainMatrix extends PApplet {
 					  if (getProteinName(s2[i].toString())!=null)
 						  components.add(getProteinName(s2[i].toString()));
 					  else {
-						  int id4 =  getComplex_RDFId_to_id(s2[i].toString());
-						 
-						  if (id4>=0){
-							  ArrayList<String> s4 = getAllGenesInComplexById(id4);
+						  if (mapComplexRDFId_index.get(s2[i].toString())==null){
+							  components.add(s2[i].toString());
+						  }
+						  else{
+							  int id4 = mapComplexRDFId_index.get(s2[i].toString());
+							  ArrayList<String> s4 = getProteinsInComplexById(id4);
 							  for (int k=0;k<s4.size();k++){
 								  components.add(s4.get(k));
 							  }
 						  }
-						  else
-							  components.add(s2[i].toString());
+						 
+							  
 					  }
 				 }
 				  found = true;
@@ -1430,17 +1404,8 @@ public class MainMatrix extends PApplet {
 	
 	
 	
-	public static int getComplex_RDFId_to_id(String RDFId){	
-		int idddd = -1;
-		int i=0;
-		for (Complex current : complexSet){
-			 if (RDFId.equals(current.getRDFId())){
-				 idddd=i;
-			 }
-			 i++;
-		 }
-		return idddd;
-	}
+		
+	
 	
 	//Update genes for drawing
 	public void write(){	

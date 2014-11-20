@@ -30,8 +30,6 @@ public class PopupComplex{
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
 	public float maxH = 20;
-	
-	
 	public static Map<Complex, Integer> itemHash =  new HashMap<Complex, Integer>();
 	
 	public PopupComplex(PApplet parent_){
@@ -44,7 +42,7 @@ public class PopupComplex{
 		Map<Complex, Integer> unsortMap  =  new HashMap<Complex, Integer>();
 		s=-400;
 		for (Complex current : main.MainMatrix.complexSet){
-			int size = main.MainMatrix.getAllGenesInComplexById(i).size();
+			int size = main.MainMatrix.proteinsInComplex[i].size();
 			unsortMap.put(current, size);
 			if (size>maxSize)
 				maxSize = size;
@@ -66,7 +64,6 @@ public class PopupComplex{
 		for (i=0;i<itemHash.size();i++){
 			hightlightList[i] = -1;
 		}
-			
 	}
 		
 	// Sort decreasing order
@@ -101,8 +98,6 @@ public class PopupComplex{
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
 		parent.text("Complex",x+w1/2,18);
-	
-		//
 		if (hightlightList==null) return;
 			
 		int countLitems = 0;
@@ -112,7 +107,6 @@ public class PopupComplex{
 			}
 		}
 		if (bPopup == true || b>=-1){
-			
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -129,7 +123,6 @@ public class PopupComplex{
 		
 		
 			parent.fill(200);
-			///parent.fill(255);
 			parent.stroke(0,150);
 			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
 			
@@ -160,7 +153,6 @@ public class PopupComplex{
 					parent.noStroke();
 					parent.fill(0);
 					parent.rect(x+10,iY[i].value-iH[i].value,w-25,iH[i].value);
-				
 					parent.fill(255,0,0);
 				}
 				else if (i==b){
@@ -235,7 +227,7 @@ public class PopupComplex{
 			float yy = (yy1+yy2)/2;
 			parent.noFill();
 			
-			float num = main.MainMatrix.getAllGenesInComplexById(indexSet).size();
+			float num = main.MainMatrix.proteinsInComplex[indexSet].size();
 			float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 			int g2 = g+40*level;
 			if (g2>255)
@@ -244,7 +236,6 @@ public class PopupComplex{
 			if (b2>255)
 				b2=255;
 			
-			//System.out.println("    parentSetIDs="+parentSetIDs+"	thickness="+thickness);
 			parent.noFill();
 			parent.strokeWeight(thickness);
 			parent.stroke(r,g2,b2,alpha);
@@ -254,7 +245,6 @@ public class PopupComplex{
 				int indexSet2 = parentSetIDs.get(i);
 				drawRelationshipUpStream(getEntryHashId(indexHash2), indexSet2,indexHash2, r,g,b,150, true, level+1);
 			}
-			
 		 }
 		 parent.strokeWeight(1);
 	 }	 
@@ -265,16 +255,16 @@ public class PopupComplex{
 	public void drawRelationshipDownStream(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
 		 ArrayList<String> components = main.MainMatrix.getComplexById(indexSet);
 		 for (int i=0;i<components.size();i++){
-			 int indexSet2 = main.MainMatrix.getComplex_RDFId_to_id(components.get(i));
-			 if (indexSet2>=0){
-				int indexHash2 = getIndexInHash(indexSet2);
+			 if (main.MainMatrix.mapComplexRDFId_index.get(components.get(i))!=null){
+				 int indexSet2 = main.MainMatrix.mapComplexRDFId_index.get(components.get(i));
+				 int indexHash2 = getIndexInHash(indexSet2);
 				float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
 				float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
 				float xx = x+30;
 				float yy = (yy1+yy2)/2;
 				parent.noFill();
 				
-				float num = main.MainMatrix.getAllGenesInComplexById(indexSet2).size();
+				float num = main.MainMatrix.proteinsInComplex[indexSet2].size();
 				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				int g2 = g+0*level;
 				if (g2>255)

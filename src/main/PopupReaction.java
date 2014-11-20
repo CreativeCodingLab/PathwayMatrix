@@ -36,6 +36,8 @@ public class PopupReaction{
 	public static Map<BiochemicalReaction, Integer> itemHash =  new HashMap<BiochemicalReaction, Integer>();
 	
 	public String[] proteins = null;
+	public static  Map<String,Integer> mapComplexRDFId_index;
+	
 	public ArrayList<Integer> bProteinLeft = new ArrayList<Integer>();
 	public ArrayList<Integer> bProteinRight = new ArrayList<Integer>();
 	public Integrator[] iP;
@@ -51,8 +53,6 @@ public class PopupReaction{
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		checkGroup = new CheckBox(parent, "Lensing");
-		
-		// Proteins list
 	}
 	
 	public void setItems(){
@@ -70,9 +70,9 @@ public class PopupReaction{
 				  if (name!=null){
 					  size++;
 				  }	  
-				  else if (s[i3].toString().contains("Complex")){
-					  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
-					  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+				  else if (main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString())!=null){
+					  int id = main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString());
+					  ArrayList<String> components = main.MainMatrix.proteinsInComplex[id];
 					  size += components.size();
 				  }
 				  else 
@@ -102,22 +102,17 @@ public class PopupReaction{
 		}
 			
 		proteins =  new String[main.MainMatrix.ggg.size()];
+		mapComplexRDFId_index = new HashMap<String,Integer>();
 		iP =  new Integrator[main.MainMatrix.ggg.size()];
 		for (int p=0; p<main.MainMatrix.ggg.size();p++){
 			proteins[p] =  main.MainMatrix.ggg.get(p).name;
+			mapComplexRDFId_index.put( main.MainMatrix.ggg.get(p).name, p);
 			iP[p] =   new Integrator(20, 0.5f,0.1f);
 		}
 		updateProteinPositions();
 	}
 	
-	public int getProteinIndex(String s){
-		for (int p=0; p<proteins.length;p++){
-			if (s.contains(proteins[p])){
-				return p;
-			}
-		}
-		return -1;
-	}
+	
 	
 	public void updateProteinPositions(){
 		hProtein = (parent.height-yBeginList)/(proteins.length);
@@ -130,8 +125,6 @@ public class PopupReaction{
 	}
 	
 	public void countProteinParticipation(){
-		
-		
 	}
 
 		
@@ -162,10 +155,10 @@ public class PopupReaction{
 	public void draw(float x_){
 		x = x_-800;
 		xL = x;
-		xL2 = xL+200;
+		xL2 = xL+150;
 		xRect = x+400;
 		xR = x+800;
-		xR2 = xR-200;
+		xR2 = xR-150;
 		
 		checkBrushing();
 		parent.textSize(13);
@@ -179,8 +172,6 @@ public class PopupReaction{
 	
 		if (hightlightList==null) return;
 	
-		
-		
 		int countLitems = 0;
 		for (int i=0;i<hightlightList.length;i++){
 			if (hightlightList[i]>=1){
@@ -202,13 +193,10 @@ public class PopupReaction{
 				iY[i].update();
 				iH[i].update();
 			}
-		
-		
 			parent.fill(230,250);
 			///parent.fill(255);
 			parent.stroke(0,150);
 			parent.rect(x-260, yBegin, w+1000,parent.height);
-			
 			
 			
 			// Draw another button
@@ -243,7 +231,6 @@ public class PopupReaction{
 			
 			for (int p=0; p<proteins.length;p++){
 				if (bRect>=0){
-					
 					// Get protein in the brushing reactions
 					int i4=0;
 					for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
@@ -315,26 +302,22 @@ public class PopupReaction{
 		for (int i3=0;i3<s.length;i3++){
 			  String name = main.MainMatrix.getProteinName(s[i3].toString());
 			  if (name!=null){
-				  int pIndex = getProteinIndex(name);
-				  if (pIndex>=0){
-					  a.add(pIndex);
+				  if (mapComplexRDFId_index.get(name)!=null){
+					  a.add(mapComplexRDFId_index.get(name));
 				  }
 				  else{
 					  System.out.println("CAN NOT find protein = "+name+"	s[i3]="+s[i3]);
 				  }
 			  }	  
 			  else{
-				  if (s[i3].toString().contains("Complex")){
-					  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
-					  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
-					  
+				  if (main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString())!=null){
+					  int id = main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString());
+					  ArrayList<String> components = main.MainMatrix.proteinsInComplex[id];
 					  for (int k=0;k<components.size();k++){
-						  int pIndex = getProteinIndex(components.get(k));
-						  if (pIndex>=0){
-							  a.add(pIndex);
+						  if (mapComplexRDFId_index.get(components.get(k))!=null){
+							  a.add(mapComplexRDFId_index.get(components.get(k)));
 						  }	  
 					  }
-					 
 				  }
 				  //else
 				//	  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
@@ -352,8 +335,9 @@ public class PopupReaction{
 		if (main.MainMatrix.isSmallMolecule(proteins[p])){
 			parent.fill(80,sat);
 			parent.textSize(textSixe*3/4f);
-			
-		}	
+		}
+		if (sat>=255 && textSixe<10)
+			parent.textSize(10);
 		parent.textAlign(PApplet.RIGHT);
 		parent.text(proteins[p], xL,y3);
 	}
@@ -366,8 +350,10 @@ public class PopupReaction{
 		if (main.MainMatrix.isSmallMolecule(proteins[p])){
 			parent.fill(80,sat);
 			parent.textSize(textSixe*3/4f);
-			
-		}	
+		}
+		if (sat>=255 && textSixe<10)
+			parent.textSize(10);
+		
 		parent.textAlign(PApplet.LEFT);
 		parent.text(proteins[p], xR,y3);
 	}
@@ -400,27 +386,28 @@ public class PopupReaction{
 			  String name = main.MainMatrix.getProteinName(s[i3].toString());
 			  if (name!=null){
 				 // System.out.println("	Left "+(i3+1)+" = "+name);
-				  int pIndex = getProteinIndex(name);
-				  if (pIndex>=0){
+				  if (mapComplexRDFId_index.get(name)!=null){
 					  parent.stroke(200,0,0,sat);
-					  parent.line(xL, iP[pIndex].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
+					  parent.line(xL, iP[mapComplexRDFId_index.get(name)].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
 				  }
 				  else{
 					  System.out.println("CAN NOT find protein = "+name+"	s[i3]="+s[i3]);
 				  }
 			  }	  
+			 // getRDFId = http://www.reactome.org/biopax/50/453279#Complex59
 			  else{
-				  if (s[i3].toString().contains("Complex")){
-					//  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
-					  int id = main.MainMatrix.getComplex_RDFId_to_id(s[i3].toString());
-					  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+				  if (main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString())!=null){
+					  int id = main.MainMatrix.mapComplexRDFId_index.get(s[i3].toString());
+					  //if (id<0)
+						//  System.out.println("	Left "+(i3+1)+" = "+s[i3]);
+						 
+					  ArrayList<String> components = main.MainMatrix.proteinsInComplex[id];
 					  
 					  float yL2 = 0;
 					  int numAvailableComponents = 0;
 					  for (int k=0;k<components.size();k++){
-						  int pIndex = getProteinIndex(components.get(k));
-						  if (pIndex>=0){
-							  yL2+= iP[pIndex].value-hProtein/4f;
+						  if (mapComplexRDFId_index.get(components.get(k))!=null){
+							  yL2+= iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f;
 							  numAvailableComponents++;
 						  }	  
 					  }
@@ -430,10 +417,9 @@ public class PopupReaction{
 						  yL2 /= numAvailableComponents;
 					  for (int k=0;k<components.size();k++){
 						//	 System.out.println("		 contains "+components.get(k));
-						  int pIndex = getProteinIndex(components.get(k));
-						  if (pIndex>=0){
+						  if (mapComplexRDFId_index.get(components.get(k))!=null){
 							  parent.stroke(0,100,150,sat);
-							  parent.line(xL, iP[pIndex].value-hProtein/4f, xL2, yL2);
+							  parent.line(xL, iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f, xL2, yL2);
 						  }
 					  }
 					  parent.stroke(0,0,150,sat);
@@ -449,23 +435,20 @@ public class PopupReaction{
 			  String name = main.MainMatrix.getProteinName(s2[i3].toString());
 			  if (name!=null){
 				  //System.out.println("	Right "+(i3+1)+" = "+name);
-				  int pIndex = getProteinIndex(name);
-				  if (pIndex>=0){
+				  if (mapComplexRDFId_index.get(name)!=null){
 					  parent.stroke(200,0,0,sat);
-					  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[pIndex].value-hProtein/4f);
+					  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[mapComplexRDFId_index.get(name)].value-hProtein/4f);
 				  }
 			  }
 			  else{
-				  if (s2[i3].toString().contains("Complex")){
-				//	  System.out.println("	Right "+(i3+1)+" = "+s2[i3]);
-					  int id = main.MainMatrix.getComplex_RDFId_to_id(s2[i3].toString());
-					  ArrayList<String> components = main.MainMatrix.getAllGenesInComplexById(id);
+				  if (main.MainMatrix.mapComplexRDFId_index.get(s2[i3].toString())!=null){
+					  int id = main.MainMatrix.mapComplexRDFId_index.get(s2[i3].toString());
+					  ArrayList<String> components = main.MainMatrix.proteinsInComplex[id];
 					  float yR2 = 0;
 					  int numAvailableComponents = 0;
 					  for (int k=0;k<components.size();k++){
-						  int pIndex = getProteinIndex(components.get(k));
-						  if (pIndex>=0){
-							  yR2+= iP[pIndex].value-hProtein/4f;
+						  if (mapComplexRDFId_index.get(components.get(k))!=null){
+							  yR2+= iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f;
 							  numAvailableComponents++;
 						  }	  
 					  }
@@ -479,10 +462,9 @@ public class PopupReaction{
 				
 					  for (int k=0;k<components.size();k++){
 						//	 System.out.println("		 contains "+components.get(k));
-						  int pIndex = getProteinIndex(components.get(k));
-						  if (pIndex>=0){
+						  if (mapComplexRDFId_index.get(components.get(k))!=null){
 							  parent.stroke(0,100,150,sat);
-							  parent.line(xR2, yR2, xR, iP[pIndex].value-hProtein/4f);
+							  parent.line(xR2, yR2, xR, iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f);
 						  }
 					  }
 						
