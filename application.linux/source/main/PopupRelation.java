@@ -10,7 +10,7 @@ public class PopupRelation{
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
-	public int w1 = 120;
+	public int w1 = 100;
 	public int w = 400;
 	public int h = 28;
 	public int itemH = 20;
@@ -31,6 +31,7 @@ public class PopupRelation{
 	public void draw(float x_){
 		x = x_;
 		checkBrushing();
+		parent.textSize(13);
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
@@ -44,12 +45,10 @@ public class PopupRelation{
 					max = sqrt;
 			}
 			for (int i=0;i<items.length;i++){
-				//int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
 				if (s[i]){
 					parent.noStroke();
 					parent.fill(0);
 					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-				
 					parent.fill(main.MainMatrix.colorRelations[i]);
 				}
 				else if (i==b){
@@ -102,11 +101,11 @@ public class PopupRelation{
 			*/	
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
-			parent.textAlign(PApplet.LEFT);
-			parent.text("Gene relations",x+10,y+18);
+			parent.textAlign(PApplet.CENTER);
+			parent.text("Relations",x+w1/2,y+18);
 		}	
 	}
 	

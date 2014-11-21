@@ -13,13 +13,6 @@ package main;
  * for the specific language governing rights and limitations under the License.
  */
 
-import static javax.swing.JOptionPane.showMessageDialog;
-import static main.MainMatrix.geneRelationList;
-import static main.MainMatrix.ggg;
-import static main.MainMatrix.minerList;
-import static main.MainMatrix.minerNames;
-import static main.MainMatrix.pairs;
-
 import java.awt.Color;
 import java.awt.FileDialog;
 import java.awt.Frame;
@@ -33,14 +26,29 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.biopax.paxtools.io.SimpleIOHandler;
+import org.biopax.paxtools.io.sbgn.L3ToSBGNPDConverter;
+import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
+import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
+import org.biopax.paxtools.model.level2.biochemicalReaction;
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
+import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.EntityReference;
+import org.biopax.paxtools.model.level3.PhysicalEntity;
+import org.biopax.paxtools.model.level3.Protein;
+import org.biopax.paxtools.model.level3.SmallMolecule;
+import org.biopax.paxtools.model.level3.SmallMoleculeReference;
+import org.biopax.paxtools.model.level3.XReferrable;
+import org.biopax.paxtools.model.level3.Xref;
 import org.biopax.paxtools.pattern.Match;
 import org.biopax.paxtools.pattern.Pattern;
 import org.biopax.paxtools.pattern.Searcher;
@@ -63,15 +71,18 @@ import org.biopax.paxtools.pattern.miner.ControlsStateChangeOfMiner;
 import org.biopax.paxtools.pattern.miner.ControlsTransportMiner;
 import org.biopax.paxtools.pattern.miner.ControlsTransportOfChemicalMiner;
 import org.biopax.paxtools.pattern.miner.DirectedRelationMiner;
+import org.biopax.paxtools.pattern.miner.IDFetcher;
 import org.biopax.paxtools.pattern.miner.InComplexWithMiner;
 import org.biopax.paxtools.pattern.miner.InteractsWithMiner;
 import org.biopax.paxtools.pattern.miner.Miner;
 import org.biopax.paxtools.pattern.miner.NeighborOfMiner;
 import org.biopax.paxtools.pattern.miner.ReactsWithMiner;
 import org.biopax.paxtools.pattern.miner.RelatedGenesOfInteractionsMiner;
+import org.biopax.paxtools.pattern.miner.SIFInteraction;
 import org.biopax.paxtools.pattern.miner.UbiquitousIDMiner;
 import org.biopax.paxtools.pattern.miner.UsedToProduceMiner;
 import org.biopax.paxtools.pattern.util.Blacklist;
+import org.biopax.paxtools.pattern.util.HGNC;
 
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 import edu.uic.ncdm.venn.Venn_Overview;
@@ -102,20 +113,21 @@ public class MainMatrix extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	//public String currentFile = "./level3/ATM Mediated Phosphorylation of Repair Proteins.owl";
+	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
+	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
+	public String currentFile = "../level3RAS/Ras_Pathway.owl";
 	
 	public static Button button;
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
-	public static ArrayList<String>[] genes;
+//	public static ArrayList<String>[] genes;
 	public static ArrayList<Integer>[][] geneRelationList;
+	public static int[][] gene_gene_InComplex; 
+	public static int maxGeneInComplex; 
 	
 	// Global data
-	public static ArrayList<String> allGenes = new ArrayList<String>();
 	public static String[] minerNames;
-	//public static ArrayList<String> gen = new ArrayList<String>();
 	public static ArrayList<Gene> ggg = new ArrayList<Gene>();
 	
 	public static Map<Integer, Integer> leaderSortedMap;
@@ -147,6 +159,8 @@ public class MainMatrix extends PApplet {
 	public int bX,bY;
 	
 	// Order genes
+	public static PopupComplex popupComplex;
+	public static PopupReaction popupReaction;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
 	public static PopupGroup popupGroup;
@@ -166,9 +180,20 @@ public class MainMatrix extends PApplet {
 	public static boolean isAllowedDrawing = false;
 	public static int  ccc = 0; // count to draw progessing bar
 	
-	
-	
 	public PFont metaBold = loadFont("Arial-BoldMT-18.vlw");
+	
+	
+	// New to read data 
+	public static  Map<String,String> mapElementRef;
+	public static  Map<String,String> mapElementGenericRef;
+	public static  Map<String,String> mapElementRDFId;
+	public static  Map<String,String> mapSmallMoleculeRDFId;
+	public static  Map<String,String> mapPhysicalEntity;
+	public static Set<Complex> complexSet; 
+	public static  Map<String,Integer> mapComplexRDFId_index;
+	public static Set<BiochemicalReaction> reactionSet; 
+	
+	public static ArrayList<String>[] proteinsInComplex; 
 	
 	
 	public static void main(String args[]){
@@ -237,12 +262,13 @@ public class MainMatrix extends PApplet {
 		//minerList.add(new CSCOBothControllerAndParticipantMiner());
 		//minerList.add(new CSCOThroughControllingSmallMoleculeMiner());
 		//minerList.add(new CSCOThroughBindingSmallMoleculeMiner());
+		//minerList.add(new CSCOThroughDegradationMiner());
 		//minerList.add(new ControlsStateChangeDetailedMiner());
 		//minerList.add(new ControlsPhosphorylationMiner());
+		
 		minerList.add(new ControlsTransportMiner());
 		minerList.add(new ControlsExpressionMiner());
 		minerList.add(new ControlsExpressionWithConvMiner());
-		//minerList.add(new CSCOThroughDegradationMiner());
 		minerList.add(new ControlsDegradationIndirectMiner());
 		minerList.add(new ConsumptionControlledByMiner());
 		minerList.add(new ControlsProductionOfMiner());
@@ -255,8 +281,8 @@ public class MainMatrix extends PApplet {
 		minerList.add(new NeighborOfMiner());
 		minerList.add(new ReactsWithMiner());
 		minerList.add(new UsedToProduceMiner());
-		minerList.add(new RelatedGenesOfInteractionsMiner());
-		minerList.add(new UbiquitousIDMiner());
+		//minerList.add(new RelatedGenesOfInteractionsMiner()); Genes related to Biochemical reactions which involves multiple proteins/complex input and output
+		//minerList.add(new UbiquitousIDMiner());
 	
 		colorRelations =  new int[minerList.size()];
 		for (int i=0; i<minerList.size();i++){
@@ -288,6 +314,8 @@ public class MainMatrix extends PApplet {
 		
 		button = new Button(this);
 		popupRelation = new PopupRelation(this);
+		popupComplex = new PopupComplex(this);
+		popupReaction = new PopupReaction(this);
 		popupOrder  = new PopupOrder(this);
 		popupGroup  = new PopupGroup(this);
 		check1 = new CheckBox(this, "Lensing");
@@ -297,46 +325,23 @@ public class MainMatrix extends PApplet {
 		vennDetail = new Venn_Detail(this);
 		thread1=new Thread(loader1);
 		thread1.start();
+		
+		// enable the mouse wheel, for zooming
+		addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+			public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+				mouseWheel(evt.getWheelRotation());
+			}
+		});
 	}	
 	
 	
-	public void computeRelationship(String fileName, int relID) {
-		File modFile = new File(fileName);
-		File outFile = new File("output.txt");
-		SimpleIOHandler io = new SimpleIOHandler();
-		Model model;
-		try{
-			model = io.convertFromOWL(new FileInputStream(modFile));
-		}
-		catch (FileNotFoundException e){
-			e.printStackTrace();
-			showMessageDialog(this, "File not found: " + modFile.getPath());
-			return;
-		}
-
-		// Search
-		Miner min = minerList.get(relID);
-		Pattern p = min.getPattern();
-		Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
-
-		try{
-			FileOutputStream os = new FileOutputStream(outFile);
-			min.writeResult(matches, os);
-			
-			os.close();
-		}
-		catch (IOException e){
-			e.printStackTrace();
-			showMessageDialog(this, "Error occurred while writing the results");
-			return;
-		}
-	}
+	
 		
 	
 	public void draw() {
 		background(255);
-		
 		// Print message
+		
 		if (processingMiner<colorRelations.length){
 			ccc+=10;
 			if (ccc>10000) ccc=0;
@@ -346,14 +351,41 @@ public class MainMatrix extends PApplet {
 			
 			this.fill(colorRelations[processingMiner]);
 			this.textSize(14);
+			this.textAlign(PApplet.LEFT);
 			this.text(message, marginX+20,this.height-14);
 		}
-
+		
+		if (PopupReaction.sPopup)
+			popupReaction.drawReactions();
+		else{
+			drawMatrix();
+			this.textSize(13);
+			check1.draw(this.width-600, 50);
+			check2.draw(this.width-600, 70);
+			
+		}	
+		// Draw button
+		try{
+			this.textSize(13);
+			button.draw();
+			popupGroup.draw(this.width-100);
+			popupRelation.draw(this.width-304);
+			popupComplex.draw(this.width-406);
+			popupReaction.drawButton(this.width-508);
+			popupOrder.draw(this.width-202);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return;
+		}
+	}	
+	
+	public void drawMatrix() {
 		if (isAllowedDrawing){
 			if (ggg==null || ggg.size()==0)
 				return;
 			else{
-				size = (this.height-marginY)/allGenes.size();
+				size = (this.height-marginY)/ggg.size();
 				size = size*0.75f;
 				if (size>100)
 					size=100;
@@ -386,7 +418,6 @@ public class MainMatrix extends PApplet {
 				System.out.println();
 				System.out.println("*******************Catch ERROR*******************");
 				e.printStackTrace();
-				System.out.println("**************************************************");
 				return;
 			}
 		}
@@ -396,19 +427,19 @@ public class MainMatrix extends PApplet {
 		float y2 = 140;
 		this.fill(0);
 		this.textAlign(PApplet.LEFT);
-		this.textSize(14);
+		this.textSize(13);
 		this.text("File: "+currentFile, x2, y2);
 		// find minerID index
 		if (Venn_Overview.minerGlobalIDof!=null){
 			if (currentRelation>=0){
 				this.fill(colorRelations[currentRelation]);
 				this.text("Realationship "+currentRelation+": "+minerList.get(currentRelation), x2+250, y2+20);
-				this.text("Total genes: "+genes[currentRelation].size(), x2+250, y2+40);
+				this.text("Total genes: "+ggg.size(), x2+250, y2+40);
 				this.text("Total relations: "+pairs[currentRelation].size(), x2+250, y2+60);
 			}
 			this.fill(0);
 			this.text("Pathway summary", x2, y2+20);
-			this.text("Total genes: "+allGenes.size(), x2, y2+40);
+			this.text("Total genes: "+ggg.size(), x2, y2+40);
 			int totalRelations = 0;
 			for (int i=0;i<pairs.length;i++){
 				totalRelations+=pairs[i].size();
@@ -416,17 +447,9 @@ public class MainMatrix extends PApplet {
 			this.text("Total relations: "+totalRelations, x2, y2+60);
 		}
 		vennOverview.draw(x2+50,300,10);
-		//vennDetail.draw(x2+100,500,10);
-		
-		// Draw button
-		check1.draw(this.width-600, 7);
-		check2.draw(this.width-600, 27);
-		button.draw();
-		popupGroup.draw(this.width-258);
-		popupOrder.draw(this.width-379);
-		popupRelation.draw(this.width-500);
-		
-	}	
+	}
+	
+	
 	
 	public void drawGroups() {
 		if (leaderSortedMap==null) return;
@@ -527,14 +550,16 @@ public class MainMatrix extends PApplet {
 			int numE = locals[index].size();
 			float ww = ggg.get(index).iW.value;
 			String name = ggg.get(index).name;
-			this.fill(70);
+			this.fill(50);
 			float fontSize = PApplet.map(numE, 1, maxElement, 10, 18);
 			this.textSize(fontSize);
 			if (locals[index].size()>1){
-				name = locals[index].size()+" genes";
+				name = locals[index].size()+" proteins";
 				this.fill(0);
 			}	
 			if (ww>8){
+				if (isSmallMolecule(name))
+					this.fill(100);
 				float xx =  ggg.get(index).iX.value;
 				this.textAlign(PApplet.LEFT);
 				float al = -PApplet.PI/2;
@@ -546,6 +571,8 @@ public class MainMatrix extends PApplet {
 			}
 			float hh =ggg.get(index).iH.value;
 			if (hh>8){
+				if (isSmallMolecule(name))
+					this.fill(100);
 				float yy =  ggg.get(index).iY.value;
 				this.textAlign(PApplet.RIGHT);
 				this.text(name, marginX-6, yy+hh/2+fontSize/3);
@@ -557,15 +584,15 @@ public class MainMatrix extends PApplet {
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int indexI = entryI.getKey();
 			// Check if this is grouping
-			float xx =  ggg.get(indexI).iX.value;
-			float ww = ggg.get(indexI).iW.value;
+			float yy =  ggg.get(indexI).iY.value;
+			float hh = ggg.get(indexI).iH.value;
 			
 			int numEx = locals[indexI].size();
 			
 			for (Map.Entry<Integer, Integer> entryJ : leaderSortedMap.entrySet()) {
 				int indexJ = entryJ.getKey();
-				float yy =  ggg.get(indexJ).iY.value;
-				float hh =ggg.get(indexJ).iH.value;
+				float xx =  ggg.get(indexJ).iX.value;
+				float ww =ggg.get(indexJ).iW.value;
 				
 				// Draw background
 				if (indexI!=indexJ && check2.s) {
@@ -595,7 +622,6 @@ public class MainMatrix extends PApplet {
 	
 	// Draw group names
 	public void drawGenesInGroup(int maxElement) {
-		
 		for (Map.Entry<Integer, Integer> entryI : leaderSortedMap.entrySet()) {
 			int index = entryI.getKey();
 			// Check if this is grouping
@@ -693,7 +719,7 @@ public class MainMatrix extends PApplet {
 		this.fill(0);
 		if (count>1){
 			this.textSize(14);
-			this.text("These genes are:",xx3, yy2+13*numE+3);
+			this.text("These proteins are:",xx3, yy2+13*numE+3);
 		}	
 		else{
 			this.textSize(13);
@@ -701,7 +727,7 @@ public class MainMatrix extends PApplet {
 				this.text("No realations between",xx3-10, yy2+13*numE+5);
 			else	
 				this.text("No realations between",xx3, yy2+13*numE+5);
-			this.text("genes in this group",xx3, yy2+13*numE+18);
+			this.text("proteins in this group",xx3, yy2+13*numE+18);
 		}
 	}
 	
@@ -782,23 +808,13 @@ public class MainMatrix extends PApplet {
 			float ww = ggg.get(i).iW.value;
 			if (ww>10){
 				float xx =  ggg.get(i).iX.value;
-				// Draw rose chart
-				/*
-				if (Venn_Overview.numMiner>0){
-					float[] aValues = new float[Venn_Overview.numMiner];
-					for (int r=0;r<Venn_Overview.numMiner && main.Gene.hGenes!=null;r++){
-						String g = gen.get(i);
-						if (main.Gene.hGenes.get(g) == null) continue;// thread exception
-						//int count = main.Gene.hGenes.get(g)[r];
-						//float val = PApplet.map(count, 0, main.Gene.maxRelationOfGenes, 0, 1);
-						//aValues[r] = val;
-					}
-					float x4 = xx+ww/2;
-					float y4 = marginY-20;
-				//	drawRose(x4, y4, ww*2f, aValues);
-				}*/
-				
-				this.fill(50,50,50);
+				this.fill(50);
+				this.textSize(13);
+				if (isSmallMolecule(ggg.get(i).name)){
+					this.fill(100);
+					this.textSize(10);
+				}	
+					
 				this.textAlign(PApplet.LEFT);
 				float al = -PApplet.PI/2;
 				this.translate(xx+ww/2+5,marginY-8);
@@ -810,37 +826,126 @@ public class MainMatrix extends PApplet {
 			float hh =ggg.get(i).iH.value;
 			if (hh>10){
 				float yy =  ggg.get(i).iY.value;
-				this.fill(50,50,50);
+				this.fill(50);
+				this.textSize(13);
+				if (isSmallMolecule(ggg.get(i).name)){
+					this.fill(100);
+					this.textSize(10);
+				}	
 				this.textAlign(PApplet.RIGHT);
 				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
 			}
 		}
-			
+		
+		
+		// All complexes
+		if (PopupComplex.sAll || PopupComplex.b==-1){
+			for (int i=0;i<ggg.size();i++){
+				// Check if this is grouping
+				float yy =  ggg.get(i).iY.value;
+				float hh = ggg.get(i).iH.value;
+				for (int j=0;j<ggg.size();j++){
+					float xx =  ggg.get(j).iX.value;
+					float ww =ggg.get(j).iW.value;
+					if (gene_gene_InComplex[i][j]>0){
+						float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
+						float sat = 50+sat2;
+						this.fill(0,sat);
+						this.noStroke();
+						this.rect(xx, yy, ww, hh);
+					}
+				}
+			}	
+		}
+		
+		// brushingComplex &&&&&& selectedComplex
+		int brushingComplex = popupComplex.getIndexInSet(PopupComplex.b);
+		if (brushingComplex>=0){
+			drawComplex(brushingComplex,200,100,0);
+		}
+		int selectedComplex = popupComplex.getIndexInSet(PopupComplex.s);
+		if (selectedComplex>=0){
+			drawComplex(selectedComplex,255,0,0);
+		}
+		
+		// brushingReaction &&&&&& selectedReaction
+		/*int brushingReaction = popupReaction2.getIndexInSet(PopupComplex.b);
+		if (brushingReaction>=0){
+			drawComplex(brushingComplex,200,100,0);
+		}
+		int selectedRection = popupReaction2.getIndexInSet(PopupComplex.s);
+		if (selectedRection>=0){
+			drawComplex(selectedComplex,255,0,0);
+		}*/
 		
 		
 		this.noStroke();
 		for (int i=0;i<ggg.size();i++){
 			// Check if this is grouping
-			float xx =  ggg.get(i).iX.value;
-			float ww = ggg.get(i).iW.value;
+			float yy =  ggg.get(i).iY.value;
+			float hh = ggg.get(i).iH.value;
 			for (int j=0;j<ggg.size();j++){
-				float yy =  ggg.get(j).iY.value;
-				float hh =ggg.get(j).iH.value;
-				// Draw Rosemary chart
-				if (geneRelationList==null || geneRelationList[i][j]==null) {
-					continue; // no relation of two genes
-				}
-				for (int i2=0;i2<geneRelationList[i][j].size();i2++){
-					int localRalationIndex = geneRelationList[i][j].get(i2);
-					this.noStroke();
-					this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
-					float alpha = PApplet.PI*2/minerGlobalIDof.length;
-					this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
-				}
+				float xx =  ggg.get(j).iX.value;
+				float ww =ggg.get(j).iW.value;
+				
+				if (geneRelationList!=null && geneRelationList[i][j]!=null) {
+				//	System.out.println(geneRelationList+" " +geneRelationList[i][j]);
+					for (int i2=0;i2<geneRelationList[i][j].size();i2++){
+						int localRalationIndex = geneRelationList[i][j].get(i2);
+						this.noStroke();
+						this.fill(colorRelations[minerGlobalIDof[localRalationIndex]]);
+						float alpha = PApplet.PI*2/minerGlobalIDof.length;
+						this.arc(xx+ww/2,yy+hh/2, PApplet.min(ww,hh), PApplet.min(ww,hh), localRalationIndex*alpha, (localRalationIndex+1)*alpha);
+					}
+				}	
 			}
 		}
 	}	
 	
+	public void drawComplex(int complex, int r, int g, int b) {
+		ArrayList<String> a = proteinsInComplex[complex];
+		for (int i=0;i<a.size();i++){
+			int indexI = getProteinOrderByName(a.get(i));
+			if (indexI<0) { // Exception *******************************
+				System.out.println("drawComplex()	CAN NOT FIND protein = "+a.get(i));
+				continue;
+			}	
+			float yy =  ggg.get(indexI).iY.value;
+			float hh = ggg.get(indexI).iH.value;
+			for (int j=0;j<a.size();j++){
+				int indexJ = getProteinOrderByName(a.get(j));
+				if (indexJ<0) { // Exception *******************************
+					System.out.println("drawComplex()	CAN NOT FIND protein = "+a.get(j));
+					continue;
+				}
+				
+				float xx =  ggg.get(indexJ).iX.value;
+				float ww =ggg.get(indexJ).iW.value;
+					
+				this.fill(r,g,b,200);
+				this.noStroke();
+				this.rect(xx, yy, ww, hh);
+			}
+		}
+	}
+	
+	
+		
+	
+	
+	
+		
+	
+	/*
+	public static boolean isInTheSameComplex(int g1, int g2, int c1) {
+		ArrayList<String> a = getAllGenesInComplexById(c1);
+		if (a.indexOf(ggg.get(g1).name)>=0 && a.indexOf(ggg.get(g2).name)>=0){
+			return true;
+		}
+		return false;
+		
+	}*/
+		 
 	
 	public void setValue(Integrator inter, float value) {
 		if (ggg.size()<500){
@@ -881,6 +986,19 @@ public class MainMatrix extends PApplet {
 		}
 		else if (popupRelation.b>=0){
 			popupRelation.mouseClicked();
+		}
+		else if (PopupComplex.b>=-1){
+			popupComplex.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check1.b){
+			PopupReaction.check1.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check5.b){
+			PopupReaction.check5.mouseClicked();
+			popupReaction.updateReactionPositions();
+		}
+		else if (PopupReaction.bPopup){
+			popupReaction.mouseClicked();
 		}
 		else if (popupOrder.b>=0){
 			popupOrder.mouseClicked();
@@ -941,7 +1059,7 @@ public class MainMatrix extends PApplet {
 		if (this.key == 'g' || this.key == 'G'){
 			thread3=new Thread(loader3);
 			thread3.start();
-			main.MainMatrix.stateAnimation=0;
+			stateAnimation=0;
 			PopupGroup.s = 2;
 		}
 	}
@@ -953,6 +1071,7 @@ public class MainMatrix extends PApplet {
 		public ThreadLoader1(PApplet parent_) {
 			p = parent_;
 		}
+		
 		@SuppressWarnings("unchecked")
 		public void run() {
 			isAllowedDrawing =  false;
@@ -962,58 +1081,340 @@ public class MainMatrix extends PApplet {
 			for (int i=0;i<minerList.size();i++){
 				pairs[i] = new ArrayList<String>();
 			}
-			genes = new ArrayList[minerList.size()];
-			for (int i=0;i<minerList.size();i++){
-				genes[i] = new ArrayList<String>();
-			}
 			
-			allGenes = new ArrayList<String>();
 			ggg = new ArrayList<Gene>();
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
+			File modFile = new File(currentFile);
+			File outFile = new File("output.txt");
+			SimpleIOHandler io = new SimpleIOHandler();
+			Model model;
+			try{
+				System.out.println("***************** Load data: "+modFile+" ***************************");
+				model = io.convertFromOWL(new FileInputStream(modFile));
+				mapElementRef = new HashMap<String,String>();
+				mapElementGenericRef = new HashMap<String,String>();
+				mapElementRDFId = new HashMap<String,String>();
+				mapSmallMoleculeRDFId =  new HashMap<String,String>();
+				mapComplexRDFId_index =  new HashMap<String,Integer>();
+					
+				
+				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 int i2=0;
+				 for (Protein currentProtein : proteinSet){
+					 if (currentProtein.getEntityReference()==null) continue;
+					 Object[] s =   currentProtein.getGenericEntityReferences().toArray();
+					 for (int i=0;i<s.length;i++){
+						 mapElementGenericRef.put(s[i].toString(), currentProtein.getDisplayName());
+					 }
+					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
+					 
+					 // Gloabal data 
+					 String displayName = currentProtein.getDisplayName();
+					 if (getProteinOrderByName(displayName)<0)
+						 ggg.add(new Gene(displayName,ggg.size()));
+					 
+					 i2++;
+				 }
+					
+				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
+				 i2=0;
+				 for (SmallMolecule currentMolecule : smallMoleculeSet){
+					 if (currentMolecule.getEntityReference()==null) continue;
+					 Object[] s =   currentMolecule.getGenericEntityReferences().toArray();
+					 for (int i=0;i<s.length;i++){
+						 mapElementGenericRef.put(s[i].toString(), currentMolecule.getDisplayName());
+					 }
+					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
+					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
+					 
+					 // Gloabal data 
+						ggg.add(new Gene(currentMolecule.getDisplayName(),ggg.size()));
+					
+					 
+					 i2++;
+				 }
+				 
+				 
+				 /*
+				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
+				 i2=0;
+				 for (PhysicalEntity current : physicalEntitySet){
+					// Object[] s =   current.getRDFId().toArray();
+					 
+					 System.out.println(i2+" PhysicalEntity() = "+current.getDisplayName());
+					  
+					 System.out.println("	PhysicalEntity() = "+current.getRDFId()+"	PhysicalEntity ="+ current.getComment());
+					 i2++;
+				 }*/
+				 
+				 complexSet = model.getObjects(Complex.class);
+				 i2=0;
+				 for (Complex current : complexSet){
+					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
+					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
+					 
+					 ArrayList<String> components = getComplexById(i2);
+					 for (int i=0;i<components.size();i++){
+						 System.out.println("	"+components.get(i));
+						 }
+					 i2++;
+				 }
+				 i2=0;
+				 
+				 proteinsInComplex = new ArrayList[complexSet.size()];
+				 computeProteinsInComplex();
+				 
+				 reactionSet = model.getObjects(BiochemicalReaction.class);
+				 i2=0;
+				 for (BiochemicalReaction current : reactionSet){
+					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
+					  Object[] s = current.getLeft().toArray();
+					  for (int i=0;i<s.length;i++){
+						  String name = getProteinName(s[i].toString());
+						  if (name!=null)
+							  System.out.println("	Left "+(i+1)+" = "+name);
+						  else{
+							  if (mapComplexRDFId_index.get(s[i].toString())!=null){
+								  System.out.println("	Left "+(i+1)+" = "+s[i]);
+								  int id = mapComplexRDFId_index.get(s[i].toString());
+								  ArrayList<String> components = proteinsInComplex[id];
+									 for (int k=0;k<components.size();k++){
+										 System.out.println("		 contains "+components.get(k));
+								  }
+							  }
+							  else
+								  System.out.println("	Left "+(i+1)+" = "+s[i]);
+						  }
+					  }
+
+					  Object[] s2 = current.getRight().toArray();
+					  for (int i=0;i<s2.length;i++){
+						  String name = getProteinName(s2[i].toString());
+						  if (name!=null)
+							  System.out.println("	Right "+(i+1)+" = "+name);
+						  else{
+							 if (mapComplexRDFId_index.get(s2[i].toString())!=null){
+								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
+								  int id = mapComplexRDFId_index.get(s2[i].toString());
+								  ArrayList<String> components = proteinsInComplex[id];
+									 for (int k=0;k<components.size();k++){
+										 System.out.println("		 contains "+components.get(k));
+								  }
+							  }
+							  else		
+								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
+						  }
+					  }
+					// System.out.println("  		getLeft() = "+current.getLeft());
+					// System.out.println("  		getRight() ="+ current.getRight());
+					 i2++;
+				 }
+				 
+				 
+				
+				/* SIF
+				// Iterate through all BioPAX Elements and print basic info
+				 SimpleInteractionConverter converter =
+					 new SimpleInteractionConverter(new ControlRule());
+					 try {
+						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				String[] lines = p.loadStrings("A.txt");
+				for (int i=0;i<lines.length;i++){
+					String[] p  = lines[i].split("\t");
+ 					BioPAXElement element1 = model.getByID(p[0]);
+ 					BioPAXElement element2 = model.getByID(p[2]);
+ 					if (lines[i].contains("http://www.pantherdb.or")){
+ 						System.out.println();
+ 						System.out.println(i+"	"+lines[i]);
+ 					String id1 = fetchID(element1);
+ 					String id2 = fetchID(element2);
+ 					
+ 					}
+				*/
+			}
+			catch (FileNotFoundException e){
+				e.printStackTrace();
+				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
+				return;
+			}
+			
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
-				 message = "Processing realtion ("+processingMiner+"/"+minerList.size()
+				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
-				 computeRelationship(currentFile, processingMiner);
+
+				 // Search
+				Miner min = minerList.get(processingMiner);
+				Pattern p = min.getPattern();
+				Map<BioPAXElement,List<Match>> matches = Searcher.search(model, p, null);
+				
+				for (List<Match> matchList : matches.values()){
+					for (Match match : matchList){
+						String s1 = getProteinName(match.getFirst().toString());
+						String s2 = getProteinName(match.getLast().toString());
+						
+						if (s1!=null && s2!=null)
+							storeData(s1+"\t"+s2, s1, s2);
+						else{
+							System.out.println();
+							System.out.println("	NULLLLLLLLL");
+							System.out.println(match);
+							System.out.println();
+							System.out.println(match);
+							System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+s1);
+							System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+s2);
+						}
+					}	
+				}
+				 
+				try{
+					FileOutputStream os = new FileOutputStream(outFile);
+					min.writeResult(matches, os);
+					
+					os.close();
+ 				}
+				catch (IOException e){
+					e.printStackTrace();
+					return;
+				}
 				
 			}
 			System.out.println();
 		
-		
-			
+			popupComplex.setItems();
+			popupReaction.setItems();
 			vennOverview.initialize();
+			
+			
+			stateAnimation=0;
+			isAllowedDrawing =  true;  //******************* Start drawing **************
 			
 			// Compute the summary for each Gene
 			Gene.compute();
 			
-			Gene.computeGeneRalationList();
+			Gene.computeGeneRelationList();
+			Gene.computeGeneGeneInComplex();
 			//write();
 			
 			
-			stateAnimation=0;
-			isAllowedDrawing =  true;
-			
-			vennOverview.compute();
-			
-			
+			//vennOverview.compute();
+			//Gene.orderByRandom(p);
 			PopupOrder.s =0;
-			Gene.orderByRandom(p);
 			PopupGroup.s = 0;
-			
-			/*
-			 System.out.println("BRCA1 NBN= "+Gene.computeDis(0,1));
-			 System.out.println("ADP ATM= "+Gene.computeDis(6,3));
-			int index =  Gene.getSimilarGene(0, new ArrayList<Integer>());
-			if (index>=0)
-				System.out.println("Most similar to BRA1= "+ggg.get(index).name+"	dis="+Gene.computeDis(0,2));
-			*/
-			
 		}
 	}
 	
+	public static void storeData(String rel, String gene1, String gene2){
+		// Store results for visualization
+		if (!pairs[processingMiner].contains(rel)){
+			pairs[processingMiner].add(rel);
+		}	
+	}
+	
+	public int getProteinOrderByName(String name) {
+		for (int i=0;i<ggg.size();i++){
+			if (ggg.get(i).name.equals(name))
+				return i;
+		}
+		return -1;
+	}
+	
+	public static String getProteinName(String ref){	
+		String s1 = mapElementGenericRef.get(ref);
+		if (s1==null)
+			s1 = mapElementRef.get(ref);
+		if (s1==null)
+			s1 = mapElementRDFId.get(ref);
+		return s1;
+	}
+	
+	public static boolean isSmallMolecule(String name){	
+		if (mapSmallMoleculeRDFId.containsValue(name))
+			return true;
+		else
+			return false;
+	}
+	
+	
+	
+	
+	public static ArrayList<String> getComplexById(int id){	
+		ArrayList<String> components = new ArrayList<String>(); 
+		int i2=0;
+		for (Complex current : complexSet){
+			 if (i2==id){
+				  Object[] s2 = current.getComponent().toArray();
+				  for (int i=0;i<s2.length;i++){
+					  if (getProteinName(s2[i].toString())!=null)
+						  components.add(getProteinName(s2[i].toString()));
+					  else
+						  components.add(s2[i].toString());
+				 }
+			 }
+			 i2++;
+		 }
+		 return components;
+	}
+	
+	public static void computeProteinsInComplex(){	
+		int i2=0;
+		for (Complex current : complexSet){
+			proteinsInComplex[i2] = getProteinsInComplexById(i2);
+			i2++;
+		}
+			
+		
+	}
+		
+	public static ArrayList<String> getProteinsInComplexById(int id){	
+		ArrayList<String> components = new ArrayList<String>(); 
+		int i2=0;
+		
+		 boolean found = false;
+		 for (Complex current : complexSet){
+			 if (i2==id){
+				  Object[] s2 = current.getComponent().toArray();
+				  for (int i=0;i<s2.length;i++){
+					  if (getProteinName(s2[i].toString())!=null)
+						  components.add(getProteinName(s2[i].toString()));
+					  else {
+						  if (mapComplexRDFId_index.get(s2[i].toString())==null){
+							  components.add(s2[i].toString());
+						  }
+						  else{
+							  int id4 = mapComplexRDFId_index.get(s2[i].toString());
+							  ArrayList<String> s4 = getProteinsInComplexById(id4);
+							  for (int k=0;k<s4.size();k++){
+								  components.add(s4.get(k));
+							  }
+						  }
+						 
+							  
+					  }
+				 }
+				  found = true;
+			 }
+			 i2++;
+		 }
+		 if (!found ){
+			 System.err.println("********** CAN NOT find complex id = "+id);
+		 }
+		 return components;
+	}
+	
+	
 	
 		
+	
 	
 	//Update genes for drawing
 	public void write(){	
@@ -1073,7 +1474,14 @@ public class MainMatrix extends PApplet {
 		}
 	}	
 	
-	
+	void mouseWheel(int delta) {
+		if (PopupComplex.b>=0){
+		//	PopupComplex.y2 -= delta/2;
+		//	if (PopupComplex.y2>20)
+		//		PopupComplex.y2 = 20;
+		}
+	}
+
 	
 	
 }

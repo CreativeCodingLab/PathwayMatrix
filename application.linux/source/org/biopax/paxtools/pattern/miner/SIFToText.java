@@ -1,4 +1,4 @@
-package org.biopax.paxtools.pattern.miner;
+ package org.biopax.paxtools.pattern.miner;
 
 /**
  * An interface for converting a SIF interaction to text.

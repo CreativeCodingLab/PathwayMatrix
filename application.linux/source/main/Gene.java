@@ -19,6 +19,8 @@ import edu.uic.ncdm.venn.Venn_Overview;
 import static main.MainMatrix.pairs;
 import static main.MainMatrix.ggg;
 import static main.MainMatrix.geneRelationList;
+import static main.MainMatrix.gene_gene_InComplex;
+import static main.MainMatrix.maxGeneInComplex;
 import static main.MainMatrix.leaderSortedMap;
 import static main.MainMatrix.locals;
 import static edu.uic.ncdm.venn.Venn_Overview.numMinerContainData;
@@ -47,8 +49,8 @@ public class Gene {
 	
 	public static void compute(){
 		 hGenes = new Hashtable<String,int[]>();
-		 for (int i=0; i<main.MainMatrix.allGenes.size();i++){
-			 hGenes.put(main.MainMatrix.allGenes.get(i), new int[numMinerContainData]);
+		 for (int i=0; i<main.MainMatrix.ggg.size();i++){
+			 hGenes.put(main.MainMatrix.ggg.get(i).name, new int[numMinerContainData]);
 		 }
 		 maxRelationOfGenes = -1;
 		 for (int j=0; j<numMinerContainData;j++){
@@ -66,7 +68,7 @@ public class Gene {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void computeGeneRalationList(){
+	public static void computeGeneRelationList(){
 		geneRelationList = new ArrayList[ggg.size()][ggg.size()];
 		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
 			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
@@ -76,6 +78,23 @@ public class Gene {
 						if (geneRelationList[i][j]==null)
 							geneRelationList[i][j] = new ArrayList<Integer>();
 						geneRelationList[i][j].add(localMinerID);
+					}
+				}
+			}
+		 }	
+	 }	 
+	
+	public static void computeGeneGeneInComplex(){
+		maxGeneInComplex = 0;
+		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
+		for (int c=0;c<main.MainMatrix.complexSet.size();c++){
+			ArrayList<String> a = main.MainMatrix.proteinsInComplex[c];
+			for (int i=0;i<ggg.size();i++){
+				for (int j=0;j<ggg.size();j++){
+					if (a.indexOf(ggg.get(i).name)>=0 && a.indexOf(ggg.get(j).name)>=0){
+						gene_gene_InComplex[i][j]++;
+						if (gene_gene_InComplex[i][j]>maxGeneInComplex)
+							maxGeneInComplex = gene_gene_InComplex[i][j];
 					}
 				}
 			}
@@ -164,7 +183,7 @@ public class Gene {
 	}
 	
 	
-	private static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap) {
+	public static Map<String, Integer> sortByComparator(Map<String, Integer> unsortMap) {
 		// Convert Map to List
 		List<Map.Entry<String, Integer>> list = 
 			new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
@@ -210,32 +229,159 @@ public class Gene {
 	
 	
 	
-	// Order by similarity
+	// Order by similarity *********** SMALL MOLECULES are first
 	public static void orderBySimilarity(){	
-		Map<String, Integer> mapGene = new HashMap<String, Integer>();
-		for (int i=0;i<ggg.size();i++){
-			mapGene.put(ggg.get(i).name, i);
+		int maxminIndex = -1;
+		double maxRelation = -100;
+		
+		// Find the smallest molecule
+		for (int p=0;p<ggg.size();p++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+				int count = getNumberRelationOfProtein(p);
+				if (count>maxRelation){
+					maxRelation = count;
+					maxminIndex = p;
+				}	
+			}
 		}
 		
-		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
-		for (int i=0;i<ggg.size();i++){
-			unsortMap.put(ggg.get(i).name, 0);
+		// Find the smallest protein
+		double minRelation = Double.POSITIVE_INFINITY;
+		if (maxminIndex<0){
+			for (int p=0;p<ggg.size();p++){
+				if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+					continue;
+				}
+				int count = getNumberRelationOfProtein(p);
+				if (count<minRelation){
+					minRelation = count;
+					maxminIndex = p;
+				}	
+			}
 		}
 		
-		for (int m=0;m<pairs.length;m++){
-			for (int i=0;i<pairs[m].size();i++){
-				String pair = pairs[m].get(i);
-				String gene1 = pair.split("\t")[0];
-				String gene2 = pair.split("\t")[1];
-				int c = unsortMap.get(gene1);
-				c++;
-				unsortMap.put(gene1, c);
-				c = unsortMap.get(gene2);
-				c++;
-				unsortMap.put(gene2, c);
+		// Process small molecules
+		ArrayList<Integer> processedProteins =  new ArrayList<Integer>();
+		int beginIndex = maxminIndex;
+		int order = 0;
+		ggg.get(beginIndex).order=order;
+		order++;
+		processedProteins.add(beginIndex);
+		
+		// Eliminate proteins
+		for (int i=0;i<ggg.size();i++){
+			if (!main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedProteins.add(i);
 			}
 		}	
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedProteins);
+			if (similarIndex<0) break;  // can not find more small molecules
+			
+			ggg.get(similarIndex).order=order;
+			order++;
+			beginIndex = similarIndex;
+			processedProteins.add(similarIndex);
+		}
 		
+		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
+		
+		// Eliminate small molecules
+		for (int i=0;i<ggg.size();i++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedGenes.add(i);
+			}
+		}
+		
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedGenes);
+			if (similarIndex<0) break;  // can not find more protein
+			
+			ggg.get(similarIndex).order=order;
+			//System.out.println("	"+i+"  beginIndex="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedGenes.add(similarIndex);
+		}
+		
+		
+		
+	}
+	
+	// Order by similarity *********** SMALL MOLECULES are last
+	/*
+	public static void orderBySimilarity(){	
+		int minIndex = -1;
+		double minRelation = Double.POSITIVE_INFINITY;
+		// Find the smallest protein
+		for (int p=0;p<ggg.size();p++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(p).name)){
+				continue;
+			}
+			int count = getNumberRelationOfProtein(p);
+			if (count<minRelation){
+				minRelation = count;
+				minIndex = p;
+			}	
+		}
+		
+		System.out.println("	minIndex = "+minIndex);
+		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
+		int beginIndex = minIndex;
+		int order = 0;
+			
+		ggg.get(beginIndex).order=order;
+		order++;
+		processedGenes.add(beginIndex);
+		// Eliminate small molecules
+		for (int i=0;i<ggg.size();i++){
+			if (main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedGenes.add(i);
+				System.out.println("   isSmallMolecule ="+ggg.get(i).name);
+			}
+		}
+		
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedGenes);
+			if (similarIndex<0) break;  // can not find more protein
+			
+			ggg.get(similarIndex).order=order;
+			System.out.println("	"+i+"  beginIndex="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedGenes.add(similarIndex);
+		}
+		
+		// Process small molecules
+		ArrayList<Integer> processedProteins =  new ArrayList<Integer>();
+		for (int i=0;i<ggg.size();i++){
+			if (!main.MainMatrix.isSmallMolecule(ggg.get(i).name)){
+				processedProteins.add(i);
+			}
+		}	
+		for (int i=0;i<ggg.size();i++){
+			int similarIndex =  getSimilarGene(beginIndex, processedProteins);
+			if (similarIndex<0) break;  // can not find more small molecules
+			
+			ggg.get(similarIndex).order=order;
+			System.out.println("	"+i+"  beginMolecule="+beginIndex+"	similarIndex="+similarIndex+ " = order "+order);
+			
+			order++;
+			beginIndex = similarIndex;
+			processedProteins.add(similarIndex);
+		}
+		
+	}
+	*/
+	
+	// Order by Complex
+	public static void orderByComplex(){	
+		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+		for (int i=0;i<ggg.size();i++){
+			unsortMap.put(ggg.get(i).name, ggg.get(i).order);
+		}
 		Map<String, Integer> sortedMap = sortByComparator(unsortMap);
 		
 		
@@ -244,7 +390,7 @@ public class Gene {
 			firstEntry = entry;
 			break;
 		}
-		int index1 = mapGene.get(firstEntry.getKey());
+		int index1 = sortedMap.get(firstEntry.getKey());
 		int orderReading1 = index1;
 		
 		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
@@ -252,11 +398,41 @@ public class Gene {
 			ggg.get(index1).order=i;
 			processedGenes.add(orderReading1);
 			if (i==ggg.size()-1) break;
-			int similarIndex =  getSimilarGene(orderReading1,processedGenes);
+			int similarIndex =  getSimilarGeneComplex(orderReading1,processedGenes);
 			index1 = similarIndex;
 			orderReading1 = index1;
 		}
 	}
+	public static int getNumberRelationOfProtein(int p){
+		int count=0;
+		for (int i=0;i<ggg.size();i++){
+			if (geneRelationList[p][i]!=null)
+				count+=geneRelationList[p][i].size();
+			if (geneRelationList[i][p]!=null)
+				count+=geneRelationList[i][p].size();
+		}
+		return count;
+	}
+		
+	
+	public static int getSimilarGeneComplex(int orderReading1, ArrayList<Integer> a){
+		float minDis = Float.POSITIVE_INFINITY;
+		int minIndex = -1;
+		for (int i=0;i<ggg.size();i++){
+			int orderReading2 = i;
+			if (orderReading1==orderReading2) continue;
+			if (a.contains(orderReading2)) continue;
+			float dis = -gene_gene_InComplex[orderReading1][orderReading2];
+			if (dis<minDis){
+				minDis = dis;
+				minIndex = i;
+			}
+		}
+		return minIndex;
+	}
+	
+		
+		
 	
 	public static int getSimilarGene(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
@@ -290,6 +466,7 @@ public class Gene {
 		return dis;
 	}
 	
+
 	public static float computeDisOfArrayList(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
 		if (a1==null && a2==null) return 0;
 		else if (a1==null) return a2.size();
@@ -305,6 +482,42 @@ public class Gene {
 		// main.MainViewer.popupOrder.slider.val=0    We consider total number of element;
 		// main.MainViewer.popupOrder.slider.val=2    We consider only the different;
 	}
+	
+	/*
+	public static float computeDisOfArrayListComplex(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
+		int inComplexMinerID = -1;
+		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
+			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
+			if (main.MainMatrix.minerList.get(globalMinerId).toString().contains("in-complex-with")){
+				inComplexMinerID = localMinerID;
+			}
+		}	
+		if (a1==null && a2==null) return 0;
+		else if (a1==null) {
+			if (a2.contains(inComplexMinerID))
+				return 1;
+			else 
+				return 0;
+			
+		}
+		else if (a2==null){
+			if (a1.contains(inComplexMinerID))
+				return 1;
+			else 
+				return 0;
+		}
+		else{
+			if (a1.contains(inComplexMinerID) && a2.contains(inComplexMinerID)){
+				System.out.println("aaaaaaaaaaa");
+				return -val;
+			}	
+			else if (!a1.contains(inComplexMinerID) && !a2.contains(inComplexMinerID))
+				return 0;
+			else
+				return 1;
+		}
+	}
+	*/
 	
 // ************************ grouping
 	// Group by similarity

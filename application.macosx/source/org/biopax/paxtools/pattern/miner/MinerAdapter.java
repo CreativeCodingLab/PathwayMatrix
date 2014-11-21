@@ -473,18 +473,22 @@ public abstract class MinerAdapter implements Miner
 		if (matches.isEmpty()) {
 			return;
 		}
+		/*
 		
-		/* Remove to run faster
+		// Remove to run faster
 		if (this instanceof SIFMiner){
 			writeSIFsUsingSIFFramework(matches, out, directed);
 			return;
 		}
-		*/
+		
 		
 		for (BioPAXElement ele : matches.keySet())	{
 			for (Match m : matches.get(ele)){
 				String s1 = getIdentifier(m, label1);
 				String s2 = getIdentifier(m, label2);
+				
+				//if (main.MainMatrix.processingMiner==14)
+					System.out.println(" 	label1="+label1+" label2="+label2+" "+s1+" "+s2);
 				
 				if (s1 != null && s2 != null){
 					String relation = s1 + "\t" + s2;
@@ -495,7 +499,7 @@ public abstract class MinerAdapter implements Miner
 						storeData(reverse, s2, s1);
 				}
 			}
-		}
+		}*/
 	}
 
 	/**
@@ -511,9 +515,11 @@ public abstract class MinerAdapter implements Miner
 
 		for (List<Match> matchList : matches.values()){
 			for (Match match : matchList){
+				
 				SIFInteraction inter = this.createSIFInteraction(match, new IDFetcher(){
 					@Override
 					public String fetchID(BioPAXElement ele){
+						//System.out.println("     ele="+ele);
 						if (ele instanceof SmallMoleculeReference){
 							SmallMoleculeReference smr = (SmallMoleculeReference) ele;
 							if (smr.getDisplayName() != null) return smr.getDisplayName();
@@ -536,6 +542,7 @@ public abstract class MinerAdapter implements Miner
 											String symbol = HGNC.getSymbol(id);
 											if (symbol != null && !symbol.isEmpty())
 											{
+											//	System.out.println("     symbol="+symbol);
 												return symbol;
 											}
 										}
@@ -561,40 +568,18 @@ public abstract class MinerAdapter implements Miner
 		
 		for (SIFInteraction inter : sifMap.keySet())
 		{
-			String[] s  = inter.toString().split("\t");
-			storeData(s[0]+"\t"+s[2], s[0], s[2]);
+			//System.out.println(" inter.toString()="+ inter.toString());
 			
-			if (!directed)
-				storeData(s[2]+"\t"+s[0], s[2], s[0]);
+			String[] s  = inter.toString().split("\t");
+		//	storeData(s[0]+"\t"+s[2], s[0], s[2]);
+			
+		//	if (!directed)
+		//		storeData(s[2]+"\t"+s[0], s[2], s[0]);
 			
 		}
 	}
 	
-	public static void storeData(String rel, String gene1, String gene2){
-		// Store results for visualization
-		
-		if (!main.MainMatrix.pairs[main.MainMatrix.processingMiner].contains(rel)){
-			main.MainMatrix.pairs[main.MainMatrix.processingMiner].add(rel);
-		}	
-		if (!main.MainMatrix.genes[main.MainMatrix.processingMiner].contains(gene1)){
-			main.MainMatrix.genes[main.MainMatrix.processingMiner].add(gene1);
-		}
-		if (!main.MainMatrix.genes[main.MainMatrix.processingMiner].contains(gene2)){
-			main.MainMatrix.genes[main.MainMatrix.processingMiner].add(gene2);
-		}
-		
-		// Global data 
-		if (!main.MainMatrix.allGenes.contains(gene1)){
-			main.MainMatrix.allGenes.add(gene1);
-			main.MainMatrix.ggg.add(new Gene(gene1,main.MainMatrix.ggg.size()));
-		}
-		if (!main.MainMatrix.allGenes.contains(gene2)){
-			main.MainMatrix.allGenes.add(gene2);
-			main.MainMatrix.ggg.add(new Gene(gene2, main.MainMatrix.ggg.size()));
-		}
-		
-			
-	}
+	
 			
 			
 	
@@ -690,7 +675,7 @@ public abstract class MinerAdapter implements Miner
 
 				
 				String[] s  = line.split("\t");
-				storeData(s[0]+"\t"+s[2], s[0], s[2]);
+				//storeData(s[0]+"\t"+s[2], s[0], s[2]);
 				
 				boolean directed =  false;
 				if (this.getName().equals("controls-state-change-detailed"))
@@ -698,8 +683,8 @@ public abstract class MinerAdapter implements Miner
 				if (this.getName().equals("ubiquitous-molecule-lister"))
 					directed = false;
 					
-				if (!directed)
-					storeData(s[2]+"\t"+s[0], s[2], s[0]);
+				//if (!directed)
+				//	storeData(s[2]+"\t"+s[0], s[2], s[0]);
 				
 				
 				if (!mem.contains(line))

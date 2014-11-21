@@ -28,7 +28,7 @@
 	<key>Java</key>
 	<dict>
 		<key>VMOptions</key>
-		<string> -Xms64m -Xmx384m</string>
+		<string>-Xmx10g</string>
 		<key>MainClass</key>
 		<string>main.MainMatrix</string>
 		<key>JVMVersion</key>

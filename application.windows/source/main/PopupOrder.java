@@ -10,12 +10,12 @@ public class PopupOrder{
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
-	public int w1 = 120;
+	public int w1 = 100;
 	public int w = 300;
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"Random","Reading order", "Name", "Similarity"}; 
+	public static String[] items={"Random","Reading order", "Name", "Similarity", "Complex"}; 
 	public static int s=1;
 	public Slider slider;
 
@@ -31,7 +31,9 @@ public class PopupOrder{
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
+			parent.textSize(13);
 			h=items.length*itemH+40;
+			parent.noStroke();
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
@@ -58,14 +60,16 @@ public class PopupOrder{
 			}	
 			
 			if (items[s].equals("Similarity")) 
-				slider.draw(x+130, y+itemH*items.length-14);
+				slider.draw(x+110, y+itemH*4-14);
 			
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
+			parent.noStroke();
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
 			parent.textAlign(PApplet.CENTER);
+			parent.textSize(13);
 			parent.text("Order by",x+w1/2,y+18);
 		}	
 	}
@@ -93,6 +97,12 @@ public class PopupOrder{
 				main.PopupGroup.s=0;
 				Gene.orderBySimilarity();
 			}	
+			else if (items[s].equals("Complex"))  {
+				main.MainMatrix.stateAnimation=0;
+				main.PopupGroup.s=0;
+				Gene.orderByComplex();
+			}	
+			main.MainMatrix.popupReaction.updateProteinPositions();
 		}
 	}
 	 

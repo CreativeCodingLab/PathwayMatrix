@@ -115,7 +115,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "../level3RAS/Rb-E2FpathwayReactome.owl";
+	public String currentFile = "../level3RAS/Ras_Pathway.owl";
 	
 	public static Button button;
 	
@@ -992,6 +992,10 @@ public class MainMatrix extends PApplet {
 		}
 		else if (PopupReaction.sPopup && PopupReaction.check1.b){
 			PopupReaction.check1.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check5.b){
+			PopupReaction.check5.mouseClicked();
+			popupReaction.updateReactionPositions();
 		}
 		else if (PopupReaction.bPopup){
 			popupReaction.mouseClicked();

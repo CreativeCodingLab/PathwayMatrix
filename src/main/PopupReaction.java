@@ -36,6 +36,7 @@ public class PopupReaction{
 	float hProtein = 0;
 	
 	public static Map<BiochemicalReaction, Integer> itemHash =  new HashMap<BiochemicalReaction, Integer>();
+	float itemH2 = 0; // height of items in the reaction
 	
 	public String[] proteins = null;
 	public static  Map<String,Integer> mapComplexRDFId_index;
@@ -45,6 +46,7 @@ public class PopupReaction{
 	public Integrator[] iP;
 	
 	public static CheckBox check1;
+	public static CheckBox check5;
 	//public static CheckBox checkGroup;
 	
 	public float xL = x;
@@ -62,7 +64,9 @@ public class PopupReaction{
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		check1 = new CheckBox(parent, "Fade links of small molecules");
-	//	checkGroup = new CheckBox(parent, "Lensing");
+		check5 = new CheckBox(parent, "Rearrange reactions");
+
+		//	checkGroup = new CheckBox(parent, "Lensing");
 	}
 	
 	public void setItems(){
@@ -120,6 +124,8 @@ public class PopupReaction{
 			iP[p] =   new Integrator(20, 0.5f,0.1f);
 		}
 		updateProteinPositions();
+		updateReactionPositions();
+		
 	}
 	
 	
@@ -135,8 +141,74 @@ public class PopupReaction{
 	}
 	
 	public void countProteinParticipation(){
+		
 	}
 
+	public void updateReactionPositions(){
+		itemH2 = (parent.height-yBeginList)/(itemHash.size());
+		// Compute positions
+		if (itemH2>maxH)
+			itemH2 =maxH;
+		for (int i=0;i<itemHash.size();i++){
+			iH[i].target(itemH2);
+		}	
+		
+		if (check5.s){
+			int indexOfItemHash=0;
+			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
+			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+				BiochemicalReaction rect = entry.getKey();
+				
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				ArrayList<Integer> proteinLeft = getProteinsInOneSideOfReaction(aLeft);
+				ArrayList<Integer> proteinRight = getProteinsInOneSideOfReaction(aRight);
+				
+				float score = 0;
+				float size = 0;
+				for (int i=0; i<proteinLeft.size();i++){
+					int pOrder = proteinLeft.get(i);
+					if (!main.MainMatrix.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
+						score -= iP[pOrder].value;
+						size++;
+					}	
+				}
+				for (int i=0; i<proteinRight.size();i++){
+					int pOrder = proteinRight.get(i);
+					if (!main.MainMatrix.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
+						score -= iP[pOrder].value;
+						size++;
+					}	
+				}
+				
+				if (size>0)
+					score = score/size;
+				
+				System.out.println("indexOfItemHash="+indexOfItemHash+"	score="+score+ "	entry="+rect.getDisplayName().toString());
+				unsortMap.put(indexOfItemHash, score);	
+				indexOfItemHash++;
+			}
+			
+			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap);
+			int i5 = 0;
+			for (Map.Entry<Integer, Float> entry : sortedMap.entrySet()) {
+				int rectOrder = entry.getKey();
+				iY[rectOrder].target(yBeginList+i5*itemH2);
+				i5++;
+			}
+				
+			
+			
+				
+			
+		}
+		else{
+			for (int i=0;i<itemHash.size();i++){
+				iY[i].target(yBeginList+i*itemH2);
+			}
+		}
+		
+	}
 		
 		
 	// Sort decreasing order
@@ -161,6 +233,31 @@ public class PopupReaction{
 		}
 		return sortedMap;
 	}
+	
+	// Sort Reactions by score (average positions of proteins)
+	public static Map<Integer, Float> sortByComparator2(Map<Integer, Float> unsortMap) {
+		// Convert Map to List
+		List<Map.Entry<Integer, Float>> list = 
+			new LinkedList<Map.Entry<Integer, Float>>(unsortMap.entrySet());
+ 
+		// Sort list with comparator, to compare the Map values
+		Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+			public int compare(Map.Entry<Integer, Float> o1,
+                                           Map.Entry<Integer, Float> o2) {
+				return -(o1.getValue()).compareTo(o2.getValue());
+			}
+		});
+ 
+		// Convert sorted map back to a Map
+		Map<Integer, Float> sortedMap = new LinkedHashMap<Integer, Float>();
+		for (Iterator<Map.Entry<Integer, Float>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<Integer, Float> entry = it.next();
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedMap;
+	}
+	
+	
 	
 	public void drawButton(float x_){
 		xButton = x_;
@@ -195,26 +292,13 @@ public class PopupReaction{
 		}
 	}
 	
+	
 	public void drawReactions(){
 		if (proteins==null) return;
-			
-			// Compute positions
-			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
-			if (itemH2>maxH)
-				itemH2 =maxH;
-			for (int i=0;i<itemHash.size();i++){
-				iY[i].target(yBeginList+i*itemH2);
-				iH[i].target(itemH2);
-			}
-			
 			for (int i=0;i<itemHash.size();i++){
 				iY[i].update();
 				iH[i].update();
 			}
-			//parent.fill(230,250);
-			//parent.stroke(0,150);
-			//parent.rect(x-260, yBegin, w+1000,parent.height);
-			
 			
 			// Draw another button
 			if (sAll){
@@ -237,7 +321,6 @@ public class PopupReaction{
 			for (int p=0; p<proteins.length;p++){
 				iP[p].update();
 			}
-			
 			
 			parent.fill(0);
 			parent.textSize(13);
@@ -312,12 +395,13 @@ public class PopupReaction{
 					drawReactionNode(entry, i, 200);
 				i++;
 			}	
-			float x7 = (xR+200);
-			float y7 = 50;
+			float x7 = (xR+100);
+			float y7 = 70;
 			float gap7 = 40;
 			float step7 = 16;
 			
 			
+			check5.draw((int) x7, (int) y7-20);
 			check1.draw((int) x7, (int) y7);
 			//draw color legend
 			parent.textSize(12);
@@ -563,80 +647,7 @@ public class PopupReaction{
 		  }
 	 }
 		
-	
-	public Map.Entry<BiochemicalReaction, Integer> getEntryHashId(int hashID) {
-	 	 int i=0;
-	 	 for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-			if (i==hashID){
-				return entry;
-			}
-			i++;
-		 }
-		 return null;
-	 }
-	
-	 public int getIndexSetByName(String name) {
-	 	 int i=0;
-		 for (Complex current : main.MainMatrix.complexSet){
-			 if (current.getDisplayName().equals(name)){
-				 return i;
-			 }
-		 }
-		i++;		
-		 return -33;
-	 }
-	 
-	 public int getIndexHashByName(String name) {
-	 	 int i=0;
-		 for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-			 if (entry.getKey().getDisplayName().equals(name)){
-			  return i;
-			 }
-		 }
-		i++;		
-		 return -11;
-	 }
-	 
-	
-	public int getIndexInSet(int brushing) {
-		String name = "";
-		int i=0;
-		for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-			if (i==brushing){
-				name = entry.getKey().getDisplayName();
-			}
-			i++;
-		}	
-		
-		i=0;
-		for (Complex current : main.MainMatrix.complexSet){
-			if (current.getDisplayName().equals(name))
-				return i;
-			i++;
-		}
-		return -5;	
-	}
-	
-	public int getIndexInHash(int indexSet) {
-		int i=0;
-		String name = "";
-		for (Complex current : main.MainMatrix.complexSet){
-			if (indexSet==i)
-				name = current.getDisplayName();
-			i++;
-		}
-		
-		i=0;
-		for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-			if (entry.getKey().getDisplayName().equals(name)){
-				return i;
-			}
-			i++;
-		}	
-		return -5;	
-	}
-		
-	 public void mouseClicked() {
+	public void mouseClicked() {
 		 if (bPopup)
 			 sPopup = !sPopup;
 		if (bRect==-1){

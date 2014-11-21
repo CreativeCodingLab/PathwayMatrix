@@ -10,7 +10,7 @@ public class PopupGroup{
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
-	public int w1 = 120;
+	public int w1 = 100;
 	public int w = 300;
 	public int h;
 	public int itemH = 20;
@@ -62,7 +62,8 @@ public class PopupGroup{
 			
 		}
 		else{
-			parent.fill(125,125,125);
+			parent.fill(150);
+			parent.textSize(13);
 			parent.rect(x,y,w1,25);
 			parent.fill(0);
 			parent.textAlign(PApplet.CENTER);
