@@ -18,8 +18,8 @@ import processing.core.PApplet;
 public class PopupReaction{
 	public static boolean sPopup = true;
 	public static boolean bPopup = false;
-	public static boolean sAll = false;
 	public static int bRect = -1000;
+	public static ArrayList<Integer> sRectList = new ArrayList<Integer>();
 	public PApplet parent;
 	public float x = 0;
 	public float xButton = 0;
@@ -48,6 +48,7 @@ public class PopupReaction{
 	public static CheckBox check1;
 	public static CheckBox check5;
 	//public static CheckBox checkGroup;
+	public static TextBox textbox1; 
 	
 	public float xL = x;
 	public float xL2 = xL+200;
@@ -60,13 +61,16 @@ public class PopupReaction{
 	public static Color complexRectionColor = new Color(0,0,180);
 	public static Color proteinRectionColor = new Color(180,0,0);
 	
+	public static WordCloud wordCloud;
 	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		check1 = new CheckBox(parent, "Fade links of small molecules");
 		check5 = new CheckBox(parent, "Rearrange reactions");
-
-		//	checkGroup = new CheckBox(parent, "Lensing");
+		textbox1 = new TextBox(parent, "Search");
+		wordCloud = new WordCloud(parent, 10,290,200,parent.height-10);
+		
+		
 	}
 	
 	public void setItems(){
@@ -100,6 +104,20 @@ public class PopupReaction{
 		}
 		itemHash = sortByComparator(unsortMap);
 		
+		// Word cloud
+		WordCount wc1 = new WordCount(70);
+		ArrayList<String> a = new ArrayList<String>();
+		for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+			String rectName = entry.getKey().getDisplayName();
+			String[] pieces = rectName.split(" ");
+			for (int k=0;k<pieces.length;k++){
+				a.add(pieces[k]);
+			}
+		}
+			
+		wc1.countNames(a); 
+		wordCloud.updateTags(wc1.wordArray, wc1.counts);
+		
 		// positions of items
 		iX = new Integrator[itemHash.size()];
 		iY = new Integrator[itemHash.size()];
@@ -124,8 +142,6 @@ public class PopupReaction{
 			iP[p] =   new Integrator(20, 0.5f,0.1f);
 		}
 		updateProteinPositions();
-		updateReactionPositions();
-		
 	}
 	
 	
@@ -138,6 +154,7 @@ public class PopupReaction{
 			int order = main.MainMatrix.ggg.get(p).order;
 			iP[p].target(yBeginList+hProtein*order);
 		}
+		updateReactionPositions();  /// **********Update reactions when updating proteins **********
 	}
 	
 	public void countProteinParticipation(){
@@ -158,7 +175,6 @@ public class PopupReaction{
 			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
 			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
 				BiochemicalReaction rect = entry.getKey();
-				
 				Object[] aLeft = rect.getLeft().toArray();
 				Object[] aRight = rect.getRight().toArray();
 				ArrayList<Integer> proteinLeft = getProteinsInOneSideOfReaction(aLeft);
@@ -169,14 +185,14 @@ public class PopupReaction{
 				for (int i=0; i<proteinLeft.size();i++){
 					int pOrder = proteinLeft.get(i);
 					if (!main.MainMatrix.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
-						score -= iP[pOrder].value;
+						score -= iP[pOrder].target;
 						size++;
 					}	
 				}
 				for (int i=0; i<proteinRight.size();i++){
 					int pOrder = proteinRight.get(i);
 					if (!main.MainMatrix.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
-						score -= iP[pOrder].value;
+						score -= iP[pOrder].target;
 						size++;
 					}	
 				}
@@ -184,7 +200,6 @@ public class PopupReaction{
 				if (size>0)
 					score = score/size;
 				
-				System.out.println("indexOfItemHash="+indexOfItemHash+"	score="+score+ "	entry="+rect.getDisplayName().toString());
 				unsortMap.put(indexOfItemHash, score);	
 				indexOfItemHash++;
 			}
@@ -196,11 +211,6 @@ public class PopupReaction{
 				iY[rectOrder].target(yBeginList+i5*itemH2);
 				i5++;
 			}
-				
-			
-			
-				
-			
 		}
 		else{
 			for (int i=0;i<itemHash.size();i++){
@@ -290,6 +300,10 @@ public class PopupReaction{
 				countLitems++;
 			}
 		}
+		
+		// Draw seach box
+		textbox1.draw(xRect);
+		
 	}
 	
 	
@@ -301,21 +315,10 @@ public class PopupReaction{
 			}
 			
 			// Draw another button
-			if (sAll){
-				parent.noStroke();
-				parent.fill(0);
-				parent.rect(x+10,30,200,19);
-				parent.fill(180);
-			}
-			else if (bRect==-1){
-				parent.fill(255);
-			}
-			else{
-				parent.fill(0);
-			}
+			parent.fill(0);
 			parent.textSize(13);
 			parent.textAlign(PApplet.CENTER);
-			parent.text("All Reactions",xRect,45);
+			parent.text(itemHash.size()+" Reactions",xRect,45);
 			
 			// Draw proteins *****************************
 			for (int p=0; p<proteins.length;p++){
@@ -330,20 +333,41 @@ public class PopupReaction{
 			parent.text("Output Complexes", xR2, 45);
 			parent.text("Output Proteins", xR, 45);
 			
-			for (int p=0; p<proteins.length;p++){
-				if (bRect>=0){
-					// Get protein in the brushing reactions
-					int i4=0;
-					for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-						if (i4==bRect){
-							BiochemicalReaction rect = entry.getKey();
-							Object[] aLeft = rect.getLeft().toArray();
-							Object[] aRight = rect.getRight().toArray();
-							bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
-							bProteinRight = getProteinsInOneSideOfReaction(aRight);
-						}
-						i4++;
+			
+			int i4=0;
+			bProteinLeft =  new ArrayList<Integer>();
+			bProteinRight =  new ArrayList<Integer>();
+			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+				if (i4==bRect){
+					BiochemicalReaction rect = entry.getKey();
+					Object[] aLeft = rect.getLeft().toArray();
+					Object[] aRight = rect.getRight().toArray();
+					bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
+					bProteinRight = getProteinsInOneSideOfReaction(aRight);
+				}
+				else if (sRectList.indexOf(i4)>=0){
+					BiochemicalReaction rect = entry.getKey();
+					Object[] aLeft = rect.getLeft().toArray();
+					Object[] aRight = rect.getRight().toArray();
+					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+					for (int i=0;i<a1.size();i++){
+						int ind = a1.get(i);
+						if (bProteinLeft.indexOf(ind)<0)
+							bProteinLeft.add(ind);
 					}
+					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+					for (int i=0;i<a2.size();i++){
+						int ind = a2.get(i);
+						if (bProteinRight.indexOf(ind)<0)
+							bProteinRight.add(ind);
+					}
+				}
+					
+				i4++;
+			}
+			for (int p=0; p<proteins.length;p++){
+				if (bRect>=0 || !textbox1.searchText.equals("") ){
+					// Get protein in the brushing reactions
 					if (bProteinLeft.indexOf(p)>=0)
 						drawProteinLeft(p,255);
 					else
@@ -365,21 +389,21 @@ public class PopupReaction{
 			int i2=0;
 			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
 				BiochemicalReaction rect = entry.getKey();
-				if (bRect>=0)
+				if (bRect>=0 || !textbox1.searchText.equals(""))
 					drawReactionLink(rect, i2, xL, xL2, xRect, xR, xR2, 25);
 				else 
 					drawReactionLink(rect, i2, xL, xL2, xRect, xR, xR2, 200);
 				i2++;
 			}
 			
+			System.out.println(sRectList);
 			// Draw brushing reactions ***************
-			if (bRect>=0){
+			if (bRect>=0 || sRectList.size()>0){
 				int i3=0;
 				for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
-					if (i3==bRect){
+					if (i3==bRect || sRectList.indexOf(i3)>=0){
 						BiochemicalReaction rect = entry.getKey();
 						drawReactionLink(rect, i3, xL, xL2, xRect, xR, xR2, 255);
-						break;
 					}
 					i3++;
 				}
@@ -395,7 +419,7 @@ public class PopupReaction{
 					drawReactionNode(entry, i, 200);
 				i++;
 			}	
-			float x7 = (xR+100);
+			float x7 = (xR+150);
 			float y7 = 70;
 			float gap7 = 40;
 			float step7 = 16;
@@ -430,6 +454,13 @@ public class PopupReaction{
 			y8 += step7;
 			parent.text("Protein reaction",x8, y8);
 			parent.line(x7, y8-5, x7+25, y8-5);
+			
+			// Draw word cloud
+			wordCloud.x1=parent.width-250; 
+			wordCloud.x2=parent.width; 
+			
+			wordCloud.draw(parent);
+			
 			
 	}
 	
@@ -519,9 +550,18 @@ public class PopupReaction{
 		float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 		parent.noStroke();
 		parent.fill(0,sat);
-		parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
 		
-		// draw brushing reaction name
+		String rectName = entry.getKey().getDisplayName();
+		if (!textbox1.searchText.equals("")){
+			if (sRectList.indexOf(i)>=0){
+				parent.fill(150,0,0);
+				parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
+			}
+		}	
+		else 
+			parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
+		
+		// Draw brushing reaction name
 		if (i==bRect){
 			parent.fill(0);
 			parent.ellipse(xRect,iY[i].value-iH[i].value/2, r, r);
@@ -532,7 +572,8 @@ public class PopupReaction{
 			float y3 = iY[i].value-iH[i].value;
 			if (y3<55)
 				y3=55;
-			parent.text(entry.getKey().getDisplayName(),xRect,y3);
+			
+			parent.text(rectName,xRect,y3);
 		}
 	}
 		 
@@ -650,15 +691,11 @@ public class PopupReaction{
 	public void mouseClicked() {
 		 if (bPopup)
 			 sPopup = !sPopup;
-		if (bRect==-1){
-			sAll = !sAll;
-		}
-		else{
-			if (bRect!=s)
-				s = bRect;
-			else
-				s =-200;
-		}
+		if (bRect!=s)
+			s = bRect;
+		else
+			s =-200;
+		
 		
 	}
 	 
