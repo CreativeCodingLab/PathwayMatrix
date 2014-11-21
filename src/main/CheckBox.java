@@ -26,7 +26,7 @@ public class CheckBox{
 		
 		checkBrushing();
 		parent.textAlign(PApplet.LEFT);
-		parent.textSize(14);
+		parent.textSize(12);
 		parent.stroke(0);
 		if (b)
 			parent.fill(180);
@@ -41,8 +41,14 @@ public class CheckBox{
 		}
 		else if (b)
 			parent.fill(100);
-		
-		parent.text(text,x+20,y+13);
+		if (text.contains("small molecules")){
+			parent.text(text.replace("small molecules", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.smallMoleculeColor.getRed(),main.PopupReaction.smallMoleculeColor.getGreen(),main.PopupReaction.smallMoleculeColor.getBlue());
+			parent.text("small molecules",x+95,y+13);
+		}
+			
+		else	
+			parent.text(text,x+20,y+13);
 		
 		count++;
 	    if (count==10000)

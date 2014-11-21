@@ -1,4 +1,5 @@
 package main;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,7 +21,8 @@ public class PopupReaction{
 	public static boolean sAll = false;
 	public static int bRect = -1000;
 	public PApplet parent;
-	public float x = 800;
+	public float x = 0;
+	public float xButton = 0;
 	public static float yBegin = 25;
 	public static float yBeginList = 70;
 	public int w1 = 100;
@@ -42,7 +44,8 @@ public class PopupReaction{
 	public ArrayList<Integer> bProteinRight = new ArrayList<Integer>();
 	public Integrator[] iP;
 	
-	public static CheckBox checkGroup;
+	public static CheckBox check1;
+	//public static CheckBox checkGroup;
 	
 	public float xL = x;
 	public float xL2 = xL+200;
@@ -50,9 +53,16 @@ public class PopupReaction{
 	public float xR = x+800;
 	public float xR2 = xR-200;
 	
+	public static Color smallMoleculeColor = new Color(150,150,0);
+	public static Color formComplexColor = new Color(0,100,150);
+	public static Color complexRectionColor = new Color(0,0,180);
+	public static Color proteinRectionColor = new Color(180,0,0);
+	
+	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
-		checkGroup = new CheckBox(parent, "Lensing");
+		check1 = new CheckBox(parent, "Fade links of small molecules");
+	//	checkGroup = new CheckBox(parent, "Lensing");
 	}
 	
 	public void setItems(){
@@ -152,7 +162,8 @@ public class PopupReaction{
 		return sortedMap;
 	}
 	
-	public void draw(float x_){
+	public void drawButton(float x_){
+		xButton = x_;
 		x = x_-800;
 		xL = x;
 		xL2 = xL+150;
@@ -165,10 +176,14 @@ public class PopupReaction{
 		parent.fill(150);
 		if (bPopup)
 			parent.stroke(255,0,0);
-		parent.rect(x+800,0,w1,25);
+		if (sPopup)
+			parent.fill(0);
+		parent.rect(xButton,0,w1,25);
 		parent.fill(0);
+		if (sPopup)
+			parent.fill(255);
 		parent.textAlign(PApplet.CENTER);
-		parent.text("Reaction",x+800+w1/2,18);
+		parent.text("Reaction",xButton+w1/2,18);
 	
 		if (hightlightList==null) return;
 	
@@ -178,8 +193,11 @@ public class PopupReaction{
 				countLitems++;
 			}
 		}
-		
-		if (sPopup == true || bRect>=-1){
+	}
+	
+	public void drawReactions(){
+		if (proteins==null) return;
+			
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
 			if (itemH2>maxH)
@@ -193,10 +211,9 @@ public class PopupReaction{
 				iY[i].update();
 				iH[i].update();
 			}
-			parent.fill(230,250);
-			///parent.fill(255);
-			parent.stroke(0,150);
-			parent.rect(x-260, yBegin, w+1000,parent.height);
+			//parent.fill(230,250);
+			//parent.stroke(0,150);
+			//parent.rect(x-260, yBegin, w+1000,parent.height);
 			
 			
 			// Draw another button
@@ -217,9 +234,10 @@ public class PopupReaction{
 			parent.text("All Reactions",xRect,45);
 			
 			// Draw proteins *****************************
-			 for (int p=0; p<proteins.length;p++){
+			for (int p=0; p<proteins.length;p++){
 				iP[p].update();
 			}
+			
 			
 			parent.fill(0);
 			parent.textSize(13);
@@ -294,9 +312,64 @@ public class PopupReaction{
 					drawReactionNode(entry, i, 200);
 				i++;
 			}	
-			checkGroup.draw((int) (xR+200), 50);
-		}	
+			float x7 = (xR+200);
+			float y7 = 50;
+			float gap7 = 40;
+			float step7 = 16;
+			
+			
+			check1.draw((int) x7, (int) y7);
+			//draw color legend
+			parent.textSize(12);
+			parent.textAlign(PApplet.LEFT);
+			parent.fill(smallMoleculeColor.getRGB());
+			parent.stroke(smallMoleculeColor.getRGB());
+			float x8 = x7+30;
+			float y8 = y7+gap7;
+			parent.text("Small Molecules",x8, y8);
+			parent.line(x7, y8-5, x7+25, y8-5);
+			
+			parent.fill(formComplexColor.getRGB());
+			parent.stroke(formComplexColor.getRGB());
+			y8 += step7;
+			parent.text("Complex formation",x8, y8);
+			parent.line(x7, y8-5, x7+25, y8-5);
+			
+			parent.fill(complexRectionColor.getRGB());
+			parent.stroke(complexRectionColor.getRGB());
+			y8 += step7;
+			parent.text("Complex reaction",x8, y8);
+			parent.line(x7, y8-5, x7+25, y8-5);
+			
+			parent.fill(proteinRectionColor.getRGB());
+			parent.stroke(proteinRectionColor.getRGB());
+			y8 += step7;
+			parent.text("Protein reaction",x8, y8);
+			parent.line(x7, y8-5, x7+25, y8-5);
+			
 	}
+	
+	public  void drawGradientLine(float x1, float y1, float x2, float y2, float sat) {
+		int gap = 100;
+		if (sat==255)
+			gap=400;
+		parent.noStroke();
+		for (float x = 0; x <= gap; x=x+1f) {
+			  float x3 = x1+x;	
+			  float x4 = x2-x;	
+			  float y3 = (x3-x1)*(y2-y1)/(float) (x2-x1) +y1;
+			  float y4 = (x4-x1)*(y2-y1)/(float) (x2-x1) +y1;
+			  //float dis1 = PApplet.min(x3-x1, x2-x3);
+			  float alpha = PApplet.map(x, 0,gap, sat, 0);
+			  if (alpha>1){
+				   Color c = new Color(smallMoleculeColor.getRed(), smallMoleculeColor.getGreen(), smallMoleculeColor.getBlue(),(int) alpha);
+				   parent.fill(c.getRGB());
+				   parent.ellipse(x3,y3,1.25f,1.25f);
+				   parent.ellipse(x4,y4,1.25f,1.25f);
+			  } 
+		}
+	} 
+	
 	public ArrayList<Integer> getProteinsInOneSideOfReaction(Object[] s) {
 		ArrayList<Integer> a = new ArrayList<Integer>();
 		for (int i3=0;i3<s.length;i3++){
@@ -333,8 +406,8 @@ public class PopupReaction{
 		parent.textSize(textSixe);
 		parent.fill(0,sat);
 		if (main.MainMatrix.isSmallMolecule(proteins[p])){
-			parent.fill(80,sat);
-			parent.textSize(textSixe*3/4f);
+			parent.fill(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
+			parent.textSize(textSixe);
 		}
 		if (sat>=255 && textSixe<10)
 			parent.textSize(10);
@@ -348,8 +421,8 @@ public class PopupReaction{
 		parent.textSize(textSixe);
 		parent.fill(0,sat);
 		if (main.MainMatrix.isSmallMolecule(proteins[p])){
-			parent.fill(80,sat);
-			parent.textSize(textSixe*3/4f);
+			parent.fill(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
+			parent.textSize(textSixe);
 		}
 		if (sat>=255 && textSixe<10)
 			parent.textSize(10);
@@ -385,10 +458,18 @@ public class PopupReaction{
 		  for (int i3=0;i3<s.length;i3++){
 			  String name = main.MainMatrix.getProteinName(s[i3].toString());
 			  if (name!=null){
-				 // System.out.println("	Left "+(i3+1)+" = "+name);
 				  if (mapComplexRDFId_index.get(name)!=null){
-					  parent.stroke(200,0,0,sat);
-					  parent.line(xL, iP[mapComplexRDFId_index.get(name)].value-hProtein/4f, xRect, iY[i2].value-iH[i2].value/2);
+					  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),sat);
+					  float y5 = iP[mapComplexRDFId_index.get(name)].value-hProtein/4f;
+					  float y6 = iY[i2].value-iH[i2].value/2;
+					  if (check1.s && main.MainMatrix.isSmallMolecule(name))
+						  drawGradientLine(xL, y5, xRect, y6,sat);
+					  else  {
+						  if (main.MainMatrix.isSmallMolecule(name))
+								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
+						  parent.line(xL, y5, xRect, y6);
+					  }
+						
 				  }
 				  else{
 					  System.out.println("CAN NOT find protein = "+name+"	s[i3]="+s[i3]);
@@ -417,12 +498,12 @@ public class PopupReaction{
 						  yL2 /= numAvailableComponents;
 					  for (int k=0;k<components.size();k++){
 						//	 System.out.println("		 contains "+components.get(k));
+						  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
 						  if (mapComplexRDFId_index.get(components.get(k))!=null){
-							  parent.stroke(0,100,150,sat);
 							  parent.line(xL, iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f, xL2, yL2);
 						  }
 					  }
-					  parent.stroke(0,0,150,sat);
+					  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
 					  parent.line(xL2, yL2, xRect, iY[i2].value-iH[i2].value/2);
 				  }
 				  //else
@@ -436,8 +517,16 @@ public class PopupReaction{
 			  if (name!=null){
 				  //System.out.println("	Right "+(i3+1)+" = "+name);
 				  if (mapComplexRDFId_index.get(name)!=null){
-					  parent.stroke(200,0,0,sat);
-					  parent.line(xRect, iY[i2].value-iH[i2].value/2,xR, iP[mapComplexRDFId_index.get(name)].value-hProtein/4f);
+					  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),sat);
+					  float y5 = iY[i2].value-iH[i2].value/2;
+					  float y6 = iP[mapComplexRDFId_index.get(name)].value-hProtein/4f;
+					  if (check1.s && main.MainMatrix.isSmallMolecule(name))
+						  drawGradientLine(xRect, y5, xR, y6,sat);
+					  else{
+						  if (main.MainMatrix.isSmallMolecule(name))
+								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
+						  parent.line(xRect, y5,xR, y6);
+					  }	  
 				  }
 			  }
 			  else{
@@ -457,13 +546,12 @@ public class PopupReaction{
 					  else 	  
 						  yR2 /= numAvailableComponents;
 					  
-					  parent.stroke(0,0,150,sat);
+					  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
 					  parent.line(xRect, iY[i2].value-iH[i2].value/2, xR2, yR2);
 				
 					  for (int k=0;k<components.size();k++){
-						//	 System.out.println("		 contains "+components.get(k));
+						  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
 						  if (mapComplexRDFId_index.get(components.get(k))!=null){
-							  parent.stroke(0,100,150,sat);
 							  parent.line(xR2, yR2, xR, iP[mapComplexRDFId_index.get(components.get(k))].value-hProtein/4f);
 						  }
 					  }
@@ -567,17 +655,12 @@ public class PopupReaction{
 		if (itemHash==null || iH==null || iH.length==0) return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (x<mX && mX<x+w1 && 0<=mY && mY<=yBegin){
+		if (xButton<mX && mX<xButton+w1 && 0<=mY && mY<=yBegin){
 			bPopup=true;
 			return;
 		}	
 		else if (sPopup){
 			bPopup=false;		
-			
-			if (x<mX && mX<x+w1 && yBegin<=mY && mY<=iY[0].value-iH[0].value){
-				bRect=-1;
-				return;
-			}	
 			for (int i=0; i<itemHash.size(); i++){
 				if (xRect-50<=mX && mX<=xRect+50 && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					bRect =i;

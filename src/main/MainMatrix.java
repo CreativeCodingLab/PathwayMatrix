@@ -340,8 +340,8 @@ public class MainMatrix extends PApplet {
 	
 	public void draw() {
 		background(255);
-		
 		// Print message
+		
 		if (processingMiner<colorRelations.length){
 			ccc+=10;
 			if (ccc>10000) ccc=0;
@@ -354,7 +354,33 @@ public class MainMatrix extends PApplet {
 			this.textAlign(PApplet.LEFT);
 			this.text(message, marginX+20,this.height-14);
 		}
-
+		
+		if (PopupReaction.sPopup)
+			popupReaction.drawReactions();
+		else{
+			drawMatrix();
+			this.textSize(13);
+			check1.draw(this.width-600, 50);
+			check2.draw(this.width-600, 70);
+			
+		}	
+		// Draw button
+		try{
+			this.textSize(13);
+			button.draw();
+			popupGroup.draw(this.width-100);
+			popupRelation.draw(this.width-304);
+			popupComplex.draw(this.width-406);
+			popupReaction.drawButton(this.width-508);
+			popupOrder.draw(this.width-202);
+		}
+		catch (Exception e){
+			e.printStackTrace();
+			return;
+		}
+	}	
+	
+	public void drawMatrix() {
 		if (isAllowedDrawing){
 			if (ggg==null || ggg.size()==0)
 				return;
@@ -420,28 +446,10 @@ public class MainMatrix extends PApplet {
 			} 
 			this.text("Total relations: "+totalRelations, x2, y2+60);
 		}
-		
-		// Draw button
-		try{
-			vennOverview.draw(x2+50,300,10);
-			//vennDetail.draw(x2+100,500,10);
-			
-			this.textSize(13);
-			check1.draw(this.width-600, 50);
-			check2.draw(this.width-600, 70);
-			button.draw();
-			popupGroup.draw(this.width-100);
-			popupRelation.draw(this.width-304);
-			popupComplex.draw(this.width-406);
-			popupReaction.draw(this.width-508);
-			popupOrder.draw(this.width-202);
-			
-		}
-		catch (Exception e){
-			e.printStackTrace();
-			return;
-		}
-	}	
+		vennOverview.draw(x2+50,300,10);
+	}
+	
+	
 	
 	public void drawGroups() {
 		if (leaderSortedMap==null) return;
@@ -982,11 +990,8 @@ public class MainMatrix extends PApplet {
 		else if (PopupComplex.b>=-1){
 			popupComplex.mouseClicked();
 		}
-		else if (PopupReaction.bPopup && PopupReaction.checkGroup.b){
-			PopupReaction.checkGroup.mouseClicked();
-			if (PopupReaction.checkGroup.s){
-				
-			}
+		else if (PopupReaction.sPopup && PopupReaction.check1.b){
+			PopupReaction.check1.mouseClicked();
 		}
 		else if (PopupReaction.bPopup){
 			popupReaction.mouseClicked();
