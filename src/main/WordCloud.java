@@ -189,10 +189,10 @@ public class WordCloud{
 			parent.textAlign(PApplet.LEFT);
 			parent.fill(color.getRGB());
 			if (id==b){
-				parent.fill(255);
+				parent.fill(Color.RED.getRGB());
 			}
 			if (id==s)
-				parent.fill(Color.RED.getRGB());
+				parent.fill(Color.BLACK.getRGB());
 				
 			parent.textFont(font2, font_size);
 					

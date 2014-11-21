@@ -115,7 +115,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "../level3RAS/Ras_Pathway.owl";
+	public String currentFile = "../level3RAS/RAF-Cascade.owl";
 	
 	public static Button button;
 	
@@ -194,6 +194,7 @@ public class MainMatrix extends PApplet {
 	public static Set<BiochemicalReaction> reactionSet; 
 	
 	public static ArrayList<String>[] proteinsInComplex; 
+	
 	
 	
 	public static void main(String args[]){
@@ -320,6 +321,7 @@ public class MainMatrix extends PApplet {
 		popupGroup  = new PopupGroup(this);
 		check1 = new CheckBox(this, "Lensing");
 		check2 = new CheckBox(this, "Highlight groups");
+		
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
 		vennDetail = new Venn_Detail(this);
@@ -1026,6 +1028,11 @@ public class MainMatrix extends PApplet {
 	
 	
 	public void keyPressed() {
+		if (PopupReaction.sPopup &&  PopupReaction.textbox1.b){
+			PopupReaction.textbox1.keyPressed();
+			return;
+		}
+		
 		if (this.key == '+') {
 			currentRelation++;
 			if (currentRelation>=minerList.size())

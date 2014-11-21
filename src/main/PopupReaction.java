@@ -62,13 +62,13 @@ public class PopupReaction{
 	public static Color proteinRectionColor = new Color(180,0,0);
 	
 	public static WordCloud wordCloud;
-	
+	public static int numTop =30;
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		check1 = new CheckBox(parent, "Fade links of small molecules");
 		check5 = new CheckBox(parent, "Rearrange reactions");
 		textbox1 = new TextBox(parent, "Search");
-		wordCloud = new WordCloud(parent, 10,290,200,parent.height-10);
+		wordCloud = new WordCloud(parent, 10,290,200,parent.height-300);
 		
 		
 	}
@@ -105,13 +105,13 @@ public class PopupReaction{
 		itemHash = sortByComparator(unsortMap);
 		
 		// Word cloud
-		WordCount wc1 = new WordCount(70);
+		WordCount wc1 = new WordCount(numTop);
 		ArrayList<String> a = new ArrayList<String>();
 		for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
 			String rectName = entry.getKey().getDisplayName();
 			String[] pieces = rectName.split(" ");
 			for (int k=0;k<pieces.length;k++){
-				a.add(pieces[k]);
+				a.add(pieces[k].trim());
 			}
 		}
 			
@@ -456,12 +456,84 @@ public class PopupReaction{
 			parent.line(x7, y8-5, x7+25, y8-5);
 			
 			// Draw word cloud
-			wordCloud.x1=parent.width-250; 
+			wordCloud.x1=parent.width-200; 
 			wordCloud.x2=parent.width; 
-			
 			wordCloud.draw(parent);
 			
-			
+			int[][] rel =  new int[numTop][numTop];
+			for (Map.Entry<BiochemicalReaction, Integer> entry : itemHash.entrySet()) {
+				String rectName = entry.getKey().getDisplayName();
+				for (int m=0;m<numTop;m++){
+					for (int n=0;n<numTop;n++){
+						if (wordCloud.words[m].equals("") || wordCloud.words[n].equals("")) 
+							continue;
+						if (rectName.contains(wordCloud.words[m].word) && rectName.contains(wordCloud.words[n].word))
+							rel[m][n]++;
+					}
+				}		
+			}
+			drawRelationship(wordCloud, rel, Color.BLACK);
+	}
+
+	
+	public void drawRelationship(WordCloud wc, int[][] rel, Color color){
+		int max = 0;
+		
+		for (int i=0;i<numTop;i++){
+			for (int j=i+1;j<numTop;j++){
+				if (rel[i][j]>max)
+					max = rel[i][j];
+			}
+		}	
+		
+		 for (int i=0;i<numTop;i++){
+			float y1 = wc.words[i].y-wc.words[i].font_size/3.5f;
+			for (int j=i+1;j<numTop;j++){
+				float y2 = wc.words[j].y-wc.words[j].font_size/3.5f;
+				float xx = wc.x1;
+				float yy = (y1+y2)/2;
+				parent.noFill();
+				
+				float maxWeight = max;
+				if (max<=5){
+					maxWeight = 6;
+				}
+				
+				float wei = PApplet.map(rel[i][j], 0, maxWeight, 0, 100);
+				parent.stroke(color.getRed(),color.getGreen(),color.getBlue(),wei);
+				parent.strokeWeight(wei/20);
+				parent.arc(xx, yy, y2-y1,y2-y1, PApplet.PI/2, 3*PApplet.PI/2);
+			}
+		}
+		// Draw relationship of brushing term
+		 int brushing = wc.b;
+		 if (brushing>=0){
+		 	float y1 = wc.words[brushing].y-wc.words[brushing].font_size/3.5f;
+			for (int j=0;j<numTop;j++){
+				if (j==brushing) continue;
+				float y2 = wc.words[j].y-wc.words[j].font_size/3.5f;
+				float xx = wc.x1;
+				float yy = (y1+y2)/2;
+				parent.noFill();
+				
+				float maxWeight = max;
+				if (max<=5){
+					maxWeight = 6;
+				}
+				if (j>brushing){
+					float wei = PApplet.map(rel[brushing][j], 0, maxWeight, 0, 191);
+					parent.stroke(255,0,0,wei+64);
+					parent.strokeWeight(wei/20);
+					parent.arc(xx, yy, y2-y1,y2-y1, PApplet.PI/2, 3*PApplet.PI/2);
+				}
+				else{
+					float wei = PApplet.map(rel[j][brushing], 0, maxWeight, 0, 191);
+					parent.stroke(255,0,0,wei+64);
+					parent.strokeWeight(wei/20);
+					parent.arc(xx, yy, y1-y2,y1-y2, PApplet.PI/2, 3*PApplet.PI/2);
+				}
+			}
+		 } 
 	}
 	
 	public  void drawGradientLine(float x1, float y1, float x2, float y2, float sat) {

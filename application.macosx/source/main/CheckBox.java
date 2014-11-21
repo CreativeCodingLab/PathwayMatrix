@@ -23,7 +23,6 @@ public class CheckBox{
 		x = x_;
 		y = y_;
 		
-		
 		checkBrushing();
 		parent.textAlign(PApplet.LEFT);
 		parent.textSize(12);
