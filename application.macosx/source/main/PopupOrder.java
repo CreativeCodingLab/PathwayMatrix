@@ -26,7 +26,7 @@ public class PopupOrder{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrix.popupRelation.b<0)
+		if (main.MainMatrixVersion_1.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -37,8 +37,8 @@ public class PopupOrder{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrix.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrix.pairs[j].size());
+			for (int j=0;j<main.MainMatrixVersion_1.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -78,31 +78,31 @@ public class PopupOrder{
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("Random")) { 
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderByRandom(parent);
 			}	
 			else if (items[s].equals("Reading order"))  {
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderByReadingOrder();
 			}	
 			else if (items[s].equals("Name"))  {
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderByName();
 			}	
 			else if (items[s].equals("Similarity"))  {
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderBySimilarity();
 			}	
 			else if (items[s].equals("Complex"))  {
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				main.PopupGroup.s=0;
 				Gene.orderByComplex();
 			}	
-			main.MainMatrix.popupReaction.updateProteinPositions();
+			main.MainMatrixVersion_1.popupReaction.updateProteinPositions();
 		}
 	}
 	 

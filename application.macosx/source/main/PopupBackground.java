@@ -26,7 +26,7 @@ public class PopupBackground{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrix.popupRelation.b<0)
+		if (main.MainMatrixVersion_1.popupRelation.b<0)
 			checkBrushing();
 		parent.noStroke();
 		parent.fill(200,200,200);
@@ -38,8 +38,8 @@ public class PopupBackground{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrix.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrix.pairs[j].size());
+			for (int j=0;j<main.MainMatrixVersion_1.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}

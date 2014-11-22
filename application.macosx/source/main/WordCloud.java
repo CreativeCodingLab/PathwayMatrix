@@ -172,16 +172,18 @@ public class WordCloud{
 			}
 		}
 
-		int checkBrushing(PApplet p) {
+		public int checkBrushing(PApplet p) {
 			if (x-word_width/2<=parent.mouseX && parent.mouseX<=x+word_width/2 &&
 				y-font_size<=parent.mouseY && parent.mouseY<=y){
 				b=id;
+				main.PopupReaction.textbox1.searchText = words[b].word.toLowerCase();
+				PopupReaction.textbox1.updateReactions();
 				return b;
 			}	
 			else{
 				b=-200;
+				return b;
 			}
-			return b;
 		}
 		
 		

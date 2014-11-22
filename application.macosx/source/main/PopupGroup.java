@@ -26,7 +26,7 @@ public class PopupGroup{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrix.popupRelation.b<0 && main.MainMatrix.popupOrder.b<0)
+		if (main.MainMatrixVersion_1.popupRelation.b<0 && main.MainMatrixVersion_1.popupOrder.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -35,8 +35,8 @@ public class PopupGroup{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrix.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrix.pairs[j].size());
+			for (int j=0;j<main.MainMatrixVersion_1.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -75,11 +75,11 @@ public class PopupGroup{
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("None")){  
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				Gene.orderBySimilarity();
 			}	
 			else if (items[s].equals("Similarity"))  {
-				main.MainMatrix.stateAnimation=0;
+				main.MainMatrixVersion_1.stateAnimation=0;
 				Gene.groupBySimilarity();
 			}	
 		}

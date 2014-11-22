@@ -89,24 +89,25 @@ public class TextBox {
 			
 			
 			if (!textBefore.equals(searchText) && !searchText.equals("")){
-				//System.out.println("	*****searchText="+searchText+"*****");
-				int indexOfItemHash=0;
-				main.PopupReaction.sRectList =  new ArrayList<Integer>();
-				for (Map.Entry<BiochemicalReaction, Integer> entry : main.PopupReaction.itemHash.entrySet()) {
-					String rectName = entry.getKey().getDisplayName();
-					if (rectName.toLowerCase().contains(searchText)){
-						main.PopupReaction.sRectList.add(indexOfItemHash);
-					}
-					indexOfItemHash++;
-				}
+				updateReactions();
+				
 			}
 			else if (searchText.equals(""))
 				main.PopupReaction.sRectList =  new ArrayList<Integer>();
-			
-			
 		}
 	}
-
+	public void updateReactions() {
+		int indexOfItemHash=0;
+		main.PopupReaction.sRectList =  new ArrayList<Integer>();
+		for (Map.Entry<BiochemicalReaction, Integer> entry : main.PopupReaction.rectHash.entrySet()) {
+			String rectName = entry.getKey().getDisplayName();
+			if (rectName.toLowerCase().contains(searchText)){
+				main.PopupReaction.sRectList.add(indexOfItemHash);
+			}
+			indexOfItemHash++;
+		}
+	}
+		
 	public void checkBrushing() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
