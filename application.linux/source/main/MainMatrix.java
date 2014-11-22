@@ -115,7 +115,7 @@ public class MainMatrix extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "../level3RAS/RAF-Cascade.owl";
+	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
 	
 	public static Button button;
 	
@@ -1313,7 +1313,7 @@ public class MainMatrix extends PApplet {
 			//write();
 			
 			
-			//vennOverview.compute();
+			vennOverview.compute();
 			//Gene.orderByRandom(p);
 			PopupOrder.s =0;
 			PopupGroup.s = 0;

@@ -396,7 +396,6 @@ public class PopupReaction{
 				i2++;
 			}
 			
-			System.out.println(sRectList);
 			// Draw brushing reactions ***************
 			if (bRect>=0 || sRectList.size()>0){
 				int i3=0;
