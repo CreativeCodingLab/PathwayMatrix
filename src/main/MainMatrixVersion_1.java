@@ -90,7 +90,7 @@ import edu.uic.ncdm.venn.Venn_Detail;
 
 import processing.core.*;
 
-public class MainMatrix extends PApplet {
+public class MainMatrixVersion_1 extends PApplet {
 	private static final long serialVersionUID = 1L;
 	public int count = 0;
 	/**
@@ -198,7 +198,7 @@ public class MainMatrix extends PApplet {
 	
 	
 	public static void main(String args[]){
-	  PApplet.main(new String[] { MainMatrix.class.getName() });
+	  PApplet.main(new String[] { MainMatrixVersion_1.class.getName() });
     }
 
 	static{
@@ -360,9 +360,8 @@ public class MainMatrix extends PApplet {
 		
 		// Draw 
 		try{
-			
 			if (PopupReaction.sPopup)
-				popupReaction.drawReactions();
+				popupReaction.drawReactions(100);
 			else{
 				drawMatrix();
 				this.textSize(13);
@@ -374,10 +373,10 @@ public class MainMatrix extends PApplet {
 			this.textSize(13);
 			button.draw();
 			popupGroup.draw(this.width-100);
+			popupOrder.draw(this.width-202);
 			popupRelation.draw(this.width-304);
 			popupComplex.draw(this.width-406);
 			popupReaction.drawButton(this.width-508);
-			popupOrder.draw(this.width-202);
 		}
 		catch (Exception e){
 			e.printStackTrace();
