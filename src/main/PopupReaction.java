@@ -69,8 +69,6 @@ public class PopupReaction{
 		check5 = new CheckBox(parent, "Rearrange reactions");
 		textbox1 = new TextBox(parent, "Search");
 		wordCloud = new WordCloud(parent, 10,290,200,parent.height-300);
-		
-		
 	}
 	
 	public void setItems(){
@@ -466,6 +464,11 @@ public class PopupReaction{
 					for (int n=0;n<numTop;n++){
 						if (wordCloud.words[m].equals("") || wordCloud.words[n].equals("")) 
 							continue;
+						if (wordCloud.words[m]==null || wordCloud.words[m].word==null
+								|| wordCloud.words[n]==null || wordCloud.words[n].word==null ){
+							System.out.println("wordCloud.words[m] = "+wordCloud.words[m]+"   wordCloud.words[m].word="+wordCloud.words[m].word);
+							System.out.println(" wordCloud.words[n] = "+wordCloud.words[n]+"   wordCloud.words[n].word="+wordCloud.words[n].word);
+						}
 						if (rectName.contains(wordCloud.words[m].word) && rectName.contains(wordCloud.words[n].word))
 							rel[m][n]++;
 					}
