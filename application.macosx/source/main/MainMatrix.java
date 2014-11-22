@@ -357,17 +357,20 @@ public class MainMatrix extends PApplet {
 			this.text(message, marginX+20,this.height-14);
 		}
 		
-		if (PopupReaction.sPopup)
-			popupReaction.drawReactions();
-		else{
-			drawMatrix();
-			this.textSize(13);
-			check1.draw(this.width-600, 50);
-			check2.draw(this.width-600, 70);
-			
-		}	
-		// Draw button
+		
+		// Draw 
 		try{
+			
+			if (PopupReaction.sPopup)
+				popupReaction.drawReactions();
+			else{
+				drawMatrix();
+				this.textSize(13);
+				check1.draw(this.width-600, 50);
+				check2.draw(this.width-600, 70);
+				
+			}	
+			
 			this.textSize(13);
 			button.draw();
 			popupGroup.draw(this.width-100);
