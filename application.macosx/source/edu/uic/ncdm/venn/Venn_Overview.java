@@ -19,8 +19,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import edu.uic.ncdm.venn.data.VennData;
-import static main.MainMatrixVersion_1_1.minerList;
-import static main.MainMatrixVersion_1_1.minerNames;
+import static main.MainMatrixVersion_1_2.minerList;
+import static main.MainMatrixVersion_1_2.minerNames;
 
 public class Venn_Overview{
 	int count = 0;
@@ -55,7 +55,7 @@ public class Venn_Overview{
 		// Select the list of miner
 		numMinerContainData = 0;
 		for (int i=0;i<minerList.size();i++){
-			if (main.MainMatrixVersion_1_1.pairs[i].size()>0)
+			if (main.MainMatrixVersion_1_2.pairs[i].size()>0)
 				numMinerContainData++;
 		}	
 		if (numMinerContainData==0) return;
@@ -67,9 +67,9 @@ public class Venn_Overview{
 		minerNames = new String[numMinerContainData];
 		int count =0;
 		for (int i=0;i<minerList.size();i++){
-			if (main.MainMatrixVersion_1_1.pairs[i].size()>0){
+			if (main.MainMatrixVersion_1_2.pairs[i].size()>0){
 				minerGlobalIDof[count] = i;
-				pair2[count] = main.MainMatrixVersion_1_1.pairs[i];
+				pair2[count] = main.MainMatrixVersion_1_2.pairs[i];
 				minerNames[count] = ""+minerList.get(i);
 				count++;
 			}	           
@@ -218,12 +218,12 @@ public class Venn_Overview{
             int radius = (int) (pi * size);
             float x = xPanelRight+10+(int) (xi * size);
             float y = yy4 + (int) (yi * size);
-            Color color = new Color(main.MainMatrixVersion_1_1.colorRelations[minerGlobalIDof[i]]);  
+            Color color = new Color(main.MainMatrixVersion_1_2.colorRelations[minerGlobalIDof[i]]);  
             
              // if (deactive[i])
            // 	color = new Color(255,255,255,10);
             
-            if (minerGlobalIDof[i]==main.MainMatrixVersion_1_1.currentRelation){
+            if (minerGlobalIDof[i]==main.MainMatrixVersion_1_2.currentRelation){
             	currentSize = radius;
             }
             	
@@ -242,9 +242,9 @@ public class Venn_Overview{
            }
         }
         if (minerGlobalIDof!=null && brushing>=0)
-        	main.MainMatrixVersion_1_1.currentRelation = minerGlobalIDof[brushing];
+        	main.MainMatrixVersion_1_2.currentRelation = minerGlobalIDof[brushing];
         else
-        	main.MainMatrixVersion_1_1.currentRelation = -1;
+        	main.MainMatrixVersion_1_2.currentRelation = -1;
         
         parent.fill(Color.GRAY.getRGB());
 		parent.textSize(14);
@@ -271,12 +271,12 @@ public class Venn_Overview{
 	 
 	public boolean mouseClicked() {
 		if (brushing>=0){
-			main.MainMatrixVersion_1_1.currentRelation = minerGlobalIDof[brushing];
+			main.MainMatrixVersion_1_2.currentRelation = minerGlobalIDof[brushing];
 			deactive[brushing] =! deactive[brushing];
 			return true;
 		}
 		else{
-			main.MainMatrixVersion_1_1.currentRelation = -2;
+			main.MainMatrixVersion_1_2.currentRelation = -2;
 			return false;
 		}	
 	}

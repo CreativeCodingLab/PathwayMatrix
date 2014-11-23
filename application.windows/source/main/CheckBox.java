@@ -40,10 +40,35 @@ public class CheckBox{
 		}
 		else if (b)
 			parent.fill(100);
-		if (text.contains("small molecules")){
-			parent.text(text.replace("small molecules", ""),x+20,y+13);
+		if (text.contains("Small molecules")){
+			parent.text(text.replace("Small molecules", ""),x+20,y+13);
 			parent.fill(main.PopupReaction.smallMoleculeColor.getRed(),main.PopupReaction.smallMoleculeColor.getGreen(),main.PopupReaction.smallMoleculeColor.getBlue());
-			parent.text("small molecules",x+95,y+13);
+			parent.text("Small molecules",x+95,y+13);
+		}
+		else if (text.contains("Unidentified elements")){
+			parent.text(text.replace("Unidentified elements", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
+			parent.text("Unidentified elements",x+95,y+13);
+		}
+		else if (text.contains("Complex formation")){
+			parent.text(text.replace("Complex formation", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.formComplexColor.getRed(),main.PopupReaction.formComplexColor.getGreen(),main.PopupReaction.formComplexColor.getBlue());
+			parent.text("Complex formation",x+95,y+13);
+		}
+		else if (text.contains("Complex formation")){
+			parent.text(text.replace("Complex formation", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.formComplexColor.getRed(),main.PopupReaction.formComplexColor.getGreen(),main.PopupReaction.formComplexColor.getBlue());
+			parent.text("Complex formation",x+95,y+13);
+		}
+		else if (text.contains("Complex reaction")){
+			parent.text(text.replace("Complex reaction", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.complexRectionColor.getRed(),main.PopupReaction.complexRectionColor.getGreen(),main.PopupReaction.complexRectionColor.getBlue());
+			parent.text("Complex reaction",x+95,y+13);
+		}
+		else if (text.contains("Protein reaction")){
+			parent.text(text.replace("Protein reaction", ""),x+20,y+13);
+			parent.fill(main.PopupReaction.proteinRectionColor.getRed(),main.PopupReaction.proteinRectionColor.getGreen(),main.PopupReaction.proteinRectionColor.getBlue());
+			parent.text("Protein reaction",x+95,y+13);
 		}
 			
 		else	
