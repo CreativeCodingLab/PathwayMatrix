@@ -26,19 +26,20 @@ public class PopupOrder{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrixVersion_1.popupRelation.b<0)
+		if (main.MainMatrixVersion_1_1.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
 			parent.textSize(13);
 			h=items.length*itemH+40;
-			parent.noStroke();
-			parent.rect(x, y-2, w,h);
+			parent.fill(200);
+			parent.stroke(0,150);
+			parent.rect(x, y+25, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrixVersion_1.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1.pairs[j].size());
+			for (int j=0;j<main.MainMatrixVersion_1_1.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1_1.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -46,63 +47,62 @@ public class PopupOrder{
 				if (i==s){
 					parent.noStroke();
 					parent.fill(0);
-					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
+					parent.rect(x+10,y+itemH*(i)+5+25,w-25,itemH+1);
 					parent.fill(255,255,0);
 				}
 				else if (i==b){
-					parent.fill(255);
+					parent.fill(200,0,0);
 				}
 				else{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(items[i],x+30,y+itemH*(i+1));
+				parent.text(items[i],x+30,y+itemH*(i+1)+25);  // 
 			}	
 			
 			if (items[s].equals("Similarity")) 
-				slider.draw(x+110, y+itemH*4-14);
+				slider.draw(x+110, y+itemH*4-14+25);
 			
 		}
-		else{
-			parent.fill(150);
-			parent.noStroke();
-			parent.rect(x,y,w1,25);
-			parent.fill(0);
-			parent.textAlign(PApplet.CENTER);
-			parent.textSize(13);
-			parent.text("Order by",x+w1/2,y+18);
-		}	
+		parent.fill(150);
+		parent.noStroke();
+		parent.rect(x,y,w1,25);
+		parent.fill(0);
+		parent.textAlign(PApplet.CENTER);
+		parent.textSize(13);
+		parent.text("Order by",x+w1/2,y+18);
+		
 	}
 	
 	 public void mouseClicked() {
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("Random")) { 
-				main.MainMatrixVersion_1.stateAnimation=0;
-				main.PopupGroup.s=0;
+				main.MainMatrixVersion_1_1.stateAnimation=0;
+				main.MainMatrixVersion_1_1.check2.s =false;
 				Gene.orderByRandom(parent);
 			}	
 			else if (items[s].equals("Reading order"))  {
-				main.MainMatrixVersion_1.stateAnimation=0;
-				main.PopupGroup.s=0;
+				main.MainMatrixVersion_1_1.stateAnimation=0;
+				main.MainMatrixVersion_1_1.check2.s =false;
 				Gene.orderByReadingOrder();
 			}	
 			else if (items[s].equals("Name"))  {
-				main.MainMatrixVersion_1.stateAnimation=0;
-				main.PopupGroup.s=0;
+				main.MainMatrixVersion_1_1.stateAnimation=0;
+				main.MainMatrixVersion_1_1.check2.s =false;
 				Gene.orderByName();
 			}	
 			else if (items[s].equals("Similarity"))  {
-				main.MainMatrixVersion_1.stateAnimation=0;
-				main.PopupGroup.s=0;
+				main.MainMatrixVersion_1_1.stateAnimation=0;
+				main.MainMatrixVersion_1_1.check2.s =false;
 				Gene.orderBySimilarity();
 			}	
 			else if (items[s].equals("Complex"))  {
-				main.MainMatrixVersion_1.stateAnimation=0;
-				main.PopupGroup.s=0;
+				main.MainMatrixVersion_1_1.stateAnimation=0;
+				main.MainMatrixVersion_1_1.check2.s =false;
 				Gene.orderByComplex();
 			}	
-			main.MainMatrixVersion_1.popupReaction.updateProteinPositions();
+			main.MainMatrixVersion_1_1.popupReaction.updateProteinPositions();
 		}
 	}
 	 
@@ -117,7 +117,7 @@ public class PopupOrder{
 		}
 		else{
 			for (int i=0; i<items.length; i++){
-				if (x<=mX && mX<=x+w && y+itemH*i<=mY && mY<=y+itemH*(i+1)+6){
+				if (x<=mX && mX<=x+w && y+itemH*i+25<=mY && mY<=y+itemH*(i+1)+6+25){
 					b =i;
 					return;
 				}	
