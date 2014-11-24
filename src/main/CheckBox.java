@@ -46,9 +46,6 @@ public class CheckBox{
 			parent.text("Small molecules",x+95,y+13);
 		}
 		else if (text.contains("Unidentified elements")){
-			parent.text(text.replace("Unidentified elements", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
-			parent.text("Unidentified elements",x+95,y+13);
 		}
 		else if (text.contains("Complex formation")){
 			parent.text(text.replace("Complex formation", ""),x+20,y+13);
@@ -69,6 +66,10 @@ public class CheckBox{
 			parent.text(text.replace("Protein reaction", ""),x+20,y+13);
 			parent.fill(main.PopupReaction.proteinRectionColor.getRed(),main.PopupReaction.proteinRectionColor.getGreen(),main.PopupReaction.proteinRectionColor.getBlue());
 			parent.text("Protein reaction",x+95,y+13);
+			
+			parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
+			parent.text("Unidentified elements",x+95,y+33);
+		
 		}
 			
 		else	
@@ -82,7 +83,7 @@ public class CheckBox{
 	public void checkBrushing() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (x-10<mX && mX < x+110 && y<mY && mY<y+20){
+		if (x-10<mX && mX < x+200 && y<mY && mY<y+20){
 			b=true;
 		}
 		else
