@@ -19,7 +19,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import edu.uic.ncdm.venn.data.VennData;
-import static main.MainMatrixVersion_1_2.minerList;
+import static main.MainMatrixVersion_1_3.minerList;
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 
 public class Venn_Detail{
@@ -60,9 +60,9 @@ public class Venn_Detail{
 		int currentIndex =-1;
 		for (int j=0;j<minerList.size();j++){
 			int countPair=0;
-			for (int i2 =0; i2< main.MainMatrixVersion_1_2.pairs[current].size(); i2++){
-				for (int j2 =0; j2< main.MainMatrixVersion_1_2.pairs[j].size(); j2++){
-					if (main.MainMatrixVersion_1_2.pairs[current].get(i2).equals(main.MainMatrixVersion_1_2.pairs[j].get(j2)))
+			for (int i2 =0; i2< main.MainMatrixVersion_1_3.pairs[current].size(); i2++){
+				for (int j2 =0; j2< main.MainMatrixVersion_1_3.pairs[j].size(); j2++){
+					if (main.MainMatrixVersion_1_3.pairs[current].get(i2).equals(main.MainMatrixVersion_1_3.pairs[j].get(j2)))
 						countPair++;
 				}
 			}
@@ -80,16 +80,16 @@ public class Venn_Detail{
 		
 		for (int i =0; i< numMiner; i++){
 			data[i][0] = minerNames.get(i);
-			areas[i]= main.MainMatrixVersion_1_2.pairs[minerID.get(i)].size();
+			areas[i]= main.MainMatrixVersion_1_3.pairs[minerID.get(i)].size();
 		}
 		
 		int k=numMiner;
 		for (int i =0; i< numMiner; i++){
 			for (int j =i+1; j< numMiner; j++){
-				for (int i2 =0; i2< main.MainMatrixVersion_1_2.pairs[minerID.get(i)].size(); i2++){
-					for (int j2 =0; j2< main.MainMatrixVersion_1_2.pairs[minerID.get(j)].size(); j2++){
-						if (main.MainMatrixVersion_1_2.pairs[minerID.get(i)].get(i2).equals
-								(main.MainMatrixVersion_1_2.pairs[minerID.get(j)].get(j2))){
+				for (int i2 =0; i2< main.MainMatrixVersion_1_3.pairs[minerID.get(i)].size(); i2++){
+					for (int j2 =0; j2< main.MainMatrixVersion_1_3.pairs[minerID.get(j)].size(); j2++){
+						if (main.MainMatrixVersion_1_3.pairs[minerID.get(i)].get(i2).equals
+								(main.MainMatrixVersion_1_3.pairs[minerID.get(j)].get(j2))){
 							areas[k]++;
 						}
 					}
@@ -142,7 +142,7 @@ public class Venn_Detail{
             // Recompute scale to make sure Circles has same size as in the overview Venn
             float radius2 = (pi * size);
             
-            if (minerID.get(i)==main.MainMatrixVersion_1_2.currentRelation){
+            if (minerID.get(i)==main.MainMatrixVersion_1_3.currentRelation){
             	currentSize2 = radius2;
             }
             float scale = (Venn_Overview.currentSize/currentSize2);
@@ -151,7 +151,7 @@ public class Venn_Detail{
             float y = y4 + scale*(yi * size);
            
             
-            Color color = new Color(main.MainMatrixVersion_1_2.colorRelations[minerGlobalIDof[i]]);  
+            Color color = new Color(main.MainMatrixVersion_1_3.colorRelations[minerGlobalIDof[i]]);  
             
             if (PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius2/2 && brushing<0){
             	color = new Color(255,255,255,100);
