@@ -987,29 +987,34 @@ public class MainMatrixVersion_1_2 extends PApplet {
 		else if (PopupComplex.b>=-1){
 			popupComplex.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check21.b){
-			PopupReaction.check21.mouseClicked();
+		else if (PopupReaction.sPopup && PopupReaction.check11.b){
+			PopupReaction.check11.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check22.b){
-			PopupReaction.check22.mouseClicked();
+		else if (PopupReaction.sPopup && PopupReaction.check12.b){
+			PopupReaction.check12.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check23.b){
-			PopupReaction.check23.mouseClicked();
+		else if (PopupReaction.sPopup && PopupReaction.check13.b){
+			PopupReaction.check13.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check24.b){
-			PopupReaction.check24.mouseClicked();
+		else if (PopupReaction.sPopup && PopupReaction.check14.b){
+			PopupReaction.check14.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check25.b){
-			PopupReaction.check25.mouseClicked();
+		else if (PopupReaction.sPopup && PopupReaction.check15.b){
+			PopupReaction.check15.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check1.b){
-			PopupReaction.check1.mouseClicked();
-			if (PopupReaction.check1.s){
-				PopupReaction.check21.s = true;   // Fade small molecule links if order reactions to avoid crossing
-				PopupReaction.check22.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
-				PopupReaction.check23.s = true;   // Fade complex formation links if order reactions to avoid crossing
+		else if (PopupReaction.sPopup && PopupReaction.check2.b){
+			PopupReaction.check2.mouseClicked();
+			if (PopupReaction.check2.s){
+				PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
+				PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
+			//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
 			}	
 			popupReaction.updateReactionPositions();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check3.b){
+			PopupReaction.check3.mouseClicked();
+				
+			popupReaction.updateProteinPositions();
 		}
 		else if (PopupReaction.bPopup){
 			popupReaction.mouseClicked();
@@ -1104,6 +1109,7 @@ public class MainMatrixVersion_1_2 extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
+		
 			File modFile = new File(currentFile);
 			File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
@@ -1309,6 +1315,9 @@ public class MainMatrixVersion_1_2 extends PApplet {
 			System.out.println();
 		
 			popupComplex.setItems();
+			PopupReaction.check2.s=false;
+			PopupReaction.check3.s=false;
+			
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
@@ -1321,11 +1330,11 @@ public class MainMatrixVersion_1_2 extends PApplet {
 			
 			Gene.computeGeneRelationList();
 			Gene.computeGeneGeneInComplex();
+			Gene.orderByRandom(p);
 			//write();
 			
 			
 			vennOverview.compute();
-			//Gene.orderByRandom(p);
 			PopupOrder.s =1;
 			check2.s  = false;
 		}
@@ -1352,6 +1361,8 @@ public class MainMatrixVersion_1_2 extends PApplet {
 			s1 = mapElementRef.get(ref);
 		if (s1==null)
 			s1 = mapElementRDFId.get(ref);
+		//if (s1==null)
+		//	s1 = ref;
 		return s1;
 	}
 	
