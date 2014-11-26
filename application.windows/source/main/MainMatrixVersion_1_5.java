@@ -93,29 +93,14 @@ import processing.core.*;
 public class MainMatrixVersion_1_5 extends PApplet {
 	private static final long serialVersionUID = 1L;
 	public int count = 0;
-	/**
-	 * The name of the file for IDs of ubiquitous molecules.
-	 */
-	private static final String UBIQUE_FILE = "blacklist.txt";
-
-	/**
-	 * The url of the file for IDs of ubiquitous molecules.
-	 */
-	private static final String UBIQUE_URL = "http://www.pathwaycommons.org/pc2/downloads/blacklist.txt";
-
-
-	/**
-	 * Blacklist for detecting ubiquitous small molecules.
-	 */
 	
-	
-	private static Blacklist blacklist;
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
+	//public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
+	public String currentFile = "";
 	
 	public static Button button;
 	
@@ -202,45 +187,6 @@ public class MainMatrixVersion_1_5 extends PApplet {
 	  PApplet.main(new String[] { MainMatrixVersion_1_5.class.getName() });
     }
 
-	static{
-		File f = new File(UBIQUE_FILE);
-
-		if (!f.exists()) downloadUbiques();
-		else if (f.exists()) blacklist = new Blacklist(f.getAbsolutePath());
-		else System.out.println("Warning: Cannot load blacklist.");
-	}
-	/**
-	 * Downloads the PC data.
-	 * @return true if download successful
-	 */
-	private static boolean downloadUbiques(){
-		return downloadPlain(UBIQUE_URL, UBIQUE_FILE);
-	}
-	private static boolean downloadPlain(String urlString, String file){
-		try{
-			URL url = new URL(urlString);
-			URLConnection con = url.openConnection();
-			InputStream in = con.getInputStream();
-
-			// Open the output file
-			OutputStream out = new FileOutputStream(file);
-			// Transfer bytes from the compressed file to the output file
-			byte[] buf = new byte[1024];
-
-			int lines = 0;
-			int len;
-			while ((len = in.read(buf)) > 0){
-				out.write(buf, 0, len);
-				lines++;
-			}
-			// Close the file and stream
-			in.close();
-			out.close();
-
-			return lines > 0;
-		}
-		catch (IOException e){return false;}
-	}
 	
 	
 
@@ -326,8 +272,8 @@ public class MainMatrixVersion_1_5 extends PApplet {
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
 		vennDetail = new Venn_Detail(this);
-		thread1=new Thread(loader1);
-		thread1.start();
+		//thread1=new Thread(loader1);
+		//thread1.start();
 		
 		// enable the mouse wheel, for zooming
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -364,21 +310,39 @@ public class MainMatrixVersion_1_5 extends PApplet {
 			if (PopupReaction.sPopup)
 				popupReaction.drawReactions(100);
 			else{
-				drawMatrix();
-				this.textSize(13);
-				check1.draw(this.width-500, 60);
-				check2.draw(this.width-500, 82);
-				if (check2.s)
+				if (currentFile.equals("")){
+					int ccc = this.frameCount*6%255;
+					this.fill(ccc, 255-ccc,(ccc*3)%255);
+					this.textAlign(PApplet.LEFT);
+					this.textSize(20);
+					this.text("Please select a BioPax input file", 300,250);
+					
+					float x6 =74;
+					float y6 =25;
+					this.stroke(ccc, 255-ccc,(ccc*3)%255);
+					this.line(74,25,300,233);
+					this.noStroke();
+					this.triangle(x6, y6, x6+4, y6+13, x6+13, y6+4);
+				}
+				else{
+					drawMatrix();
+					this.textSize(13);
+					
+					popupOrder.draw(this.width-304);
+					popupComplex.draw(this.width-202);
+				
+					check1.draw(this.width-500, 60);
+					check2.draw(this.width-500, 82);
+					if (check2.s)
 					check3.draw(this.width-500, 100);
+				}
 			}	
 			
 			this.textSize(13);
 			button.draw();
-			if (!PopupReaction.sPopup){
-				//popupRelation.draw(this.width-304);
-				popupOrder.draw(this.width-304);
-				popupComplex.draw(this.width-202);
-			}
+			//popupRelation.draw(this.width-304);
+			
+			
 			popupReaction.drawButton(this.width-100);
 		}
 		catch (Exception e){
@@ -1111,9 +1075,11 @@ public class MainMatrixVersion_1_5 extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
+			PopupReaction.textbox1.searchText="";
 		
+			
 			File modFile = new File(currentFile);
-			File outFile = new File("output.txt");
+			//File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
 			Model model;
 			try{
@@ -1303,6 +1269,7 @@ public class MainMatrixVersion_1_5 extends PApplet {
 					}	
 				}
 				 
+				/*
 				try{
 					FileOutputStream os = new FileOutputStream(outFile);
 					min.writeResult(matches, os);
@@ -1312,7 +1279,7 @@ public class MainMatrixVersion_1_5 extends PApplet {
 				catch (IOException e){
 					e.printStackTrace();
 					return;
-				}
+				}*/
 				
 			}
 			System.out.println();

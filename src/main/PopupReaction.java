@@ -16,7 +16,7 @@ import org.biopax.paxtools.model.level3.Complex;
 import processing.core.PApplet;
 
 public class PopupReaction{
-	public static boolean sPopup = true;
+	public static boolean sPopup = false;
 	public static boolean bPopup = false;
 	public static int bRect = -1000;
 	public static ArrayList<Integer> sRectList = new ArrayList<Integer>();
@@ -39,6 +39,7 @@ public class PopupReaction{
 	
 	public static Map<BiochemicalReaction, Integer> rectHash =  new HashMap<BiochemicalReaction, Integer>();
 	public static ArrayList<BiochemicalReaction> rectList =  new ArrayList<BiochemicalReaction>();
+	public static ArrayList<String>[] rectWordList ;
 	float itemH2 = 0; // height of items in the reaction
 	
 	public String[] proteins = null;
@@ -100,6 +101,7 @@ public class PopupReaction{
 		wordCloud = new WordCloud(parent, 10,290,250,parent.height-250);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void setItems(){
 		int i=0;
 		maxSize =0;
@@ -136,14 +138,20 @@ public class PopupReaction{
 		}
 			
 		// Word cloud
+		rectWordList =  new ArrayList[rectHash.size()];
 		WordCount wc1 = new WordCount(numTop);
 		ArrayList<String> a = new ArrayList<String>();
+		int r=0;
 		for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
 			String rectName = entry.getKey().getDisplayName();
 			String[] pieces = rectName.split(" ");
+			rectWordList[r] = new ArrayList<String>();
 			for (int k=0;k<pieces.length;k++){
-				a.add(pieces[k].trim());
+				String str = pieces[k].trim();
+				a.add(str);
+				rectWordList[r].add(str);
 			}
+			r++;
 		}
 			
 		wc1.countNames(a); 
@@ -791,13 +799,12 @@ public class PopupReaction{
 			wordCloud.draw(parent);
 			
 			int[][] rel =  new int[numTop][numTop];
-			for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-				String rectName = entry.getKey().getDisplayName();
+			for (int r=0;r<rectList.size();r++){
 				for (int m=0;m<numTop;m++){
 					for (int n=0;n<numTop;n++){
 						if (wordCloud.words[m].equals("") || wordCloud.words[n].equals("")) 
 							continue;
-						if (rectName.contains(wordCloud.words[m].word) && rectName.contains(wordCloud.words[n].word))
+						if (rectWordList[r].contains(wordCloud.words[m].word) && rectWordList[r].contains(wordCloud.words[n].word))
 							rel[m][n]++;
 					}
 				}		
@@ -842,8 +849,8 @@ public class PopupReaction{
 				parent.noFill();
 				
 				float maxWeight = max;
-				if (max<=5){
-					maxWeight = 6;
+				if (max<=2){
+					maxWeight = 3;
 				}
 				float wei = PApplet.map(rel[i][j], 0, maxWeight, 0, 100);
 				parent.stroke(color.getRed(),color.getGreen(),color.getBlue(),wei);
@@ -862,8 +869,8 @@ public class PopupReaction{
 				parent.noFill();
 				
 				float maxWeight = max;
-				if (max<=5){
-					maxWeight = 6;
+				if (max<=2){
+					maxWeight = 3;
 				}
 				if (j>brushing && rel[brushing][j]>0){
 					float wei = PApplet.map(rel[brushing][j], 0, maxWeight, 0, 150);

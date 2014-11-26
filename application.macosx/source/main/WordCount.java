@@ -30,15 +30,12 @@ public class WordCount {
 		int count;
 		for (int u = 0; u < a.size(); u++) {
 			String word = a.get(u);
-			//	System.out.println(u+" word = "+word);
 			if (!stopWords.contains(word)) {
 				if (wordMap.containsKey(word)) {
 					count = (Integer) wordMap.get(word);
-					//count += entry.getValue();
 					count ++;
 					wordMap.put(word, new Integer(count));
 				} else {
-					//wordMap.put(word, new Integer(entry.getValue()));
 					wordMap.put(word, new Integer(1));
 				}
 			}
@@ -51,16 +48,21 @@ public class WordCount {
 	private static Set readStopWords() {
 		java.io.BufferedReader fin;
 		Set stopWords = new HashSet();
-		try {
-			fin = new java.io.BufferedReader(new java.io.FileReader(
-					"data/stopListForBlogs.txt"));
-			String record;
-			while ((record = fin.readLine()) != null) {
-				stopWords.add(record);
-			}
-		} catch (java.io.IOException ie) {
-			System.err.println("I/O exception in stopList");
-		}
+		stopWords.add("of");
+		stopWords.add("and");
+		stopWords.add("on");
+		stopWords.add("in");
+		stopWords.add("at");
+		stopWords.add("by");
+		stopWords.add("to");
+		stopWords.add("from");
+		stopWords.add("with");
+		stopWords.add("the");
+		stopWords.add("a");
+		stopWords.add("an");
+		stopWords.add("is");
+		stopWords.add("1");
+		
 		return stopWords;
 	}
 
