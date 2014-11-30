@@ -1,4 +1,7 @@
 package main;
+import static main.MainMatrixVersion_1_5.geneRelationList;
+import static main.MainMatrixVersion_1_5.ggg;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +19,7 @@ import org.biopax.paxtools.model.level3.Complex;
 import processing.core.PApplet;
 
 public class PopupReaction{
-	public static boolean sPopup = false;
+	public static boolean sPopup = true;
 	public static boolean bPopup = false;
 	public static int bRect = -1000;
 	public static ArrayList<Integer> sRectList = new ArrayList<Integer>();
@@ -304,6 +307,8 @@ public class PopupReaction{
 			hProtein = (parent.height-yBeginList-2)/(reactProteinList.size());  // Save 20 pixels for Unidentified elements
 			if (hProtein>maxH)
 				hProtein =maxH;
+			
+			//ArrayList<Integer> a = orderBySimilarity(reactProteinList);
 			for (int p=0; p<proteins.length;p++){
 				int index = reactProteinList.indexOf(p);
 				if (index>=0)
@@ -325,6 +330,65 @@ public class PopupReaction{
 		updateReactionPositions();  /// **********Update reactions when updating proteins **********
 	}
 	
+	
+	// Order by similarity 
+	public ArrayList<Integer> orderBySimilarity(ArrayList<Integer> reactProteinList){	
+		ArrayList<Integer> processedProteins =  new ArrayList<Integer>();
+		int beginIndex = 0;
+		processedProteins.add(beginIndex);
+		
+		int[][] scores = computeScore();
+		for (int p=1; p<proteins.length;p++){
+			int similarIndex =  getSimilarProtein(beginIndex, reactProteinList, processedProteins,scores);
+			processedProteins.add(p);
+		}
+			
+		return processedProteins;
+	}
+	
+	public int getSimilarProtein(int index1, ArrayList<Integer> reactProteinList, ArrayList<Integer> a, int[][] scores){
+		float minDis = Float.POSITIVE_INFINITY;
+		int minIndex = -1;
+		for (int i=0;i<proteins.length;i++){
+			int orderReading2 = i;
+			if (a.contains(orderReading2)) continue;
+			float dis = computeDis(index1,orderReading2, main.MainMatrixVersion_1_5.popupOrder.slider.val);
+			if (dis<minDis){
+				minDis = dis;
+				minIndex = i;
+			}
+		}
+		return minIndex;
+	}
+	public int[][] computeScore(){
+		int[][] score = new int [proteins.length][proteins.length];
+		for (int r=0;r<rectList.size();r++) {
+			BiochemicalReaction rect = rectList.get(r);
+			Object[] aLeft = rect.getLeft().toArray();
+			Object[] aRight = rect.getRight().toArray();
+			
+			ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+			for (int i=0;i<a1.size();i++){
+				int index1 = a1.get(i);
+				for (int j=0;j<a1.size();j++){
+					int index2 = a1.get(j);
+					if (index1==index2 || index1<0 || index2<0) continue;
+					score[index1][index2]++; 
+				}
+			}
+			
+			ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+			for (int i=0;i<a1.size();i++){
+				int index1 = a1.get(i);
+				for (int j=0;j<a2.size();j++){
+					int index2 = a2.get(j);
+					if (index1==index2 || index1<0 || index2<0) continue;
+					score[index1][index2]++; 
+				}
+			}
+		}
+		return score;
+	}
 	
 		
 	public void updateReactionPositions(){
