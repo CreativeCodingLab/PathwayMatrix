@@ -335,9 +335,10 @@ public class PopupReaction{
 		int beginIndex = 0;
 		processedProteins.add(beginIndex);
 		
-		int[][] scores = computeScore();
+		int[][] scoresComplex = computeScoreComplex();
+		int[][] scoresReaction = computeScoreReaction();
 		while (true){
-			int similarIndex =  getSimilarProtein(beginIndex, reactProteinList, processedProteins,scores);
+			int similarIndex =  getSimilarProtein(reactProteinList, processedProteins,scoresComplex,scoresReaction);
 			if (similarIndex<0) break;
 			processedProteins.add(similarIndex);
 			beginIndex = similarIndex;
@@ -346,27 +347,36 @@ public class PopupReaction{
 		return processedProteins;
 	}
 	
-	public int getSimilarProtein(int index1, ArrayList<Integer> reactProteinList, ArrayList<Integer> a, int[][] scores){
+	public int getSimilarProtein(ArrayList<Integer> reactProteinList, ArrayList<Integer> a, int[][] scoresComplex, int[][] scoresReaction){
 		float maxScore = Float.NEGATIVE_INFINITY;
 		int maxIndex = -1;
-		for (int i=0;i<proteins.length;i++){
-			if (reactProteinList.indexOf(i)<0) continue;
-			if (a.contains(i)) continue;
-			if (scores[index1][i]>maxScore){
-				maxScore = scores[index1][i];
-				maxIndex = i;
+		for (int j=0;j<proteins.length;j++){
+			if (reactProteinList.indexOf(j)<0) continue;
+			if (a.contains(j)) continue;
+			
+			float sum = 0;
+			for (int i=0;i<a.size();i++){
+				int index1 = a.get(i);
+				sum += scoresComplex[index1][j]*(a.size()-i)*2;
+				sum += scoresReaction[index1][j]*(a.size()-i);
+			}
+			if (sum>maxScore){
+				maxScore = sum;
+				maxIndex = j;
 			}
 		}
+		
 		return maxIndex;
 	}
 	
-	public int[][] computeScore(){
+	public int[][] computeScoreComplex(){
 		int[][] score = new int [proteins.length][proteins.length];
 		for (int c=0;c<complexList.size();c++){
 			 ArrayList<String> components = main.MainMatrixVersion_1_5.proteinsInComplex[complexList.get(c)];
 			 for (int k=0;k<components.size();k++){
 				 int index1 = mapProteinRDFId_index.get(components.get(k));
 				 for (int l=0;l<components.size();l++){
+					 if (l==k) continue;
 					 if (mapProteinRDFId_index.get(components.get(l))!=null){
 						int index2 =  mapProteinRDFId_index.get(components.get(l));
 						score[index1][index2]++;
@@ -383,7 +393,7 @@ public class PopupReaction{
 	}
 		
 	
-	public int[][] computeScore2(){
+	public int[][] computeScoreReaction(){
 		int[][] score = new int [proteins.length][proteins.length];
 		for (int r=0;r<rectList.size();r++) {
 			BiochemicalReaction rect = rectList.get(r);
@@ -397,16 +407,31 @@ public class PopupReaction{
 					int index2 = a1.get(j);
 					if (index1==index2 || index1<0 || index2<0) continue;
 					score[index1][index2]++; 
+					score[index2][index1]++; 
 				}
 			}
 			
 			ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+			for (int i=0;i<a2.size();i++){
+				int index1 = a2.get(i);
+				for (int j=0;j<a2.size();j++){
+					int index2 = a2.get(j);
+					if (index1==index2 || index1<0 || index2<0) continue;
+					score[index1][index2]++; 
+					score[index2][index1]++; 
+				}
+			}
+			
+			
 			for (int i=0;i<a1.size();i++){
 				int index1 = a1.get(i);
 				for (int j=0;j<a2.size();j++){
 					int index2 = a2.get(j);
 					if (index1==index2 || index1<0 || index2<0) continue;
 					score[index1][index2]++; 
+					score[index2][index1]++; 
+					if (a1.size()==1 && a2.size()==1)
+					System.out.println(proteins[index1]+"    "+proteins[index2]);
 				}
 			}
 		}
