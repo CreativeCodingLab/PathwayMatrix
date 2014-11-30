@@ -102,7 +102,6 @@ public class PopupOrder{
 				main.MainMatrixVersion_1_5.check2.s =false;
 				Gene.orderByComplex();
 			}	
-			main.MainMatrixVersion_1_5.popupReaction.updateProteinPositions();
 		}
 	}
 	 

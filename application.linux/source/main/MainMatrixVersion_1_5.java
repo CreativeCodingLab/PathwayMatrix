@@ -99,8 +99,8 @@ public class MainMatrixVersion_1_5 extends PApplet {
 	public static int processingMiner = 0;
 	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
 	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
-	//public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
-	public String currentFile = "";
+	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
+	//public String currentFile = "";
 	
 	public static Button button;
 	
@@ -272,8 +272,10 @@ public class MainMatrixVersion_1_5 extends PApplet {
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
 		vennDetail = new Venn_Detail(this);
-		//thread1=new Thread(loader1);
-		//thread1.start();
+		if (!currentFile.equals("")){
+			thread1=new Thread(loader1);
+			thread1.start();
+		}
 		
 		// enable the mouse wheel, for zooming
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() {
