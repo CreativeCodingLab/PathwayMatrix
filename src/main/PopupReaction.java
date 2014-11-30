@@ -1,6 +1,4 @@
 package main;
-import static main.MainMatrixVersion_1_5.geneRelationList;
-import static main.MainMatrixVersion_1_5.ggg;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -308,9 +306,9 @@ public class PopupReaction{
 			if (hProtein>maxH)
 				hProtein =maxH;
 			
-			//ArrayList<Integer> a = orderBySimilarity(reactProteinList);
+			ArrayList<Integer> a = orderBySimilarity(reactProteinList);
 			for (int p=0; p<proteins.length;p++){
-				int index = reactProteinList.indexOf(p);
+				int index = a.indexOf(p);
 				if (index>=0)
 					iP[p].target(yBeginList+hProtein*index);
 				else
@@ -338,29 +336,54 @@ public class PopupReaction{
 		processedProteins.add(beginIndex);
 		
 		int[][] scores = computeScore();
-		for (int p=1; p<proteins.length;p++){
+		while (true){
 			int similarIndex =  getSimilarProtein(beginIndex, reactProteinList, processedProteins,scores);
-			processedProteins.add(p);
+			if (similarIndex<0) break;
+			processedProteins.add(similarIndex);
+			beginIndex = similarIndex;
 		}
 			
 		return processedProteins;
 	}
 	
 	public int getSimilarProtein(int index1, ArrayList<Integer> reactProteinList, ArrayList<Integer> a, int[][] scores){
-		float minDis = Float.POSITIVE_INFINITY;
-		int minIndex = -1;
+		float maxScore = Float.NEGATIVE_INFINITY;
+		int maxIndex = -1;
 		for (int i=0;i<proteins.length;i++){
-			int orderReading2 = i;
-			if (a.contains(orderReading2)) continue;
-			float dis = computeDis(index1,orderReading2, main.MainMatrixVersion_1_5.popupOrder.slider.val);
-			if (dis<minDis){
-				minDis = dis;
-				minIndex = i;
+			if (reactProteinList.indexOf(i)<0) continue;
+			if (a.contains(i)) continue;
+			if (scores[index1][i]>maxScore){
+				maxScore = scores[index1][i];
+				maxIndex = i;
 			}
 		}
-		return minIndex;
+		return maxIndex;
 	}
+	
 	public int[][] computeScore(){
+		int[][] score = new int [proteins.length][proteins.length];
+		for (int c=0;c<complexList.size();c++){
+			 ArrayList<String> components = main.MainMatrixVersion_1_5.proteinsInComplex[complexList.get(c)];
+			 for (int k=0;k<components.size();k++){
+				 int index1 = mapProteinRDFId_index.get(components.get(k));
+				 for (int l=0;l<components.size();l++){
+					 if (mapProteinRDFId_index.get(components.get(l))!=null){
+						int index2 =  mapProteinRDFId_index.get(components.get(l));
+						score[index1][index2]++;
+					 }
+					 else{
+						 System.out.println(mapProteinRDFId_index+"&&&&&&&&&&&&&&"+components.get(l));
+					 }
+				 }	
+			 }	
+		}
+		
+		
+		return score;
+	}
+		
+	
+	public int[][] computeScore2(){
 		int[][] score = new int [proteins.length][proteins.length];
 		for (int r=0;r<rectList.size();r++) {
 			BiochemicalReaction rect = rectList.get(r);
@@ -1020,6 +1043,7 @@ public class PopupReaction{
 						  a.add(mapProteinRDFId_index.get(components.get(k)));
 					  }	  
 					  else{
+						  System.out.println("getProteinsInOneSideOfReaction: -----SOMETHING WRONG");
 						  int reverseIndex = -1-unidentifiedList.indexOf(components.get(k));
 						  a.add(reverseIndex);
 					  }
@@ -1179,6 +1203,7 @@ public class PopupReaction{
 								  parent.stroke(unidentifiedElementColor.getRed(),unidentifiedElementColor.getGreen(),unidentifiedElementColor.getBlue(),sat);
 								  parent.line(xL, yUFO, xL2, yL2);
 							  }
+							  System.out.println("***************"+components.get(k));
 						  }
 					  }
 					  
