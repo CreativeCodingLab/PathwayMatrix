@@ -984,6 +984,9 @@ public class MainMatrixVersion_1_5 extends PApplet {
 				
 			popupReaction.updateProteinPositions();
 		}
+		else if (PopupReaction.sPopup && PopupReaction.check4.b){
+			PopupReaction.check4.mouseClicked();
+		}
 		else if (PopupReaction.bPopup){
 			popupReaction.mouseClicked();
 		}
@@ -1289,6 +1292,7 @@ public class MainMatrixVersion_1_5 extends PApplet {
 			popupComplex.setItems();
 			PopupReaction.check2.s=false;
 			PopupReaction.check3.s=false;
+			PopupReaction.check4.s=true;
 			
 			popupReaction.setItems();
 			vennOverview.initialize();
