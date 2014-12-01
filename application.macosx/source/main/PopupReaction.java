@@ -921,8 +921,42 @@ public class PopupReaction{
 					drawReactionNode(entry, i, 25);
 				else
 					drawReactionNode(entry, i, 200);
+				
+				
 				i++;
-			}	
+			}
+			
+			// Draw reaction causation **************************
+			for (int r=0;r<rectList.size();r++) {
+				BiochemicalReaction rect = rectList.get(r);
+				Object[] sRight1 = rect.getRight().toArray();
+				for (int g=0;g<rectList.size();g++) {
+					if(g==r) continue;
+					
+					BiochemicalReaction rect2 = rectList.get(g);
+					Object[] sLeft2 = rect2.getLeft().toArray();
+					ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+					if (commonElements.size()>0){
+						float y1 = iY[r].value-iH[r].value/2;
+						float y2 = iY[g].value-iH[g].value/2;
+						float yy = (y1+y2)/2;
+						
+						
+						float beginAngle = 0;
+						for (int k=0;k<180;k++){
+							float endAngle = 0;
+							
+							parent.noFill();
+							parent.stroke(255,0,0,100);
+							parent.strokeWeight(3);
+							parent.arc(xRect, yy, y2-y1,y2-y1, PApplet.PI/2, 3*PApplet.PI/2);
+						}
+			
+					}
+				}
+				i++;
+			}
+			
 			float x7 = (xR+220);
 			float y7 = 70;
 			
@@ -968,9 +1002,25 @@ public class PopupReaction{
 			parent.text(processedComplexRight.size()+" Complexes", xR2, 45);
 			parent.fill(0);
 			parent.text("Output Proteins", xR, 45);
-			
 	}
-
+	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
+		ArrayList<String> results = new ArrayList<String>();
+		for (int i=0; i<a.length;i++){
+			String str1 = a[i].toString();
+			for (int j=0; j<b.length;j++){
+				String str2 = b[j].toString();
+				if (str1.equals(str2)){
+					 String name = main.MainMatrixVersion_1_5.getProteinName(str1);
+					 if (!main.MainMatrixVersion_1_5.isSmallMolecule(name)){
+						// System.out.println(""+name);
+						 results.add(str1);
+					 }	 
+				}	
+			}
+		}
+		return results;
+	}
+		
 	
 	public void drawRelationship(WordCloud wc, int[][] rel, Color color){
 		int max = 0;
