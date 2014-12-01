@@ -26,7 +26,7 @@ public class PopupOrder{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrixVersion_1_5.popupRelation.b<0)
+		if (main.MainMatrixVersion_1_6.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -38,8 +38,8 @@ public class PopupOrder{
 			parent.rect(x, y+25, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrixVersion_1_5.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1_5.pairs[j].size());
+			for (int j=0;j<main.MainMatrixVersion_1_6.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1_6.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -78,28 +78,28 @@ public class PopupOrder{
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("Random")) { 
-				main.MainMatrixVersion_1_5.stateAnimation=0;
-				main.MainMatrixVersion_1_5.check2.s =false;
+				main.MainMatrixVersion_1_6.stateAnimation=0;
+				main.MainMatrixVersion_1_6.check2.s =false;
 				Gene.orderByRandom(parent);
 			}	
 			else if (items[s].equals("Reading order"))  {
-				main.MainMatrixVersion_1_5.stateAnimation=0;
-				main.MainMatrixVersion_1_5.check2.s =false;
+				main.MainMatrixVersion_1_6.stateAnimation=0;
+				main.MainMatrixVersion_1_6.check2.s =false;
 				Gene.orderByReadingOrder();
 			}	
 			else if (items[s].equals("Name"))  {
-				main.MainMatrixVersion_1_5.stateAnimation=0;
-				main.MainMatrixVersion_1_5.check2.s =false;
+				main.MainMatrixVersion_1_6.stateAnimation=0;
+				main.MainMatrixVersion_1_6.check2.s =false;
 				Gene.orderByName();
 			}	
 			else if (items[s].equals("Similarity"))  {
-				main.MainMatrixVersion_1_5.stateAnimation=0;
-				main.MainMatrixVersion_1_5.check2.s =false;
+				main.MainMatrixVersion_1_6.stateAnimation=0;
+				main.MainMatrixVersion_1_6.check2.s =false;
 				Gene.orderBySimilarity();
 			}	
 			else if (items[s].equals("Complex"))  {
-				main.MainMatrixVersion_1_5.stateAnimation=0;
-				main.MainMatrixVersion_1_5.check2.s =false;
+				main.MainMatrixVersion_1_6.stateAnimation=0;
+				main.MainMatrixVersion_1_6.check2.s =false;
 				Gene.orderByComplex();
 			}	
 		}
