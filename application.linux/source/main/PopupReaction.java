@@ -52,6 +52,7 @@ public class PopupReaction{
 	
 	public static CheckBox check2;
 	public static CheckBox check3;
+	public static CheckBox check4;
 	public static CheckBox check11;
 	public static CheckBox check12;
 	public static CheckBox check13;
@@ -86,11 +87,14 @@ public class PopupReaction{
 	public Integrator[] yComplexesR; 
 	public float[] rComplexesR; 
 	
+	// Reaction simulation
+	public Integrator[] iS;
 	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		check2 = new CheckBox(parent, "Rearrange reactions");
 		check3 = new CheckBox(parent, "Remove non-react proteins");
+		check4 = new CheckBox(parent, "Show orders of reactions");
 		check11 = new CheckBox(parent, "Fade links of Small molecules");
 		check12 = new CheckBox(parent, "Fade links of Unidentified elements");
 		check13 = new CheckBox(parent, "Fade links of Complex formation");
@@ -160,10 +164,12 @@ public class PopupReaction{
 		iX = new Integrator[rectHash.size()];
 		iY = new Integrator[rectHash.size()];
 		iH = new Integrator[rectHash.size()];
+		iS = new Integrator[rectHash.size()];
 		for (i=0;i<rectHash.size();i++){
 			iX[i] = new Integrator(x, 0.5f,0.1f);
 			iY[i] = new Integrator(20, 0.5f,0.1f);
 			iH[i] = new Integrator(10, 0.5f,0.1f);
+			iS[i] = new Integrator(0, 0.5f,0.1f);
 		}
 		
 		hightlightList =  new int[rectHash.size()];
@@ -907,9 +913,11 @@ public class PopupReaction{
 				}
 			}
 			else{
-				for (int r=0;r<rectList.size();r++) {
-					BiochemicalReaction rect = rectList.get(r);
-					drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 200);
+				if (!check4.s){
+					for (int r=0;r<rectList.size();r++) {
+						BiochemicalReaction rect = rectList.get(r);
+						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 200);
+					}
 				}
 			}
 			
@@ -927,47 +935,41 @@ public class PopupReaction{
 			}
 			
 			// Draw reaction causation **************************
-			for (int r=0;r<rectList.size();r++) {
-				BiochemicalReaction rect = rectList.get(r);
-				Object[] sRight1 = rect.getRight().toArray();
-				for (int g=0;g<rectList.size();g++) {
-					if(g==r) continue;
+			if (check4.s){
+				if (s>=0){
+					ArrayList<Integer> processedList = new ArrayList<Integer>();
+					processedList.add(s);
+					drawDownStreamReaction(s, 0,processedList);
 					
-					BiochemicalReaction rect2 = rectList.get(g);
-					Object[] sLeft2 = rect2.getLeft().toArray();
-					ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
-					if (commonElements.size()>0){
-						float y1 = iY[r].value-iH[r].value/2;
-						float y2 = iY[g].value-iH[g].value/2;
-						float yy = (y1+y2)/2;
-						
-						
-						float beginAngle = 0;
-						for (int k=0;k<180;k++){
-							float endAngle = 0;
-							
-							parent.noFill();
-							parent.stroke(255,0,0,100);
-							parent.strokeWeight(3);
-							parent.arc(xRect, yy, y2-y1,y2-y1, PApplet.PI/2, 3*PApplet.PI/2);
-						}
-			
+				}
+				else{
+					ArrayList<Integer> processedList = new ArrayList<Integer>();
+					for (int r=0;r<rectList.size();r++) {
+						processedList.add(r);
+						drawDownStreamReaction(r,-100, processedList);
 					}
 				}
-				i++;
+			}
+			else{
+				for (int r=0;r<rectList.size();r++) {
+					iS[r].set(0);
+				}
+					
 			}
 			
 			float x7 = (xR+220);
-			float y7 = 70;
+			float y7 = 40;
 			
 			
+			parent.strokeWeight(1);
 			check3.draw((int) x7, (int) y7);
-			check2.draw((int) x7, (int) y7+20);
-			check11.draw((int) x7, (int) y7+40);
+			check2.draw((int) x7, (int) y7+19);
+			check11.draw((int) x7, (int) y7+44);
 			//check12.draw((int) x7, (int) y7+40);
-			check13.draw((int) x7, (int) y7+60);
-			check14.draw((int) x7, (int) y7+80);
-			check15.draw((int) x7, (int) y7+100);
+			check13.draw((int) x7, (int) y7+63);
+			check14.draw((int) x7, (int) y7+82);
+			check15.draw((int) x7, (int) y7+101);
+			check4.draw((int) x7, (int) y7+141);
 			
 			// Draw word cloud
 			wordCloud.x1=parent.width-200; 
@@ -1003,6 +1005,59 @@ public class PopupReaction{
 			parent.fill(0);
 			parent.text("Output Proteins", xR, 45);
 	}
+
+	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList){
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				iS[g].target(1000);
+				iS[g].update();
+				drawArc(r,g, iS[g]);
+				if (recursive>=0){
+					if (processedList.indexOf(g)<0 && iS[g].value>=990){
+						processedList.add(g);
+						drawDownStreamReaction(g,recursive+1,processedList);
+					}
+				}
+			}
+			
+		}
+	}
+		
+	public void drawArc(int r, int g, Integrator inter){
+		float y1 = iY[r].value-iH[r].value/2;
+		float y2 = iY[g].value-iH[g].value/2;
+		float yy = (y1+y2)/2;
+		
+		
+		float d = PApplet.abs(y2-y1);
+		int numSec = (int) d;// PApplet.map(, istart, istop, ostart, ostop);
+		if (numSec==0) return;
+		float beginAngle = PApplet.PI/2;
+		if (y1>y2)
+			beginAngle = -PApplet.PI/2;
+		
+		for (int k=0;k<=numSec;k++){
+			float percent = inter.value/1000;
+			float endAngle = beginAngle+PApplet.PI/numSec;
+			if ((float) k/numSec >=(1-percent)){
+				parent.noFill();
+				parent.stroke(155,0,155,150-k*150/numSec);
+				parent.strokeWeight(2);
+				
+				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
+			}
+			beginAngle = endAngle;
+			
+		}
+	}
+		
+	
 	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
 		ArrayList<String> results = new ArrayList<String>();
 		for (int i=0; i<a.length;i++){
@@ -1423,10 +1478,14 @@ public class PopupReaction{
 	}
 		
 	public void mouseClicked() {
-		 if (bPopup)
+		if (bPopup)
 			 sPopup = !sPopup;
-		if (bRect!=s)
+		if (bRect>0){
 			s = bRect;
+			for (int r=0;r<rectList.size();r++) {
+				iS[r].set(0);
+			}
+		}
 		else
 			s =-200;
 		

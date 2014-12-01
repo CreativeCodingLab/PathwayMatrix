@@ -68,7 +68,7 @@ public class CheckBox{
 			parent.text("Protein reaction",x+95,y+13);
 			
 			parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
-			parent.text("Unidentified elements",x+95,y+33);
+			parent.text("Unidentified elements",x+95,y+32);
 		
 		}
 			

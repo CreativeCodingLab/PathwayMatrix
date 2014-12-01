@@ -987,7 +987,7 @@ public class MainMatrixVersion_1_5 extends PApplet {
 		else if (PopupReaction.sPopup && PopupReaction.check4.b){
 			PopupReaction.check4.mouseClicked();
 		}
-		else if (PopupReaction.bPopup){
+		else if (PopupReaction.sPopup){
 			popupReaction.mouseClicked();
 		}
 		else if (popupOrder.b>=0){
