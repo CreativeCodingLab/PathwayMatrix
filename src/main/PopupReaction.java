@@ -24,7 +24,7 @@ public class PopupReaction{
 	public static ArrayList<Integer> sRectListL = new ArrayList<Integer>();
 	public static ArrayList<Integer> sRectListR = new ArrayList<Integer>();
 	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
-	public static ArrayList<Integer> simulationRectListDone = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectListLevel = new ArrayList<Integer>();
 	public PApplet parent;
 	public float x = 0;
 	public float xButton = 0;
@@ -189,10 +189,10 @@ public class PopupReaction{
 			for (int j=0;j<rectHash.size();j++){
 				iS[i][j] = new Integrator(0, 0.5f,0.2f);
 			}
-			iS1[i] = new Integrator(0, 0.5f,0.2f);
-			iS2[i] = new Integrator(0, 0.5f,0.2f);
-			iS3[i] = new Integrator(0, 0.5f,0.2f);
-			iS4[i] = new Integrator(0, 0.5f,0.2f);
+			iS1[i] = new Integrator(0, 0.2f,1f);
+			iS2[i] = new Integrator(0, 0.2f,1f);
+			iS3[i] = new Integrator(0, 0.2f,1);
+			iS4[i] = new Integrator(0, 0.2f,1f);
 		}
 		
 		hightlightList =  new int[rectHash.size()];
@@ -221,6 +221,10 @@ public class PopupReaction{
 			mapProteinRDFId_index.put(unidentifiedList.get(p), numValid+p);
 			iP[numValid+p] =   new Integrator(20, 0.5f,0.1f);
 		}
+		
+		
+		simulationRectList = new ArrayList<Integer>();
+		simulationRectListLevel = new ArrayList<Integer>();
 			
 		
 		updateProteinPositions();
@@ -803,12 +807,7 @@ public class PopupReaction{
 				 }
 			}
 			if (bComplexLold!=bComplexL){
-				for (int r=0;r<rectList.size();r++) {
-					iS1[r].set(0);
-					iS2[r].set(0);
-					iS3[r].set(0);
-					iS4[r].set(0);
-				}
+				resetIntegrators();
 			}
 			int bComplexRold = bComplexR;
 			bComplexR=-1;
@@ -830,12 +829,7 @@ public class PopupReaction{
 				 }
 			}
 			if (bComplexRold!=bComplexR){
-				for (int r=0;r<rectList.size();r++) {
-					iS1[r].set(0);
-					iS2[r].set(0);
-					iS3[r].set(0);
-					iS4[r].set(0);
-				}
+				resetIntegrators();
 			}
 			
 			// Brushing proteins
@@ -877,12 +871,7 @@ public class PopupReaction{
 					}	  
 				 }
 				if (bProteinLold!=bProteinL){
-					for (int r=0;r<rectList.size();r++) {
-						iS1[r].set(0);
-						iS2[r].set(0);
-						iS3[r].set(0);
-						iS4[r].set(0);
-					}	
+					resetIntegrators();
 				}
 			}
 		    if (sRectListR.size()==0){
@@ -924,12 +913,7 @@ public class PopupReaction{
 					}	  
 				 }
 				if (bProteinRold!=bProteinR){
-					for (int r=0;r<rectList.size();r++) {
-						iS1[r].set(0);
-						iS2[r].set(0);
-						iS3[r].set(0);
-						iS4[r].set(0);
-					}	
+					resetIntegrators();
 				}
 			}
 			
@@ -944,7 +928,14 @@ public class PopupReaction{
 				iS3[r].update();
 				iS4[r].update();
 			}
-			if (bRect>=0){
+			
+			if (simulationRectList.size()>0){
+				for (int r=0;r<simulationRectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(simulationRectList.get(r));
+					drawReactionLink(rect, simulationRectList.get(r), xL, xL2, xRect, xR, xR2, 255);
+				}
+			}
+			else if (bRect>=0){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					if (r==bRect) // Draw brushing reactions ***************
@@ -982,7 +973,7 @@ public class PopupReaction{
 				}
 			}
 			else{
-				if (!check4.s){
+				if (!check4.s && simulationRectList.size()==0){
 					for (int r=0;r<rectList.size();r++) {
 						BiochemicalReaction rect = rectList.get(r);
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 200);
@@ -1003,24 +994,22 @@ public class PopupReaction{
 				i++;
 			}
 			
-			// Draw reaction causation **************************
-			if (check4.s){
-				if (simulationRectList.size()>0){
-					ArrayList<Integer> processedList = new ArrayList<Integer>();
-					for (int r=0;r<simulationRectList.size();r++){
-						int rect = simulationRectList.get(r);
-						processedList.add(rect);
-						System.out.println("	iS4="+iS4[rect].value);
-						drawDownStreamReaction(rect, 0,processedList, iS4[rect].value);
-					}
-					
+			// Draw reaction causation ******************************************************************************
+				
+			if (simulationRectList.size()>0){
+				ArrayList<Integer> processedList = new ArrayList<Integer>();
+				for (int r=0;r<simulationRectList.size();r++){
+					int rect = simulationRectList.get(r);
+					int level = simulationRectListLevel.get(r);
+					processedList.add(rect);
+					drawDownStreamReaction(rect, level,processedList, iS4[rect].value);
 				}
-				else{
-					ArrayList<Integer> processedList = new ArrayList<Integer>();
-					for (int r=0;r<rectList.size();r++) {
-						processedList.add(r);
-						drawDownStreamReaction(r,-100, processedList, 1000);
-					}
+			}
+			else if (check4.s){
+				ArrayList<Integer> processedList = new ArrayList<Integer>();
+				for (int r=0;r<rectList.size();r++) {
+					processedList.add(r);
+					drawDownStreamReaction(r,-100, processedList, 1000);
 				}
 			}
 			else{
@@ -1029,7 +1018,6 @@ public class PopupReaction{
 						iS[r][g].set(0);
 					}	
 				}
-					
 			}
 			
 			float x7 = (xR+220);
@@ -1085,7 +1073,6 @@ public class PopupReaction{
 	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList, float iProcess){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
-		sRectList = new ArrayList<Integer>();
 		for (int g=0;g<rectList.size();g++) {
 			if(g==r) continue;
 			BiochemicalReaction rect2 = rectList.get(g);
@@ -1095,20 +1082,36 @@ public class PopupReaction{
 				if (iProcess>990){
 					iS[r][g].target(1000);
 					iS[r][g].update();
-					drawArc(r,g, iS[r][g]);
+					drawArc(r,g, iS[r][g], recursive);
 					if (recursive>=0){
 						if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
-							processedList.add(g);
-							drawDownStreamReaction(g,recursive+1,processedList, iS4[g].value);
-							sRectList.add(g);
+							processedList.add(r);
+							if (simulationRectList.indexOf(g)<0){
+								simulationRectList.add(g);
+								simulationRectListLevel.add(recursive+1);
+							}	
 						}
 					}
 				}
 			}
 		}
 	}
+	
+	public void resetIntegrators(){
+		for (int r=0;r<rectList.size();r++) {
+			iS1[r].set(0);
+			iS1[r].target(0);
+			iS2[r].set(0);
+			iS2[r].target(0);
+			iS3[r].set(0);
+			iS3[r].target(0);
+			iS4[r].set(0);
+			iS3[r].target(0);
+		}
 		
-	public void drawArc(int r, int g, Integrator inter){
+	}
+		
+	public void drawArc(int r, int g, Integrator inter, int level){
 		float y1 = iY[r].value-iH[r].value/2;
 		float y2 = iY[g].value-iH[g].value/2;
 		float yy = (y1+y2)/2;
@@ -1126,7 +1129,7 @@ public class PopupReaction{
 			float endAngle = beginAngle+PApplet.PI/numSec;
 			if ((float) k/numSec >=(1-percent)){
 				parent.noFill();
-				parent.stroke(250-k*250/numSec,k*150/numSec,250-k*250/numSec);
+				parent.stroke(255,k*150/numSec,250-k*250/numSec, 200-k*200/numSec);
 				parent.strokeWeight(2);
 				
 				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
@@ -1580,7 +1583,7 @@ public class PopupReaction{
 							  else{
 								  if (sat==255){ // Draw simulation lines
 									  if (iS3[i2].value>=990){
-										  System.out.println("********1 = "+iS4[i2].value);
+									//	  System.out.println("********1 = "+iS4[i2].value);
 										  iS4[i2].target(1000);
 									  }
 									  else{
@@ -1639,9 +1642,7 @@ public class PopupReaction{
 			  
 		  }
 		 	if (!isContainedComplexR && iS3[i2].value>=990){
-		 		 System.out.println("********2 = "+iS4[i2].value);
-		 		
-			  iS4[i2].set(1000);
+		 	 iS4[i2].set(1000);
 		  }
 			  
 	 }
@@ -1663,24 +1664,20 @@ public class PopupReaction{
 		if (bRect>=0){
 			s = bRect;
 			simulationRectList = new ArrayList<Integer>();
-			simulationRectListDone = new ArrayList<Integer>();
+			simulationRectListLevel= new ArrayList<Integer>();
 			simulationRectList.add(s);
-			
-			for (int r=0;r<rectList.size();r++) {
-				for (int g=0;g<rectList.size();g++) {
-					iS[r][g].set(0);
-				}
-			}
+			simulationRectListLevel.add(0);
 		}
 		else{
 			simulationRectList = new ArrayList<Integer>();
+			simulationRectListLevel = new ArrayList<Integer>();
 			s =-200;
 		}
+		resetIntegrators();
 		for (int r=0;r<rectList.size();r++) {
-			iS1[r].set(0);
-			iS2[r].set(0);
-			iS3[r].set(0);
-			iS4[r].set(0);
+			for (int g=0;g<rectList.size();g++) {
+				iS[r][g].set(0);
+			}
 		}
 		
 	}
@@ -1702,14 +1699,8 @@ public class PopupReaction{
 					if (textbox1.searchText.equals("") || (!textbox1.searchText.equals("") && sRectList.indexOf(i)>=0)) {
 						bRect =i;
 						if (bRectOld!=bRect){
-							for (int r=0;r<rectList.size();r++) {
-								iS1[r].set(0);
-								iS2[r].set(0);
-								iS3[r].set(0);
-								iS4[r].set(0);
-							}
+							resetIntegrators();
 						}
-							
 						hightlightList[i] = 1; 
 						return;
 					}
