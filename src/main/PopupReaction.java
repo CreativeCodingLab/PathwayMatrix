@@ -1010,7 +1010,7 @@ public class PopupReaction{
 					for (int r=0;r<simulationRectList.size();r++){
 						int rect = simulationRectList.get(r);
 						processedList.add(rect);
-						System.out.println(iS4[rect].value);
+						System.out.println("	iS4="+iS4[rect].value);
 						drawDownStreamReaction(rect, 0,processedList, iS4[rect].value);
 					}
 					
@@ -1105,7 +1105,6 @@ public class PopupReaction{
 					}
 				}
 			}
-			
 		}
 	}
 		
@@ -1393,6 +1392,7 @@ public class PopupReaction{
 					  }
 					  if (sat==255){ // Draw simulation lines
 						  if (iS1[i2].value>=990){
+							  
 							  iS2[i2].target(1000);
 						  }
 						  else{
@@ -1580,6 +1580,7 @@ public class PopupReaction{
 							  else{
 								  if (sat==255){ // Draw simulation lines
 									  if (iS3[i2].value>=990){
+										  System.out.println("********1 = "+iS4[i2].value);
 										  iS4[i2].target(1000);
 									  }
 									  else{
@@ -1637,8 +1638,9 @@ public class PopupReaction{
 			  }
 			  
 		  }
-		  System.out.println("drawReactionLink Right = "+iS4[i2].value);
-			if (!isContainedComplexR && iS3[i2].value>=990){
+		 	if (!isContainedComplexR && iS3[i2].value>=990){
+		 		 System.out.println("********2 = "+iS4[i2].value);
+		 		
 			  iS4[i2].set(1000);
 		  }
 			  
@@ -1699,19 +1701,21 @@ public class PopupReaction{
 				if (xRect-50<=mX && mX<=xRect+50 && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					if (textbox1.searchText.equals("") || (!textbox1.searchText.equals("") && sRectList.indexOf(i)>=0)) {
 						bRect =i;
+						if (bRectOld!=bRect){
+							for (int r=0;r<rectList.size();r++) {
+								iS1[r].set(0);
+								iS2[r].set(0);
+								iS3[r].set(0);
+								iS4[r].set(0);
+							}
+						}
+							
 						hightlightList[i] = 1; 
 						return;
 					}
 				}	
 			}
-			if (bRectOld!=bRect){
-				for (int r=0;r<rectList.size();r++) {
-					iS1[r].set(0);
-					iS2[r].set(0);
-					iS3[r].set(0);
-					iS4[r].set(0);
-				}
-			}
+			
 		}
 		bPopup=false;		
 		bRect =-100;
