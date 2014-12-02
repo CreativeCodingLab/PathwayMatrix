@@ -310,7 +310,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			}
 			
 			if (PopupReaction.sPopup)
-				popupReaction.drawReactions(100);
+				popupReaction.drawReactions(140);
 			else{
 				if (currentFile.equals("")){
 					int ccc = this.frameCount*6%255;
@@ -987,6 +987,9 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		else if (PopupReaction.sPopup && PopupReaction.check4.b){
 			PopupReaction.check4.mouseClicked();
 		}
+		else if (PopupReaction.sPopup && PopupReaction.check5.b){
+			PopupReaction.check5.mouseClicked();
+		}
 		else if (PopupReaction.sPopup){
 			popupReaction.mouseClicked();
 		}
@@ -1293,6 +1296,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			PopupReaction.check2.s=false;
 			PopupReaction.check3.s=false;
 			PopupReaction.check4.s=true;
+			PopupReaction.check5.s=false;
 			
 			popupReaction.setItems();
 			vennOverview.initialize();

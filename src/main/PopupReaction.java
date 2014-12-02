@@ -23,6 +23,8 @@ public class PopupReaction{
 	public static ArrayList<Integer> sRectList = new ArrayList<Integer>();
 	public static ArrayList<Integer> sRectListL = new ArrayList<Integer>();
 	public static ArrayList<Integer> sRectListR = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectListDone = new ArrayList<Integer>();
 	public PApplet parent;
 	public float x = 0;
 	public float xButton = 0;
@@ -1003,17 +1005,21 @@ public class PopupReaction{
 			
 			// Draw reaction causation **************************
 			if (check4.s){
-				if (s>=0){
+				if (simulationRectList.size()>0){
 					ArrayList<Integer> processedList = new ArrayList<Integer>();
-					processedList.add(s);
-					drawDownStreamReaction(s, 0,processedList);
+					for (int r=0;r<simulationRectList.size();r++){
+						int rect = simulationRectList.get(r);
+						processedList.add(rect);
+						System.out.println(iS4[rect].value);
+						drawDownStreamReaction(rect, 0,processedList, iS4[rect].value);
+					}
 					
 				}
 				else{
 					ArrayList<Integer> processedList = new ArrayList<Integer>();
 					for (int r=0;r<rectList.size();r++) {
 						processedList.add(r);
-						drawDownStreamReaction(r,-100, processedList);
+						drawDownStreamReaction(r,-100, processedList, 1000);
 					}
 				}
 			}
@@ -1076,22 +1082,26 @@ public class PopupReaction{
 			parent.text("Output Proteins", xR, 45);
 	}
 
-	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList){
+	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList, float iProcess){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
+		sRectList = new ArrayList<Integer>();
 		for (int g=0;g<rectList.size();g++) {
 			if(g==r) continue;
 			BiochemicalReaction rect2 = rectList.get(g);
 			Object[] sLeft2 = rect2.getLeft().toArray();
 			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
 			if (commonElements.size()>0){
-				iS[r][g].target(1000);
-				iS[r][g].update();
-				drawArc(r,g, iS[r][g]);
-				if (recursive>=0){
-					if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
-						processedList.add(g);
-						drawDownStreamReaction(g,recursive+1,processedList);
+				if (iProcess>990){
+					iS[r][g].target(1000);
+					iS[r][g].update();
+					drawArc(r,g, iS[r][g]);
+					if (recursive>=0){
+						if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
+							processedList.add(g);
+							drawDownStreamReaction(g,recursive+1,processedList, iS4[g].value);
+							sRectList.add(g);
+						}
 					}
 				}
 			}
@@ -1362,7 +1372,7 @@ public class PopupReaction{
 	public void drawReactionLink(BiochemicalReaction rect, int i2, float xL, float xL2, float xRect, float xR, float xR2, float sat) {
 		Object[] sLeft = rect.getLeft().toArray();
 		
-		boolean isContainedComplex =false; // checking if there is a complex;
+		boolean isContainedComplexL =false; // checking if there is a complex;
 		  for (int i3=0;i3<sLeft.length;i3++){
 			  String name = main.MainMatrixVersion_1_6.getProteinName(sLeft[i3].toString());
 			  if (name==null)
@@ -1406,11 +1416,11 @@ public class PopupReaction{
 				  ArrayList<String> components = main.MainMatrixVersion_1_6.proteinsInComplex[id];
 				  yComplexesL[id].update();
 				  float yL2 = yComplexesL[id].value;
-				  isContainedComplex = true;
 				  if (processedComplexLeft.indexOf(id)<0 || sat==255){  // if not drawn yet
 					  if (processedComplexLeft.indexOf(id)<0)
 							  processedComplexLeft.add(id);
 					  for (int k=0;k<components.size();k++){
+						  isContainedComplexL = true;
 						  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
 						  if (mapProteinRDFId_index.get(components.get(k))!=null){
 							  float y4 = iP[mapProteinRDFId_index.get(components.get(k))].value-hProtein/4f;
@@ -1487,10 +1497,10 @@ public class PopupReaction{
 				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
 			  }
 		  }
-		  if (!isContainedComplex)
+		  if (!isContainedComplexL)
 			  iS1[i2].target(1000);
 
-		   
+		  boolean isContainedComplexR =false; // checking if there is a complex;
 		  Object[] sRight = rect.getRight().toArray();
 		  for (int i3=0;i3<sRight.length;i3++){
 			  String name = main.MainMatrixVersion_1_6.getProteinName(sRight[i3].toString());
@@ -1534,7 +1544,6 @@ public class PopupReaction{
 				  float yR2 = yComplexesR[id].value;
 				 
 				  
-				 
 				  float yRect2 = iY[i2].value-iH[i2].value/2;
 				  if (check14.s && sat==200)
 					  drawGradientLine(xRect, yRect2, xR2, yR2, complexRectionColor, sat);
@@ -1562,6 +1571,7 @@ public class PopupReaction{
 						  processedComplexRight.add(id);
 					
 					  for (int k=0;k<components.size();k++){
+						  isContainedComplexR =true;
 						  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
 						  if (mapProteinRDFId_index.get(components.get(k))!=null){
 							  float y4=iP[mapProteinRDFId_index.get(components.get(k))].value-hProtein/4f;
@@ -1627,6 +1637,11 @@ public class PopupReaction{
 			  }
 			  
 		  }
+		  System.out.println("drawReactionLink Right = "+iS4[i2].value);
+			if (!isContainedComplexR && iS3[i2].value>=990){
+			  iS4[i2].set(1000);
+		  }
+			  
 	 }
 	
 	void polygon(float x, float y, float radius, int npoints) {
@@ -1645,15 +1660,20 @@ public class PopupReaction{
 			 sPopup = !sPopup;
 		if (bRect>=0){
 			s = bRect;
+			simulationRectList = new ArrayList<Integer>();
+			simulationRectListDone = new ArrayList<Integer>();
+			simulationRectList.add(s);
+			
 			for (int r=0;r<rectList.size();r++) {
 				for (int g=0;g<rectList.size();g++) {
 					iS[r][g].set(0);
 				}
 			}
 		}
-		else
+		else{
+			simulationRectList = new ArrayList<Integer>();
 			s =-200;
-		
+		}
 		for (int r=0;r<rectList.size();r++) {
 			iS1[r].set(0);
 			iS2[r].set(0);

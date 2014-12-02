@@ -1295,7 +1295,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			popupComplex.setItems();
 			PopupReaction.check2.s=false;
 			PopupReaction.check3.s=false;
-			PopupReaction.check4.s=false;
+			PopupReaction.check4.s=true;
 			PopupReaction.check5.s=false;
 			
 			popupReaction.setItems();
