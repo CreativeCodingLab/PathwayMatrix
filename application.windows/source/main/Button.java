@@ -1,61 +1,67 @@
 package main;
-import java.awt.Color;
 
 import processing.core.PApplet;
-import processing.core.PFont;
 
 public class Button{
-	public int b = -1;
+	public boolean b = false;
+	public boolean s = false;
 	public PApplet parent;
 	public int y = 0;
-	public int w = 73;
-	public int h = 23;
-	public float x2 = 0;
+	public int w = 98;
+	public int h = 25;
+	public float x = 0;
 	public int w2 = 200;
 	public int itemNum = 9;
-	public Color cGray  = new Color(240,240,240);
-	public Button(PApplet parent_){
+	public String text = "";
+	public Button(PApplet parent_, String str){
 		parent = parent_;
+		text = str;
 	}
-	public int count =0;
 	
 	
-	public void draw(){
+	public void draw(float x_){
+		x = x_;
 		checkBrushing();
-		parent.textSize(13);
-		if (b>0){
-			parent.fill(0,0,0);
-			parent.stroke(155,155,155);
-			parent.rect(x2, y, w, h);
-			
-			parent.textAlign(PApplet.LEFT);
-			parent.fill(255);
-			parent.text("Browse...",x2+8,y+16);
-		}	
-		else{
-			parent.fill(150);
-			parent.noStroke();
-			parent.rect(x2, y, w, h);
-			
-			parent.textAlign(PApplet.LEFT);
-			parent.fill(0);
-			parent.text("Browse...",x2+8,y+16);
-		}
+		parent.textSize(12);
+		parent.noStroke();
+		parent.fill(150);
+		if (b)
+			parent.stroke(255,0,0);
+		parent.rect(x, y, w, h);
 		
-		count++;
-	    if (count==10000)
-	    	count=200;
+		if (s){
+			if (text.endsWith("Causality"))
+				for (int i=0;i<w;i++){
+					parent.stroke(255,255-i*2.55f,i*2.55f);
+					parent.line(x+i, y, x+i, y+h-1);
+				}
+			else
+				parent.fill(50);
+			
+		}
+			
+		
+		parent.fill(0);
+		parent.textAlign(PApplet.CENTER);
+		parent.text(text,x+w/2,y+18);
+		
+		
 	}
 	
+	public void mouseClicked() {
+		s = !s;
+		
+	}
+		
 	 
 	public void checkBrushing() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (x2<mX && mX<x2+w && y<mY && mY<h){
-			b =100;
+		if (x<=mX && mX<=x+w && y<=mY && mY<=h){
+			b =true;
 			return;
 		}
-		b =-1;
+		b =false;
 	}
 	
 }
