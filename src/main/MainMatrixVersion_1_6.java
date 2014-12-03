@@ -1410,7 +1410,11 @@ public class MainMatrixVersion_1_6 extends PApplet {
 						  components.add(getProteinName(s2[i].toString()));
 					  else {
 						  if (mapComplexRDFId_index.get(s2[i].toString())==null){
-							  components.add(s2[i].toString());
+							  String name = s2[i].toString();
+							  String[] pieces = s2[i].toString().split("/");
+							  if (pieces.length>=1)
+									name = pieces[pieces.length-1];
+							  components.add(name);
 						  }
 						  else{
 							  int id4 = mapComplexRDFId_index.get(s2[i].toString());

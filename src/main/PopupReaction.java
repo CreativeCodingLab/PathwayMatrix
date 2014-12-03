@@ -23,8 +23,6 @@ public class PopupReaction{
 	public static ArrayList<Integer> sRectList = new ArrayList<Integer>();
 	public static ArrayList<Integer> sRectListL = new ArrayList<Integer>();
 	public static ArrayList<Integer> sRectListR = new ArrayList<Integer>();
-	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
-	public static ArrayList<Integer> simulationRectListLevel = new ArrayList<Integer>();
 	public PApplet parent;
 	public float x = 0;
 	public float xButton = 0;
@@ -104,7 +102,11 @@ public class PopupReaction{
 	public int minSatSimulation =15;
 	public int level1SatSimulation =50;
 	public int stepSatSimulation =15;
-	
+	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectListLevel = new ArrayList<Integer>();
+	public static ArrayList<String> interElements = new ArrayList<String>();
+	public static ArrayList<Integer> interElementsLevel = new ArrayList<Integer>();
+
 	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
@@ -1090,11 +1092,12 @@ public class PopupReaction{
 				parent.noStroke();
 				parent.rect(x2-30, y2-40, parent.width-x2+50, parent.height-y2+50);
 				
-				
+				// Print out Reaction list
 				parent.fill(0);
 				parent.textSize(12);
 				parent.text("Reaction list: ", x2-25,y2-20);
 				
+				boolean flashing = false;
 				for (int i=0;i<simulationRectList.size();i++){
 					int r = simulationRectList.get(i);
 					parent.fill(0);
@@ -1107,11 +1110,52 @@ public class PopupReaction{
 					if (rLevel==currentLevel && iS4[r].value<990){
 						float sat = (parent.frameCount*20)%200;
 						parent .fill(sat,0,0);
-						
+						flashing = true;
 					}
 					parent.text(name, x2+rLevel*25,y2+20*i);
 					
 				}
+				
+				// Print out intermediate proteins and complexes
+				float y3 = 450;
+				
+				
+				parent.fill(0);
+				parent.textSize(12);
+				parent.text("Intermediate proteins/complexes: ", x2-25,y3-20);
+				for (int i=0;i<interElements.size();i++){
+					String ref = interElements.get(i);
+					parent.fill(0);
+					
+					
+					
+					String name = main.MainMatrixVersion_1_6.getProteinName(ref);
+					  if (name==null){
+						  String[] pieces = ref.split("/");
+						  if (pieces.length>=1)
+								name = pieces[pieces.length-1];
+						}	  
+					  if (mapProteinRDFId_index.get(name)!=null){
+						  name = proteins[mapProteinRDFId_index.get(name)];
+							
+					  }	  
+					  else if (main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(ref)!=null){
+						  int id = main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(ref);
+						  name = main.MainMatrixVersion_1_6.proteinsInComplex[id].toString();
+						  
+					  }
+						
+					int currentLevel = interElementsLevel.get(interElementsLevel.size()-1);
+					int eLevel = interElementsLevel.get(i);
+					
+					if (eLevel==currentLevel && flashing){
+						float sat = (parent.frameCount*20)%200;
+						parent .fill(sat,0,0);
+					}
+					parent.text(name, x2+(eLevel)*25,y3+20*i);
+					
+				}
+				
 			}
 			else{
 				check11.draw((int) x7, (int) y7+44);
@@ -1176,11 +1220,18 @@ public class PopupReaction{
 							if (simulationRectList.indexOf(g)<0){
 								simulationRectList.add(g);
 								simulationRectListLevel.add(recursive+1);
+								
+								for (int i=0;i<commonElements.size();i++){
+									String str = commonElements.get(i);
+									interElements.add(str);
+									interElementsLevel.add(recursive+1);	
+								}
 							}	
 						}
 					}
 				}
 			}
+			
 		}
 	}
 	
@@ -1255,7 +1306,6 @@ public class PopupReaction{
 				if (str1.equals(str2)){
 					 String name = main.MainMatrixVersion_1_6.getProteinName(str1);
 					 if (!main.MainMatrixVersion_1_6.isSmallMolecule(name)){
-						// System.out.println(""+name);
 						 results.add(str1);
 					 }	 
 				}	
@@ -1825,12 +1875,17 @@ public class PopupReaction{
 				s = bRect;
 				simulationRectList = new ArrayList<Integer>();
 				simulationRectListLevel= new ArrayList<Integer>();
+				interElements =  new ArrayList<String>();
+				interElementsLevel =  new ArrayList<Integer>();
+				
 				simulationRectList.add(s);
 				simulationRectListLevel.add(0);
 			}
 			else if (bProteinL>=0){
 				simulationRectList = new ArrayList<Integer>();
 				simulationRectListLevel= new ArrayList<Integer>();
+				interElements =  new ArrayList<String>();
+				interElementsLevel =  new ArrayList<Integer>();
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					Object[] sLeft = rect.getLeft().toArray();
@@ -1852,6 +1907,8 @@ public class PopupReaction{
 			else{
 				simulationRectList = new ArrayList<Integer>();
 				simulationRectListLevel = new ArrayList<Integer>();
+				interElements =  new ArrayList<String>();
+				interElementsLevel =  new ArrayList<Integer>();
 				s =-200;
 			}
 			resetIntegrators();
