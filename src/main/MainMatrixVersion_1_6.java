@@ -102,7 +102,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
 	//public String currentFile = "";
 	
-	public static Button button;
+	public static ButtonBrowse button;
+	public static Button buttonCausality;
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
@@ -192,7 +193,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 
 	public void setup() {
 		textFont(metaBold,14);
-		button = new Button(this);
 		size(1440, 900);
 		//size(2000, 1200);
 		if (frame != null) {
@@ -260,7 +260,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		}
 		
 		
-		button = new Button(this);
+		button = new ButtonBrowse(this);
+		buttonCausality = new Button(this,"Causality");
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
 		popupReaction = new PopupReaction(this);
@@ -309,8 +310,11 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				this.text(message, marginX+20,this.height-14);
 			}
 			
-			if (PopupReaction.sPopup)
+			if (PopupReaction.sPopup){
 				popupReaction.drawReactions(140);
+				buttonCausality.draw(this.width-200);
+				
+			}	
 			else{
 				if (currentFile.equals("")){
 					int ccc = this.frameCount*6%255;
@@ -342,6 +346,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			
 			this.textSize(13);
 			button.draw();
+			
 			//popupRelation.draw(this.width-304);
 			
 			
@@ -929,80 +934,89 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		if (button.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
-			
 		}
-		else if (check1.b){
-			check1.mouseClicked();
+		else if (PopupReaction.bPopup){
+			popupReaction.mouseClicked();
 		}
-		else if (check2.b){
+		else if (PopupReaction.sPopup){
+			if (!PopupReaction.bPopup)
+				popupReaction.mouseClicked();
+			if (buttonCausality.b){
+				buttonCausality.mouseClicked();
+			}
+			else
+			if (PopupReaction.check11.b){
+				PopupReaction.check11.mouseClicked();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check12.b){
+				PopupReaction.check12.mouseClicked();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check13.b){
+				PopupReaction.check13.mouseClicked();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check14.b){
+				PopupReaction.check14.mouseClicked();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check15.b){
+				PopupReaction.check15.mouseClicked();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check2.b){
+				PopupReaction.check2.mouseClicked();
+				if (PopupReaction.check2.s){
+					PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
+					PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
+				//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
+				}	
+				popupReaction.updateReactionPositions();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check3.b){
+				PopupReaction.check3.mouseClicked();
+					
+				popupReaction.updateProteinPositions();
+			}
+			else if (PopupReaction.sPopup && PopupReaction.check5.b){
+				PopupReaction.check5.mouseClicked();
+			}
+		}
+		
+		else {
+			if (check1.b){
+				check1.mouseClicked();
+			}
+			else if (check2.b){
 			check2.mouseClicked();
 			if (check2.s){  
 				main.MainMatrixVersion_1_6.stateAnimation=0;
 				Gene.orderBySimilarity();
 				Gene.groupBySimilarity();
 			}	
-			else {
-				main.MainMatrixVersion_1_6.stateAnimation=0;
-				Gene.orderBySimilarity();
-			}	
-		}
-		else if (check3.b){
-			check3.mouseClicked();
-		}
-		else if (popupRelation.b>=0){
-			popupRelation.mouseClicked();
-		}
-		else if (PopupComplex.b>=-1){
-			popupComplex.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check11.b){
-			PopupReaction.check11.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check12.b){
-			PopupReaction.check12.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check13.b){
-			PopupReaction.check13.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check14.b){
-			PopupReaction.check14.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check15.b){
-			PopupReaction.check15.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check2.b){
-			PopupReaction.check2.mouseClicked();
-			if (PopupReaction.check2.s){
-				PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
-				PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
-			//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
-			}	
-			popupReaction.updateReactionPositions();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check3.b){
-			PopupReaction.check3.mouseClicked();
-				
-			popupReaction.updateProteinPositions();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check4.b){
-			PopupReaction.check4.mouseClicked();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check5.b){
-			PopupReaction.check5.mouseClicked();
-		}
-		else if (PopupReaction.sPopup){
-			popupReaction.mouseClicked();
-		}
-		else if (popupOrder.b>=0){
-			popupOrder.mouseClicked();
-		}
-		else if (vennOverview!=null){
-			vennOverview.mouseClicked();
-			if (vennOverview.brushing>=0)
-				vennDetail.compute(currentRelation);
-			//update();
+				else {
+					main.MainMatrixVersion_1_6.stateAnimation=0;
+					Gene.orderBySimilarity();
+				}	
+			}
+			else if (check3.b){
+				check3.mouseClicked();
+			}
+			else if (popupRelation.b>=0){
+				popupRelation.mouseClicked();
+			}
+			else if (PopupComplex.b>=-1){
+				popupComplex.mouseClicked();
+			}
+			
+			else if (popupOrder.b>=0){
+				popupOrder.mouseClicked();
+			}
+			else if (vennOverview!=null){
+				vennOverview.mouseClicked();
+				if (vennOverview.brushing>=0)
+					vennDetail.compute(currentRelation);
+				//update();
+			}
 		}
 	}
+		
 	
 	public String loadFile (Frame f, String title, String defDir, String fileType) {
 		  FileDialog fd = new FileDialog(f, title, FileDialog.LOAD);
@@ -1295,9 +1309,9 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			popupComplex.setItems();
 			PopupReaction.check2.s=false;
 			PopupReaction.check3.s=false;
-			PopupReaction.check4.s=true;
 			PopupReaction.check5.s=false;
 			
+			buttonCausality.s=true;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
