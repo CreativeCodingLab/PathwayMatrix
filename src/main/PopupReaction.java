@@ -1050,8 +1050,30 @@ public class PopupReaction{
 				}
 			}
 			
+			
+			// Draw SHORTEST PATH ******************************************************************************
+			if (bProteinL>=0){
+				ArrayList<Integer> proteinsDownStreamList = new ArrayList<Integer>();
+				for (int r=0;r<rectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(r);
+					Object[] sLeft = rect.getLeft().toArray();
+					for (int i3=0;i3<sLeft.length;i3++){
+						 String name = main.MainMatrixVersion_1_6.getProteinName(sLeft[i3].toString());
+						  if (name==null)
+							  name = sLeft[i3].toString();
+						  if (mapProteinRDFId_index.get(name)!=null && mapProteinRDFId_index.get(name)==bProteinL){
+							  if (!simulationRectList.contains(r)){
+									
+							    simulationRectList.add(r);
+								simulationRectListLevel.add(0);
+							  }	
+						  }
+					}	  
+				 }
+			}
+			
+			
 			// Draw reaction causation ******************************************************************************
-				
 			if (simulationRectList.size()>0){
 				ArrayList<Integer> processedList = new ArrayList<Integer>();
 				for (int r=0;r<simulationRectList.size();r++){
@@ -1087,10 +1109,11 @@ public class PopupReaction{
 			
 			if (main.MainMatrixVersion_1_6.buttonCausality.s){
 				float x2 = parent.width*3/4f;
-				float y2 = 150;
+				float y3 = 150;
+				float y2 = 450;
 				parent.fill(0,20);
 				parent.noStroke();
-				parent.rect(x2-30, y2-40, parent.width-x2+50, parent.height-y2+50);
+				parent.rect(x2-30, y3-40, parent.width-x2+50, parent.height-y3+50);
 				
 				// Print out Reaction list
 				parent.fill(0);
@@ -1117,7 +1140,6 @@ public class PopupReaction{
 				}
 				
 				// Print out intermediate proteins and complexes
-				float y3 = 450;
 				
 				
 				parent.fill(0);
@@ -1201,6 +1223,39 @@ public class PopupReaction{
 			parent.text("Output Proteins", xR, 45);
 	}
 
+	public void listDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList, float iProcess){
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				if (iProcess>990){
+					iS[r][g].target(1000);
+					iS[r][g].update();
+					drawArc(r,g, iS[r][g], recursive);
+					if (recursive>=0){
+						if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
+							processedList.add(r);
+							if (simulationRectList.indexOf(g)<0){
+								simulationRectList.add(g);
+								simulationRectListLevel.add(recursive+1);
+								
+								for (int i=0;i<commonElements.size();i++){
+									String str = commonElements.get(i);
+									interElements.add(str);
+									interElementsLevel.add(recursive+1);	
+								}
+							}	
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList, float iProcess){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
