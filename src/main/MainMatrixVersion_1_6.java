@@ -104,6 +104,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	public static ButtonBrowse button;
 	public static Button buttonCausality;
+	public static Button buttonLoop;
+	public static Button buttonDelete;
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
@@ -179,7 +181,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	public static ArrayList<Complex> complexList; 
 	public static  Map<String,Integer> mapComplexRDFId_index;
 	public static Set<BiochemicalReaction> reactionSet; 
-	
+	public static Set<SmallMolecule> smallMoleculeSet;
 	public static ArrayList<String>[] proteinsInComplex; 
 	
 	
@@ -262,6 +264,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		
 		button = new ButtonBrowse(this);
 		buttonCausality = new Button(this,"Causality");
+		buttonLoop = new Button(this,"Loop");
+		buttonDelete = new Button(this,"Delete Protein");
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
 		popupReaction = new PopupReaction(this);
@@ -313,7 +317,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			if (PopupReaction.sPopup){
 				popupReaction.drawReactions(140);
 				buttonCausality.draw(this.width-200);
-				
+				buttonLoop.draw(this.width-300);
+				buttonDelete.draw(this.width-400);
 			}	
 			else{
 				if (currentFile.equals("")){
@@ -944,8 +949,14 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			if (buttonCausality.b){
 				buttonCausality.mouseClicked();
 			}
-			else
-			if (PopupReaction.check11.b){
+			if (buttonLoop.b){
+				buttonLoop.mouseClicked();
+			}
+			if (buttonDelete.b){
+				System.out.println(buttonDelete.s);
+				buttonDelete.mouseClicked();
+			}
+			else if (PopupReaction.check11.b){
 				PopupReaction.check11.mouseClicked();
 			}
 			else if (PopupReaction.sPopup && PopupReaction.check12.b){
@@ -1134,7 +1145,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					 i2++;
 				 }
 					
-				 Set<SmallMolecule> smallMoleculeSet = model.getObjects(SmallMolecule.class);
+				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
 				 i2=0;
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
 					 if (currentMolecule.getEntityReference()==null) continue;
@@ -1307,11 +1318,13 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			System.out.println();
 		
 			popupComplex.setItems();
-			PopupReaction.check2.s=false;
-			PopupReaction.check3.s=false;
+			PopupReaction.check2.s=true;
+			PopupReaction.check3.s=true;
 			PopupReaction.check5.s=false;
 			
 			buttonCausality.s=true;
+			buttonLoop.s=false;
+			buttonDelete.s = true;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
