@@ -298,7 +298,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		background(255);
 		// Draw 
 		try{
-			
 			// Print message
 			if (processingMiner<colorRelations.length){
 				ccc+=10;
@@ -1320,11 +1319,11 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			popupComplex.setItems();
 			PopupReaction.check2.s=true;
 			PopupReaction.check3.s=true;
-			PopupReaction.check5.s=false;
+			PopupReaction.check5.s=true;
 			
 			buttonCausality.s=true;
 			buttonLoop.s=false;
-			buttonDelete.s = true;
+			buttonDelete.s = false;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			

@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.SmallMolecule;
 
 import processing.core.PApplet;
 
@@ -107,6 +108,18 @@ public class PopupReaction{
 	public static ArrayList<String> interElements = new ArrayList<String>();
 	public static ArrayList<Integer> interElementsLevel = new ArrayList<Integer>();
 
+	ArrayList<Integer> proteinsDownStreamList = new ArrayList<Integer>();
+	ArrayList<Integer> proteinsDownStreamList2 = new ArrayList<Integer>();
+	ArrayList<Integer> levelDownStreamList = new ArrayList<Integer>();
+	ArrayList<Integer> levelDownStreamList2 = new ArrayList<Integer>();
+	ArrayList<Integer> processedList = new ArrayList<Integer>();
+	
+	ArrayList<Integer> loopReactionList = new ArrayList<Integer>();
+	
+	ArrayList<Integer> deleteReactionList = new ArrayList<Integer>();
+	
+	int deleteProtein =-1;
+	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
 	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
@@ -293,6 +306,7 @@ public class PopupReaction{
 					unidentifiedList.add(ufo);
 			}
 		}
+		System.out.println(unidentifiedList);
 	}
 	
 	public ArrayList<String> getUnidentifiedElements2(Object[] s) {
@@ -314,6 +328,7 @@ public class PopupReaction{
 				 a.add(s[i3].toString());
 			 } 
 		}
+		System.out.println(a);
 		return a;
 	}
 	
@@ -972,7 +987,13 @@ public class PopupReaction{
 				iS4[r].update();
 			}
 			
-			if (simulationRectList.size()>0){
+			if (main.MainMatrixVersion_1_6.buttonDelete.s ){
+					
+			}
+			else if (main.MainMatrixVersion_1_6.buttonLoop.s ){
+				
+			}
+			else if (simulationRectList.size()>0 ){
 				for (int r=0;r<simulationRectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(simulationRectList.get(r));
 					drawReactionLink(rect, simulationRectList.get(r), xL, xL2, xRect, xR, xR2, 255);
@@ -1025,15 +1046,186 @@ public class PopupReaction{
 			}
 			
 			
-			// Draw reaction Nodes **************************
 			
-			if (simulationRectList.size()>0){
+			
+			
+			// Draw SHORTEST PATH ******************************************************************************
+			if (bProteinL>=0){
+				proteinsDownStreamList = new ArrayList<Integer>();
+				proteinsDownStreamList2 = new ArrayList<Integer>();
+				levelDownStreamList = new ArrayList<Integer>();
+				levelDownStreamList2 = new ArrayList<Integer>();
+				processedList = new ArrayList<Integer>();
+				for (int r=0;r<rectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(r);
+					Object[] sLeft = rect.getLeft().toArray();
+					for (int i3=0;i3<sLeft.length;i3++){
+						 String name = main.MainMatrixVersion_1_6.getProteinName(sLeft[i3].toString());
+						  if (name==null)
+							  name = sLeft[i3].toString();
+						  if (mapProteinRDFId_index.get(name)!=null && mapProteinRDFId_index.get(name)==bProteinL){
+							  processedList.add(r);
+							  listProteinDownStream(r,0,proteinsDownStreamList, levelDownStreamList, proteinsDownStreamList2, levelDownStreamList2, processedList);
+						  }
+					}	  
+				 }
+				int currentLevel = -10;
+				if (simulationRectListLevel!=null && simulationRectListLevel.size()>0)
+					currentLevel = simulationRectListLevel.get(simulationRectListLevel.size()-1);
+				
+				for (int i=0;i<proteinsDownStreamList.size();i++){
+					int p=proteinsDownStreamList.get(i);
+					int level=levelDownStreamList.get(i);
+					float y3 = iP[p].value;
+					parent.fill(proteinRectionColor.getRGB());
+					if (level==currentLevel+1){
+						float sat = (parent.frameCount*20)%200;
+						parent.fill(proteinRectionColor.getRed(), proteinRectionColor.getGreen(), proteinRectionColor.getBlue(),sat);
+							
+					}
+					for (SmallMolecule currentMolecule : main.MainMatrixVersion_1_6.smallMoleculeSet){
+						if (proteins[p].equals(currentMolecule.getDisplayName())){
+							parent .fill(smallMoleculeColor.getRGB());
+							if (level==currentLevel+1){
+								float sat = (parent.frameCount*20)%200;
+								parent.fill(smallMoleculeColor.getRed(), smallMoleculeColor.getGreen(), smallMoleculeColor.getBlue(),sat);
+									
+							}
+						}
+					}
+						
+					
+					
+					parent.textSize(12);
+					parent.textAlign(PApplet.RIGHT);
+					parent.text(level,xR-15,y3);
+				
+					float sat = (parent.frameCount*20)%200;
+					parent .fill(200,0,0, 55+sat);
+					parent.textAlign(PApplet.LEFT);
+					//parent.text(proteins[p],xR,y3);
+					
+				}
+				for (int i=0;i<proteinsDownStreamList2.size();i++){
+					int p=proteinsDownStreamList2.get(i);
+					int level=levelDownStreamList2.get(i);
+					float y3 = iP[p].value;
+					parent.fill(formComplexColor.getRGB());
+					if (level==currentLevel+1){
+						float sat = (parent.frameCount*20)%200;
+						parent.fill(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
+							
+					}
+					
+					parent.textSize(12);
+					parent.textAlign(PApplet.RIGHT);
+					parent.text(level,xR-5,y3);
+				
+					float sat = (parent.frameCount*20)%200;
+					parent .fill(0,0,200, 55+sat);
+					parent.textAlign(PApplet.LEFT);
+				//	parent.text(proteins[p],xR,y3);
+				}
+					
+			}
+			
+			
+			// Draw reaction causation ******************************************************************************
+			loopReactionList =new ArrayList<Integer>();
+			
+			if (main.MainMatrixVersion_1_6.buttonDelete.s){
+				iDelete.target(1);
+				iDelete.update();
+			
+				
+				ArrayList<Integer> processedList = new ArrayList<Integer>();
+				for (int r=0;r<rectList.size();r++) {
+					processedList.add(r);
+					drawDownStreamReaction(r,-100, processedList, 1000);
+				}
+				
+			}
+			else if (simulationRectList.size()>0){
+				ArrayList<Integer> processedList = new ArrayList<Integer>();
+				for (int r=0;r<simulationRectList.size();r++){
+					int rect = simulationRectList.get(r);
+					int level = simulationRectListLevel.get(r);
+					processedList.add(rect);
+					drawDownStreamReaction(rect, level,processedList, iS4[rect].value);
+				}
+			}
+			else if (main.MainMatrixVersion_1_6.buttonLoop.s){
+				if (bRect>=0){
+					ArrayList<Integer> loopList =  new ArrayList<Integer>();
+					drawLoopFrom(bRect, loopList);
+					loopReactionList = loopList;
+				}
+				else{
+					for (int r=0;r<rectList.size();r++) {
+						ArrayList<Integer> loopRectList =  new ArrayList<Integer>();
+						drawLoopFrom(r, loopRectList);
+						for (int j=0;j<loopRectList.size();j++){
+							int index = loopRectList.get(j);
+							if (loopReactionList.indexOf(index)<0)
+								loopReactionList.add(index);
+						}
+					}
+					
+				}
+				
+			}	
+			else if (main.MainMatrixVersion_1_6.buttonCausality.s){
+				if (bRect>=0){
+					ArrayList<Integer> processedList = new ArrayList<Integer>();
+					processedList.add(bRect);
+					drawDownStreamReaction(bRect,-100, processedList, 1000);
+					
+				}
+				else{
+					ArrayList<Integer> processedList = new ArrayList<Integer>();
+					for (int r=0;r<rectList.size();r++) {
+						processedList.add(r);
+						drawDownStreamReaction(r,-100, processedList, 1000);
+					}
+				}
+			}
+			else{
+				for (int r=0;r<rectList.size();r++) {
+					for (int g=0;g<rectList.size();g++) {
+						iS[r][g].set(0);
+					}	
+				}
+			}
+			
+			
+			
+			// Draw reaction Nodes *************************************************************
+			if (main.MainMatrixVersion_1_6.buttonDelete.s ){
+				int i=0;
+				for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
+					if (deleteReactionList.indexOf(i)>=0)
+						drawReactionNode(entry, i, 50+150*(1-iDelete.value));
+					else
+						drawReactionNode(entry, i, 200);
+					i++;
+				}
+			}
+			else if(main.MainMatrixVersion_1_6.buttonLoop.s){
+				int i=0;
+				for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
+					if (loopReactionList.indexOf(i)>=0)
+						drawReactionNode(entry, i, 255);
+					else
+						drawReactionNode(entry, i, 50);
+					i++;
+				}
+			}
+			else if (simulationRectList.size()>0){
 				int r = 0;
 				for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
 					if (simulationRectList.indexOf(r)>=0)
 						drawReactionNodeSimulation(entry, r);
 						
-				//	System.out.println(r+"	simulationRectList="+simulationRectList);	
 					r++;
 				}
 			}
@@ -1050,34 +1242,8 @@ public class PopupReaction{
 				}
 			}
 			
-			// Draw reaction causation ******************************************************************************
-				
-			if (simulationRectList.size()>0){
-				ArrayList<Integer> processedList = new ArrayList<Integer>();
-				for (int r=0;r<simulationRectList.size();r++){
-					int rect = simulationRectList.get(r);
-					int level = simulationRectListLevel.get(r);
-					processedList.add(rect);
-					drawDownStreamReaction(rect, level,processedList, iS4[rect].value);
-				}
-			}
-			else if (main.MainMatrixVersion_1_6.buttonCausality.s){
-				ArrayList<Integer> processedList = new ArrayList<Integer>();
-				for (int r=0;r<rectList.size();r++) {
-					processedList.add(r);
-					drawDownStreamReaction(r,-100, processedList, 1000);
-				}
-			}
-			else{
-				for (int r=0;r<rectList.size();r++) {
-					for (int g=0;g<rectList.size();g++) {
-						iS[r][g].set(0);
-					}	
-				}
-			}
-			
 			float x7 = (xR+220);
-			float y7 = 40;
+			float y7 = 60;
 			
 			
 			parent.strokeWeight(1);
@@ -1085,12 +1251,39 @@ public class PopupReaction{
 			check3.draw((int) x7, (int) y7);
 			check2.draw((int) x7, (int) y7+19);
 			
-			if (main.MainMatrixVersion_1_6.buttonCausality.s){
+			
+			if (main.MainMatrixVersion_1_6.buttonDelete.s){
 				float x2 = parent.width*3/4f;
-				float y2 = 150;
+				float y2 = 180;
 				parent.fill(0,20);
 				parent.noStroke();
 				parent.rect(x2-30, y2-40, parent.width-x2+50, parent.height-y2+50);
+				
+				parent.fill(0);
+				parent.textSize(12);
+				parent.text("Affected reactions: "+deleteReactionList.size()+" / "+rectList.size()+" biochemical reactions", x2-25,y2-20);
+				
+				for (int i=0;i<deleteReactionList.size();i++){
+					int r = deleteReactionList.get(i);
+					parent.fill(0);
+					String name = rectList.get(r).getDisplayName();
+					
+					
+					parent.text(name, x2 +25,y2+20*i);
+				}
+
+			}
+			else if (main.MainMatrixVersion_1_6.buttonLoop.s){
+				
+			}
+					
+			else if (main.MainMatrixVersion_1_6.buttonCausality.s){
+				float x2 = parent.width*3/4f;
+				float y3 = 150;
+				float y2 = 450;
+				parent.fill(0,20);
+				parent.noStroke();
+				parent.rect(x2-30, y3-40, parent.width-x2+50, parent.height-y3+50);
 				
 				// Print out Reaction list
 				parent.fill(0);
@@ -1108,7 +1301,7 @@ public class PopupReaction{
 					int rLevel = simulationRectListLevel.get(rectIndex);
 					
 					if (rLevel==currentLevel && iS4[r].value<990){
-						float sat = (parent.frameCount*20)%200;
+						float sat = 55+(parent.frameCount*20)%200;
 						parent .fill(sat,0,0);
 						flashing = true;
 					}
@@ -1117,9 +1310,6 @@ public class PopupReaction{
 				}
 				
 				// Print out intermediate proteins and complexes
-				float y3 = 450;
-				
-				
 				parent.fill(0);
 				parent.textSize(12);
 				parent.text("Intermediate proteins/complexes: ", x2-25,y3-20);
@@ -1149,7 +1339,7 @@ public class PopupReaction{
 					int eLevel = interElementsLevel.get(i);
 					
 					if (eLevel==currentLevel && flashing){
-						float sat = (parent.frameCount*20)%200;
+						float sat = 55+ (parent.frameCount*20)%200;
 						parent .fill(sat,0,0);
 					}
 					parent.text(name, x2+(eLevel)*25,y3+20*i);
@@ -1181,10 +1371,6 @@ public class PopupReaction{
 				}
 				drawRelationship(wordCloud, rel, Color.BLACK);
 			}
-			
-			
-			
-			
 			parent.fill(0);
 			parent.textSize(13);
 			parent.textAlign(PApplet.CENTER);
@@ -1195,12 +1381,108 @@ public class PopupReaction{
 			parent.textAlign(PApplet.CENTER);
 			parent.text("Input Proteins", xL, 45);
 			parent.fill(complexRectionColor.getRGB());
-			parent.text(processedComplexLeft.size()+" Complexes", xL2, 45);
-			parent.text(processedComplexRight.size()+" Complexes", xR2, 45);
+			parent.text("Input Complexes", xL2, 45);
+			parent.text("Output Complexes", xR2, 45);
 			parent.fill(0);
 			parent.text("Output Proteins", xR, 45);
 	}
 
+	public void drawLoopFrom(int beginReaction, ArrayList<Integer> loopRectList){
+		ArrayList<Integer> downstreamList = new ArrayList<Integer>();
+		ArrayList<Integer> parentList = new ArrayList<Integer>();
+		ArrayList<Integer> levelDownstreamList = new ArrayList<Integer>();
+		listReactionDownStream(beginReaction,0,downstreamList, parentList,levelDownstreamList);
+		if (downstreamList.indexOf(beginReaction)>=0){
+			int indexLastReaction = downstreamList.indexOf(beginReaction);
+			int parent = parentList.get(indexLastReaction);
+			ArrayList<Integer> a = new ArrayList<Integer>();
+			while (parent!=beginReaction){
+				a.add(parent);
+				indexLastReaction = downstreamList.indexOf(parent);
+				parent = parentList.get(indexLastReaction);
+			}
+			a.add(parent);
+			for (int i=a.size()-1;i>=0;i--){
+				int index = a.get(i);
+				loopRectList.add(index);
+			}
+		}
+		
+		// Draw loop
+		for (int i=0;i<loopRectList.size();i++){
+			int r = loopRectList.get(i);
+			int g = -1;
+			if (i<loopRectList.size()-1)
+				g = loopRectList.get(i+1);
+			else{
+				g = loopRectList.get(0);
+			}
+			drawArc2(r,g);
+		}
+		
+	}
+		
+	public void listProteinDownStream(int r, int recursive, ArrayList<Integer> downstreamList,ArrayList<Integer> levelDownStreamList, ArrayList<Integer> downstreamList2,ArrayList<Integer> levelDownStreamList2, ArrayList<Integer> processedList){
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		// List output protein in current reaction
+		 for (int i3=0;i3<sRight1.length;i3++){
+			  String name = main.MainMatrixVersion_1_6.getProteinName(sRight1[i3].toString());
+			  if (name==null)
+				  name = sRight1[i3].toString();
+			  if (mapProteinRDFId_index.get(name)!=null){
+				  int pId = mapProteinRDFId_index.get(name);
+				  if (downstreamList.indexOf(pId)<0){
+					  downstreamList.add(pId);
+					  levelDownStreamList.add(recursive+1);
+				  }	  
+			  }	
+			  else if (main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(name)!=null){
+					  int id = main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(name);
+					  ArrayList<String> components = main.MainMatrixVersion_1_6.proteinsInComplex[id];
+					  for (int i=0;i<components.size();i++){
+						  int pId = mapProteinRDFId_index.get(components.get(i));
+						  if (downstreamList2.indexOf(pId)<0){
+							  downstreamList2.add(pId);
+							  levelDownStreamList2.add(recursive+1);
+						  }	 
+					  }
+			  }
+		 }
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r || processedList.indexOf(g)>=0) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				processedList.add(g);
+				listProteinDownStream(g, recursive+1,downstreamList,levelDownStreamList,downstreamList2,levelDownStreamList2,  processedList);
+			}
+		}
+	}
+	
+	public void listReactionDownStream(int r, int recursive, ArrayList<Integer> downstreamList, ArrayList<Integer> parentList,ArrayList<Integer> levelDownStreamList){
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		
+		// List current reaction
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				if (downstreamList.indexOf(g)<0){
+					downstreamList.add(g);
+					parentList.add(r);
+					levelDownStreamList.add(recursive+1);
+					listReactionDownStream(g, recursive+1,downstreamList, parentList, levelDownStreamList);
+				}	
+				
+			}
+		}
+	}
+	
 	public void drawDownStreamReaction(int r, int recursive, ArrayList<Integer> processedList, float iProcess){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
@@ -1281,6 +1563,55 @@ public class PopupReaction{
 		
 		for (int k=0;k<=numSec;k++){
 			float percent = inter.value/1000;
+			float endAngle = beginAngle+PApplet.PI/numSec;
+			if ((float) k/numSec >=(1-percent)){
+				parent.noFill();
+				float sss = (float) k/numSec;
+				sss = PApplet.pow(sss,0.75f);
+				
+				float sat = 255-220*sss;
+				float red = 255;
+				float green = sss*255;
+				float blue = 255-255*sss;
+				
+				parent.stroke(red,green,blue,sat);
+				parent.strokeWeight(3);
+				if(deleteReactionList.indexOf(r)>=0){
+					red = red*(1-iDelete.value);
+					green = green*(1-iDelete.value);
+					blue = blue*(1-iDelete.value);
+					
+					if (red<0) red=0;
+					if (green<0) green=0;
+					if (blue<0) blue=0;
+					
+					parent.stroke(red,green,blue,sat);
+					parent.strokeWeight(1.5f+1.5f*(1-iDelete.value));
+					
+				}		
+				
+				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
+			}
+			beginAngle = endAngle;
+			parent.strokeWeight(1);
+		}
+	}
+	
+	public void drawArc2(int r, int g){
+		float y1 = iY[r].value-iH[r].value/2;
+		float y2 = iY[g].value-iH[g].value/2;
+		float yy = (y1+y2)/2;
+		
+		
+		float d = PApplet.abs(y2-y1);
+		int numSec = (int) d;
+		if (numSec==0) return;
+		float beginAngle = PApplet.PI/2;
+		if (y1>y2)
+			beginAngle = -PApplet.PI/2;
+		
+		for (int k=0;k<=numSec;k++){
+			float percent = 1;
 			float endAngle = beginAngle+PApplet.PI/numSec;
 			if ((float) k/numSec >=(1-percent)){
 				parent.noFill();
@@ -1431,7 +1762,7 @@ public class PopupReaction{
 	
 	public void drawProteinLeft(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 13);
+		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 12);
 		parent.textSize(textSixe);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
@@ -1457,7 +1788,7 @@ public class PopupReaction{
 	
 	public void drawProteinRight(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 13);
+		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 12);
 		parent.textSize(textSixe);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
@@ -1871,7 +2202,49 @@ public class PopupReaction{
 		if (bPopup)
 			 sPopup = !sPopup;
 		else{
-			if (bRect>=0){
+			deleteReactionList = new ArrayList<Integer>();
+			if (main.MainMatrixVersion_1_6.buttonDelete.s){
+				iDelete.value=0;
+				iDelete.target=0;
+				deleteProtein = bProteinL;
+				for (int r=0;r<rectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(r);
+					Object[] sLeft = rect.getLeft().toArray();
+					for (int i3=0;i3<sLeft.length;i3++){
+						 String name = main.MainMatrixVersion_1_6.getProteinName(sLeft[i3].toString());
+						  if (name==null)
+							  name = sLeft[i3].toString();
+						  if (mapProteinRDFId_index.get(name)!=null && mapProteinRDFId_index.get(name)==bProteinL){
+							  if (!deleteReactionList.contains(r))
+								  deleteReactionList.add(r);
+						  }
+						  
+						  else  if (main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+							  int id = main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(sLeft[i3].toString());
+							  ArrayList<String> components = main.MainMatrixVersion_1_6.proteinsInComplex[id];
+							  for (int k=0;k<components.size();k++){
+								  if (mapProteinRDFId_index.get(components.get(k))!=null){
+									  if(mapProteinRDFId_index.get(components.get(k))==bProteinL){
+										  if (!deleteReactionList.contains(r))
+											  deleteReactionList.add(r);
+									  }	  
+								  }		
+							  }
+								  
+						  }
+					}	  
+				 }
+				
+				// Retrieve downstream reactions
+				//System.out.println(deleteProtein+"	deleteReactionList1="+deleteReactionList);
+				ArrayList<Integer> parentList = new ArrayList<Integer>();
+				ArrayList<Integer> levelDownStreamList = new ArrayList<Integer>();
+				for (int i=0;i<deleteReactionList.size();i++) {
+					int r = deleteReactionList.get(i);
+					listReactionDownStream(r,0,deleteReactionList,parentList,levelDownStreamList);
+				}
+			}
+			else if (bRect>=0){
 				s = bRect;
 				simulationRectList = new ArrayList<Integer>();
 				simulationRectListLevel= new ArrayList<Integer>();
@@ -1880,6 +2253,13 @@ public class PopupReaction{
 				
 				simulationRectList.add(s);
 				simulationRectListLevel.add(0);
+				
+				resetIntegrators();
+				for (int r=0;r<rectList.size();r++) {
+					for (int g=0;g<rectList.size();g++) {
+						iS[r][g].set(0);
+					}
+				}
 			}
 			else if (bProteinL>=0){
 				simulationRectList = new ArrayList<Integer>();
@@ -1903,20 +2283,27 @@ public class PopupReaction{
 					}	  
 				 }
 				
+				resetIntegrators();
+				for (int r=0;r<rectList.size();r++) {
+					for (int g=0;g<rectList.size();g++) {
+						iS[r][g].set(0);
+					}
+				}
 			}
-			else{
+			else {
 				simulationRectList = new ArrayList<Integer>();
 				simulationRectListLevel = new ArrayList<Integer>();
 				interElements =  new ArrayList<String>();
 				interElementsLevel =  new ArrayList<Integer>();
 				s =-200;
-			}
-			resetIntegrators();
-			for (int r=0;r<rectList.size();r++) {
-				for (int g=0;g<rectList.size();g++) {
-					iS[r][g].set(0);
+				resetIntegrators();
+				for (int r=0;r<rectList.size();r++) {
+					for (int g=0;g<rectList.size();g++) {
+						iS[r][g].set(0);
+					}
 				}
 			}
+			
 		}
 	}
 	 
