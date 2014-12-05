@@ -124,8 +124,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	//public static ArrayList<Integrator> iW;
 	// Contains the location and size of each gene to display
 	public float size=0;
-	public static float marginX = 100;
-	public static float marginY = 100;
+	public static float marginX = 0;
+	public static float marginY = 40;
 	public static String message="";
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
@@ -335,14 +335,15 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					this.triangle(x6, y6, x6+4, y6+13, x6+13, y6+4);
 				}
 				else{
+					check1.draw(this.width-500, 60);
+					check2.draw(this.width-500, 82);
+					
 					drawMatrix();
 					this.textSize(13);
 					
 					popupOrder.draw(this.width-304);
 					popupComplex.draw(this.width-202);
 				
-					check1.draw(this.width-500, 60);
-					check2.draw(this.width-500, 82);
 					if (check2.s)
 					check3.draw(this.width-500, 100);
 				}
@@ -368,7 +369,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				return;
 			else{
 				size = (this.height-marginY)/ggg.size();
-				size = size*0.75f;
+				size = size*0.92f;
 				if (size>100)
 					size=100;
 			}
@@ -425,7 +426,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			}
 			this.fill(0);
 			this.text("Pathway summary", x2, y2+20);
-			this.text("Total genes: "+ggg.size(), x2, y2+40);
+			this.text("Total proteins: "+ggg.size(), x2, y2+40);
 			int totalRelations = 0;
 			for (int i=0;i<pairs.length;i++){
 				totalRelations+=pairs[i].size();
@@ -800,7 +801,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			this.fill(50);
 			
 			if (ww>3){
-				this.textSize(12);
+				this.textSize(14);
 				if (isSmallMolecule(ggg.get(i).name)){
 					this.fill(150,150,0);
 				}	
@@ -809,7 +810,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				float al = -PApplet.PI/2;
 				this.translate(xx+ww/2+5,marginY-8);
 				this.rotate(al);
-				this.text(ggg.get(i).name, 0,0);
+				//this.text(ggg.get(i).name, 0,0);
+				//this.text(ggg.get(i).name.replace("phospho-", ""), 0,0);
 				this.rotate(-al);
 				this.translate(-(xx+ww/2+5), -(marginY-8));
 			}
@@ -821,9 +823,11 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				this.fill(150,150,0);
 			}	
 			if (hh>3){
-				this.textSize(12);
+				this.textSize(14);
 				this.textAlign(PApplet.RIGHT);
-				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
+				//this.text(ggg.get(i).name.replace("phospho-", ""), marginX-6, yy+hh/2+5);
+				//this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
+				
 			}
 			
 		}
@@ -840,7 +844,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					float ww =ggg.get(j).iW.value;
 					if (gene_gene_InComplex[i][j]>0){
 						float sat2 = (255-50)*gene_gene_InComplex[i][j]/(float) maxGeneInComplex;
-						float sat = 50+sat2;
+						float sat = 80+sat2;
 						this.fill(0,sat);
 						this.noStroke();
 						this.rect(xx, yy, ww, hh);
@@ -1134,14 +1138,15 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					 }
 					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-					 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
 					 
 					 // Gloabal data 
 					 String displayName = currentProtein.getDisplayName();
-					 if (getProteinOrderByName(displayName)<0)
+					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
+					//if (getProteinOrderByName(displayName)<0 && !displayName.equals("ERK1")&& !displayName.equals("ERK2")&& !displayName.equals("ERT2")&& !displayName.equals("MSK1")&& !displayName.equals("p-S63-ATF1") && !displayName.equals("MEK1 phosphorylated")){
 						 ggg.add(new Gene(displayName,ggg.size()));
-					 
-					 i2++;
+						 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
+					}	 
+					i2++;
 				 }
 					
 				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
@@ -1321,9 +1326,10 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			PopupReaction.check3.s=true;
 			PopupReaction.check5.s=true;
 			
-			buttonCausality.s=true;
+			buttonCausality.s=false;
 			buttonLoop.s=false;
 			buttonDelete.s = false;
+			PopupReaction.sPopup =false;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
