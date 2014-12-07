@@ -114,6 +114,7 @@ public class PopupComplex{
 		if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
+			itemH2 +=1;
 			if (itemH2>maxH)
 				itemH2 =maxH;
 			for (int i=0;i<itemHash.size();i++){
@@ -127,8 +128,11 @@ public class PopupComplex{
 			}
 		
 		
-			parent.fill(200);
-			parent.stroke(0,150);
+			//parent.fill(200);
+			parent.fill(255);
+			//parent.stroke(0,150);
+			parent.noStroke();
+			
 			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
 			
 			int i=0;
@@ -138,20 +142,20 @@ public class PopupComplex{
 				parent.noStroke();
 				parent.fill(0);
 				parent.rect(x+10,30,200,19);
-				parent.fill(180);
+				parent.fill(150);
 			}
 			else if (b==-1){
-				parent.fill(255);
+				parent.fill(0);
 			}
 			else{
-				parent.fill(0);
+				parent.fill(50);
 			}
 			parent.textSize(13);
 			parent.textAlign(PApplet.LEFT);
 			parent.text("All complexes",x+50,45);
 			
 			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-				float textSixe = PApplet.map(iH[i].value, 0, 20, 2, 13);
+				float textSixe = PApplet.map(iH[i].value, 0, 20, 5, 13);
 				parent.textSize(textSixe);
 				
 				if (i==s){
@@ -167,7 +171,7 @@ public class PopupComplex{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey().getDisplayName(),x+50,iY[i].value-iH[i].value/4);
+				parent.text(entry.getKey().getDisplayName(),x+45,iY[i].value-iH[i].value/4);
 				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				
 				parent.noStroke();

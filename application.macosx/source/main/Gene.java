@@ -58,6 +58,7 @@ public class Gene {
 			 for (int p=0; p<pairs[m].size();p++){
 				 String g = pairs[m].get(p).split("\t")[0];
 				 int[] list =  hGenes.get(g);
+				 if (list==null) continue;
 				 list[j]++;
 				 // compute max number of relationships
 				 if (list[j]>maxRelationOfGenes)

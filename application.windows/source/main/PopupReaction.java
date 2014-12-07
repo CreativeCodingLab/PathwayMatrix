@@ -177,13 +177,15 @@ public class PopupReaction{
 		ArrayList<String> a = new ArrayList<String>();
 		int r=0;
 		for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-			String rectName = entry.getKey().getDisplayName();
-			String[] pieces = rectName.split(" ");
 			rectWordList[r] = new ArrayList<String>();
-			for (int k=0;k<pieces.length;k++){
-				String str = pieces[k].trim();
-				a.add(str);
-				rectWordList[r].add(str);
+			String rectName = entry.getKey().getDisplayName();
+			if (rectName!=null){
+				String[] pieces = rectName.split(" ");
+				for (int k=0;k<pieces.length;k++){
+					String str = pieces[k].trim();
+					a.add(str);
+					rectWordList[r].add(str);
+				}
 			}
 			r++;
 		}
@@ -409,7 +411,7 @@ public class PopupReaction{
 			float sum = 0;
 			for (int i=0;i<a.size();i++){
 				int index1 = a.get(i);
-				sum += scoresComplex[index1][j]*(a.size()-i)*2;
+				sum += scoresComplex[index1][j]*(a.size()-i)*10;
 				sum += scoresReaction[index1][j]*(a.size()-i);
 			}
 			if (sum>maxScore){

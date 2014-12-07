@@ -207,7 +207,7 @@ public class Venn_Overview{
 	public void draw(float xPanelRight, float yy4, int numSongs) {
 		parent.noStroke();
 		parent.textAlign(PApplet.CENTER);
-		parent.textSize(11);
+		parent.textSize(13);
 		
 		brushing=-1;
 		size = 400;
@@ -226,7 +226,21 @@ public class Venn_Overview{
             if (minerGlobalIDof[i]==main.MainMatrixVersion_1_6.currentRelation){
             	currentSize = radius;
             }
+            
+            if (labels[i].contains("controls-production-of")){
+            	x=x-50;
+            }
+            else if (labels[i].contains("consumption-con")){
+            	x=x-60;
+            	y=y+60;
+            }
+            else if (labels[i].contains("used-to-produce")){
+            	x=x-20;
+            	y=y-50;
             	
+            }
+           
+            
            if (radius>0){
         	   	parent.fill(color.getRed(), color.getGreen(), color.getBlue(),180);
         	   	if (PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius/2 && brushing<0){

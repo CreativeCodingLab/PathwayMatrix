@@ -124,8 +124,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	//public static ArrayList<Integrator> iW;
 	// Contains the location and size of each gene to display
 	public float size=0;
-	public static float marginX = 0;
-	public static float marginY = 40;
+	public static float marginX = 100;
+	public static float marginY = 100;
 	public static String message="";
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
