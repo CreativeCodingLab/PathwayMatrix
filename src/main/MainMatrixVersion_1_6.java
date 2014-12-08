@@ -174,7 +174,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	// New to read data 
 	public static  Map<String,String> mapElementRef;
-	public static  Map<String,String> mapElementGenericRef;
 	public static  Map<String,String> mapElementRDFId;
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
@@ -538,7 +537,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			float ww = ggg.get(index).iW.value;
 			String name = ggg.get(index).name;
 			this.fill(50);
-			float fontSize = PApplet.map(numE, 1, maxElement, 10, 18);
+			float fontSize = PApplet.map(numE, 1, maxElement, 9, 15);
 			this.textSize(fontSize);
 			if (locals[index].size()>1){
 				name = locals[index].size()+" proteins";
@@ -811,8 +810,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				float al = -PApplet.PI/2;
 				this.translate(xx+ww/2+5,marginY-8);
 				this.rotate(al);
-				//this.text(ggg.get(i).name, 0,0);
-				//this.text(ggg.get(i).name.replace("phospho-", ""), 0,0);
+				this.text(ggg.get(i).name, 0,0);
+				this.text(ggg.get(i).name.replace("phospho-", ""), 0,0);
 				this.rotate(-al);
 				this.translate(-(xx+ww/2+5), -(marginY-8));
 			}
@@ -826,8 +825,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			if (hh>3){
 				this.textSize(14);
 				this.textAlign(PApplet.RIGHT);
-				//this.text(ggg.get(i).name.replace("phospho-", ""), marginX-6, yy+hh/2+5);
-				//this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
+				this.text(ggg.get(i).name.replace("phospho-", ""), marginX-6, yy+hh/2+5);
+				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
 				
 			}
 			
@@ -1123,7 +1122,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
 				mapElementRef = new HashMap<String,String>();
-				mapElementGenericRef = new HashMap<String,String>();
 				mapElementRDFId = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
@@ -1133,19 +1131,14 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				 int i2=0;
 				 for (Protein currentProtein : proteinSet){
 					 if (currentProtein.getEntityReference()==null) continue;
-					 Object[] s =   currentProtein.getGenericEntityReferences().toArray();
-					 for (int i=0;i<s.length;i++){
-						 mapElementGenericRef.put(s[i].toString(), currentProtein.getDisplayName());
-					 }
-					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 					 
 					 // Gloabal data 
 					 String displayName = currentProtein.getDisplayName();
 					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
-					//if (getProteinOrderByName(displayName)<0 && !displayName.equals("ERK1")&& !displayName.equals("ERK2")&& !displayName.equals("ERT2")&& !displayName.equals("MSK1")&& !displayName.equals("p-S63-ATF1") && !displayName.equals("MEK1 phosphorylated")){
 						 ggg.add(new Gene(displayName,ggg.size()));
-						 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
+					//	 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
 					}	 
 					i2++;
 				 }
@@ -1154,12 +1147,8 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				 i2=0;
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
 					 if (currentMolecule.getEntityReference()==null) continue;
-					 Object[] s =   currentMolecule.getGenericEntityReferences().toArray();
-					 for (int i=0;i<s.length;i++){
-						 mapElementGenericRef.put(s[i].toString(), currentMolecule.getDisplayName());
-					 }
-					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
 					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
 					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
 					 
@@ -1368,13 +1357,9 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	}
 	
 	public static String getProteinName(String ref){	
-		String s1 = mapElementGenericRef.get(ref);
+		String s1 = mapElementRDFId.get(ref);
 		if (s1==null)
-			s1 = mapElementRef.get(ref);
-		if (s1==null)
-			s1 = mapElementRDFId.get(ref);
-		//if (s1==null)
-		//	s1 = ref;
+			 s1= mapElementRef.get(ref);
 		return s1;
 	}
 	
