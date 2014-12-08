@@ -114,7 +114,6 @@ public class PopupComplex{
 		if (bPopup == true || b>=-1){
 			// Compute positions
 			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
-			itemH2 +=1;
 			if (itemH2>maxH)
 				itemH2 =maxH;
 			for (int i=0;i<itemHash.size();i++){

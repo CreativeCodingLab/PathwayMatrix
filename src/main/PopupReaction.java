@@ -121,6 +121,11 @@ public class PopupReaction{
 	int deleteProtein =-1;
 	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
 	
+	public static Button buttonCausality;
+	public static Button buttonLoop;
+	public static Button buttonDelete;
+	
+	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
 		check2 = new CheckBox(parent, "Rearrange reactions");
@@ -133,6 +138,11 @@ public class PopupReaction{
 		check15 = new CheckBox(parent, "Fade links of Protein reaction");
 		textbox1 = new TextBox(parent, "Search");
 		wordCloud = new WordCloud(parent, 10,290,250,parent.height-250);
+		
+		buttonCausality = new Button(parent,"Causality");
+		buttonLoop = new Button(parent,"Loop");
+		buttonDelete = new Button(parent,"Delete Protein");
+	
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -697,6 +707,11 @@ public class PopupReaction{
 		// Draw seach box
 		textbox1.draw(xRect);
 		
+		buttonCausality.draw(parent.width-200);
+		buttonLoop.draw(parent.width-300);
+		buttonDelete.draw(parent.width-400);
+	
+		
 		if (proteins==null) return;
 			for (int i=0;i<rectHash.size();i++){
 				iY[i].update();
@@ -788,7 +803,7 @@ public class PopupReaction{
 			
 			
 			// Draw Protein names ***************************************************
-			if (main.MainMatrixVersion_1_6.buttonCausality.s && simulationRectList.size()>0){
+			if (buttonCausality.s && simulationRectList.size()>0){
 				for (int p=0; p<proteins.length;p++){
 					drawProteinLeft(p,20);
 					drawProteinRight(p,20);
@@ -989,10 +1004,10 @@ public class PopupReaction{
 				iS4[r].update();
 			}
 			
-			if (main.MainMatrixVersion_1_6.buttonDelete.s ){
+			if (buttonDelete.s ){
 					
 			}
-			else if (main.MainMatrixVersion_1_6.buttonLoop.s ){
+			else if (buttonLoop.s ){
 				
 			}
 			else if (simulationRectList.size()>0 ){
@@ -1039,7 +1054,7 @@ public class PopupReaction{
 				}
 			}
 			else{
-				if (!main.MainMatrixVersion_1_6.buttonCausality.s && simulationRectList.size()==0){
+				if (!buttonCausality.s && simulationRectList.size()==0){
 					for (int r=0;r<rectList.size();r++) {
 						BiochemicalReaction rect = rectList.get(r);
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 200);
@@ -1135,7 +1150,7 @@ public class PopupReaction{
 			// Draw reaction causation ******************************************************************************
 			loopReactionList =new ArrayList<Integer>();
 			
-			if (main.MainMatrixVersion_1_6.buttonDelete.s){
+			if (buttonDelete.s){
 				iDelete.target(1);
 				iDelete.update();
 			
@@ -1156,7 +1171,7 @@ public class PopupReaction{
 					drawDownStreamReaction(rect, level,processedList, iS4[rect].value);
 				}
 			}
-			else if (main.MainMatrixVersion_1_6.buttonLoop.s){
+			else if (buttonLoop.s){
 				if (bRect>=0){
 					ArrayList<Integer> loopList =  new ArrayList<Integer>();
 					drawLoopFrom(bRect, loopList);
@@ -1176,7 +1191,7 @@ public class PopupReaction{
 				}
 				
 			}	
-			else if (main.MainMatrixVersion_1_6.buttonCausality.s){
+			else if (buttonCausality.s){
 				if (bRect>=0){
 					ArrayList<Integer> processedList = new ArrayList<Integer>();
 					processedList.add(bRect);
@@ -1202,7 +1217,7 @@ public class PopupReaction{
 			
 			
 			// Draw reaction Nodes *************************************************************
-			if (main.MainMatrixVersion_1_6.buttonDelete.s ){
+			if (buttonDelete.s ){
 				int i=0;
 				for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
 					if (deleteReactionList.indexOf(i)>=0)
@@ -1212,7 +1227,7 @@ public class PopupReaction{
 					i++;
 				}
 			}
-			else if(main.MainMatrixVersion_1_6.buttonLoop.s){
+			else if(buttonLoop.s){
 				int i=0;
 				for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
 					if (loopReactionList.indexOf(i)>=0)
@@ -1254,7 +1269,7 @@ public class PopupReaction{
 			check2.draw((int) x7, (int) y7+19);
 			
 			
-			if (main.MainMatrixVersion_1_6.buttonDelete.s){
+			if (buttonDelete.s){
 				float x2 = parent.width*3/4f;
 				float y2 = 180;
 				parent.fill(0,20);
@@ -1275,11 +1290,11 @@ public class PopupReaction{
 				}
 
 			}
-			else if (main.MainMatrixVersion_1_6.buttonLoop.s){
+			else if (buttonLoop.s){
 				
 			}
 					
-			else if (main.MainMatrixVersion_1_6.buttonCausality.s){
+			else if (buttonCausality.s){
 				float x2 = parent.width*3/4f;
 				float y3 = 150;
 				float y2 = 450;
@@ -2199,13 +2214,57 @@ public class PopupReaction{
 		  }
 		  parent.endShape(PApplet.CLOSE);
 	}
+	
+	public void mouseClicked1() {
+		 sPopup = !sPopup;
+			
+	}
 		
-	public void mouseClicked() {
-		if (bPopup)
-			 sPopup = !sPopup;
+	public void mouseClicked2() {
+		if (buttonCausality.b){
+			buttonCausality.mouseClicked();
+		}
+		else if (buttonLoop.b){
+			buttonLoop.mouseClicked();
+		}
+		else  if (buttonDelete.b){
+			buttonDelete.mouseClicked();
+		}
+		else if (PopupReaction.check11.b){
+			PopupReaction.check11.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check12.b){
+			PopupReaction.check12.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check13.b){
+			PopupReaction.check13.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check14.b){
+			PopupReaction.check14.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check15.b){
+			PopupReaction.check15.mouseClicked();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check2.b){
+			PopupReaction.check2.mouseClicked();
+			if (PopupReaction.check2.s){
+				PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
+				PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
+			//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
+			}	
+			popupReaction.updateReactionPositions();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check3.b){
+			PopupReaction.check3.mouseClicked();
+				
+			popupReaction.updateProteinPositions();
+		}
+		else if (PopupReaction.sPopup && PopupReaction.check5.b){
+			PopupReaction.check5.mouseClicked();
+		}
 		else{
 			deleteReactionList = new ArrayList<Integer>();
-			if (main.MainMatrixVersion_1_6.buttonDelete.s){
+			if (buttonDelete.s){
 				iDelete.value=0;
 				iDelete.target=0;
 				deleteProtein = bProteinL;

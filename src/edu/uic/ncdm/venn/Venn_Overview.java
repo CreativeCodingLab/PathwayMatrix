@@ -207,7 +207,7 @@ public class Venn_Overview{
 	public void draw(float xPanelRight, float yy4, int numSongs) {
 		parent.noStroke();
 		parent.textAlign(PApplet.CENTER);
-		parent.textSize(13);
+		parent.textSize(12);
 		
 		brushing=-1;
 		size = 400;

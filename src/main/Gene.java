@@ -79,7 +79,39 @@ public class Gene {
 					}
 				}
 			}
-		 }	
+		}	
+		
+		ArrayList<Integer> removeList = new ArrayList<Integer>();
+	    for (int i=0;i<ggg.size();i++){
+	    	int count = 0;
+			for (int j=0;j<ggg.size();j++){
+				if (geneRelationList[i][j]!=null || geneRelationList[j][i]!=null){
+					count++;
+				}
+			}
+			if (count==0)
+				removeList.add(i);
+		}
+		System.out.println(" non-intereact proteins="+removeList);
+		for (int i=removeList.size()-1;i>=0;i--){
+			int index = removeList.get(i);
+			System.out.println("	"+i+":"+ggg.get(index).name);
+			ggg.remove(index);
+		}
+		    
+		geneRelationList = new ArrayList[ggg.size()][ggg.size()];
+		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
+			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
+		    for (int i=0;i<ggg.size();i++){
+				for (int j=0;j<ggg.size();j++){
+					if (pairs[globalMinerId].contains(ggg.get(i).name+"\t"+ggg.get(j).name)){
+						if (geneRelationList[i][j]==null)
+							geneRelationList[i][j] = new ArrayList<Integer>();
+						geneRelationList[i][j].add(localMinerID);
+					}
+				}
+			}
+		}	
 	 }	 
 	
 	public static void computeGeneGeneInComplex(){
@@ -374,6 +406,8 @@ public class Gene {
 	}
 	*/
 	
+	/*
+	
 	// Order by Complex
 	public static void orderByComplex(){	
 		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
@@ -401,17 +435,7 @@ public class Gene {
 			orderReading1 = index1;
 		}
 	}
-	public static int getNumberRelationOfProtein(int p){
-		int count=0;
-		for (int i=0;i<ggg.size();i++){
-			if (geneRelationList[p][i]!=null)
-				count+=geneRelationList[p][i].size();
-			if (geneRelationList[i][p]!=null)
-				count+=geneRelationList[i][p].size();
-		}
-		return count;
-	}
-		
+	
 	
 	public static int getSimilarGeneComplex(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
@@ -429,8 +453,19 @@ public class Gene {
 		return minIndex;
 	}
 	
+		*/
+	
 		
-		
+	public static int getNumberRelationOfProtein(int p){
+		int count=0;
+		for (int i=0;i<ggg.size();i++){
+			if (geneRelationList[p][i]!=null)
+				count+=geneRelationList[p][i].size();
+			if (geneRelationList[i][p]!=null)
+				count+=geneRelationList[i][p].size();
+		}
+		return count;
+	}
 	
 	public static int getSimilarGene(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;

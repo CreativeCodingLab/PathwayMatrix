@@ -85,7 +85,6 @@ import org.biopax.paxtools.pattern.util.HGNC;
 
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 import edu.uic.ncdm.venn.Venn_Overview;
-import edu.uic.ncdm.venn.Venn_Detail;
 
 import processing.core.*;
 
@@ -103,9 +102,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	
 	public static ButtonBrowse button;
-	public static Button buttonCausality;
-	public static Button buttonLoop;
-	public static Button buttonDelete;
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
@@ -141,7 +137,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	// Venn
 	public Venn_Overview vennOverview; 
-	public Venn_Detail vennDetail; 
 	
 	public int bX,bY;
 	
@@ -261,9 +256,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		
 		
 		button = new ButtonBrowse(this);
-		buttonCausality = new Button(this,"Causality");
-		buttonLoop = new Button(this,"Loop");
-		buttonDelete = new Button(this,"Delete Protein");
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
 		popupReaction = new PopupReaction(this);
@@ -274,7 +266,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
-		vennDetail = new Venn_Detail(this);
 		if (!currentFile.equals("")){
 			thread1=new Thread(loader1);
 			thread1.start();
@@ -313,9 +304,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			
 			if (PopupReaction.sPopup){
 				popupReaction.drawReactions(140);
-				buttonCausality.draw(this.width-200);
-				buttonLoop.draw(this.width-300);
-				buttonDelete.draw(this.width-400);
 			}	
 			else{
 				if (currentFile.equals("")){
@@ -367,7 +355,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				return;
 			else{
 				size = (this.height-marginY)/ggg.size();
-				size = size*0.92f;
+				size = size*0.7f;
 				if (size>100)
 					size=100;
 			}
@@ -439,7 +427,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	public void drawGroups() {
 		if (leaderSortedMap==null) return;
 		size = (this.height-marginY)/leaderSortedMap.size();
-		size = size*0.75f;
+		size = size*0.7f;
 		if (size>100)
 			size=100;
 		
@@ -799,7 +787,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			this.fill(50);
 			
 			if (ww>3){
-				this.textSize(14);
+				this.textSize(12);
 				if (isSmallMolecule(ggg.get(i).name)){
 					this.fill(150,150,0);
 				}	
@@ -820,7 +808,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				this.fill(150,150,0);
 			}	
 			if (hh>3){
-				this.textSize(14);
+				this.textSize(12);
 				this.textAlign(PApplet.RIGHT);
 				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
 			}
@@ -939,54 +927,11 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			thread4.start();
 		}
 		else if (PopupReaction.bPopup){
-			popupReaction.mouseClicked();
+			popupReaction.mouseClicked1();
 		}
 		else if (PopupReaction.sPopup){
-			if (!PopupReaction.bPopup)
-				popupReaction.mouseClicked();
-			if (buttonCausality.b){
-				buttonCausality.mouseClicked();
-			}
-			if (buttonLoop.b){
-				buttonLoop.mouseClicked();
-			}
-			if (buttonDelete.b){
-				buttonDelete.mouseClicked();
-			}
-			else if (PopupReaction.check11.b){
-				PopupReaction.check11.mouseClicked();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check12.b){
-				PopupReaction.check12.mouseClicked();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check13.b){
-				PopupReaction.check13.mouseClicked();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check14.b){
-				PopupReaction.check14.mouseClicked();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check15.b){
-				PopupReaction.check15.mouseClicked();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check2.b){
-				PopupReaction.check2.mouseClicked();
-				if (PopupReaction.check2.s){
-					PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
-					PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
-				//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
-				}	
-				popupReaction.updateReactionPositions();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check3.b){
-				PopupReaction.check3.mouseClicked();
-					
-				popupReaction.updateProteinPositions();
-			}
-			else if (PopupReaction.sPopup && PopupReaction.check5.b){
-				PopupReaction.check5.mouseClicked();
-			}
+			popupReaction.mouseClicked2();
 		}
-		
 		else {
 			if (check1.b){
 				check1.mouseClicked();
@@ -1018,8 +963,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			}
 			else if (vennOverview!=null){
 				vennOverview.mouseClicked();
-				if (vennOverview.brushing>=0)
-					vennDetail.compute(currentRelation);
 				//update();
 			}
 		}
@@ -1170,7 +1113,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				 
 				 complexSet = model.getObjects(Complex.class);
 				 complexList = new ArrayList<Complex>();
-				 /*i2=0;
+				 i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
@@ -1181,7 +1124,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 						 }
 					 i2++;
 				 }
-				 i2=0;*/
+				 i2=0;
 				 
 				 proteinsInComplex = new ArrayList[complexSet.size()];
 				 computeProteinsInComplex();
@@ -1283,8 +1226,12 @@ public class MainMatrixVersion_1_6 extends PApplet {
 						if (s2==null) 
 							s2 = match.getFirst().toString();
 						
-						if (s1!=null && s2!=null)
-							storeData(s1+"\t"+s2, s1, s2);
+						if (s1!=null && s2!=null){
+							// Store results for visualization
+							if (!pairs[processingMiner].contains(s1+"\t"+s2)){
+								pairs[processingMiner].add(s1+"\t"+s2);
+							}	
+						}	
 						else{
 							System.out.println();
 							System.out.println("	NULLLLLLLLL");
@@ -1302,10 +1249,10 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			PopupReaction.check3.s=true;
 			PopupReaction.check5.s=true;
 			
-			buttonCausality.s=false;
-			buttonLoop.s=false;
-			buttonDelete.s = false;
-			PopupReaction.sPopup =false;
+			PopupReaction.sPopup =true;
+			PopupReaction.buttonCausality.s=false;
+			PopupReaction.buttonLoop.s=false;
+			PopupReaction.buttonDelete.s = false;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
@@ -1327,12 +1274,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		}
 	}
 	
-	public static void storeData(String rel, String gene1, String gene2){
-		// Store results for visualization
-		if (!pairs[processingMiner].contains(rel)){
-			pairs[processingMiner].add(rel);
-		}	
-	}
 	
 	public int getProteinOrderByName(String name) {
 		for (int i=0;i<ggg.size();i++){
@@ -1460,7 +1401,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				currentFile = fileName;
 				//VEN DIAGRAM
 				vennOverview = new Venn_Overview(parent);
-				vennDetail = new Venn_Detail(parent);
 				thread1=new Thread(loader1);
 				thread1.start();
 			}
