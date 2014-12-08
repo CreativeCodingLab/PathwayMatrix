@@ -34,7 +34,6 @@ public class Gene {
 	public String name = "????";
 	public Integrator iX, iY, iH,iW;
 	public int order;
-//	public int orderReading;
 	
 	public Gene(String name_, int order_){
 		name = name_;
@@ -43,8 +42,6 @@ public class Gene {
 		iW = new Integrator(0,.5f,.1f);
 		iH = new Integrator(0,.5f,.1f);
 		order = order_;
-	//	orderReading = order;
-	//	orderParent = order;
 	}
 	
 	public static void compute(){
@@ -484,41 +481,7 @@ public class Gene {
 		// main.MainViewer.popupOrder.slider.val=2    We consider only the different;
 	}
 	
-	/*
-	public static float computeDisOfArrayListComplex(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
-		int inComplexMinerID = -1;
-		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
-			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
-			if (main.MainMatrix.minerList.get(globalMinerId).toString().contains("in-complex-with")){
-				inComplexMinerID = localMinerID;
-			}
-		}	
-		if (a1==null && a2==null) return 0;
-		else if (a1==null) {
-			if (a2.contains(inComplexMinerID))
-				return 1;
-			else 
-				return 0;
-			
-		}
-		else if (a2==null){
-			if (a1.contains(inComplexMinerID))
-				return 1;
-			else 
-				return 0;
-		}
-		else{
-			if (a1.contains(inComplexMinerID) && a2.contains(inComplexMinerID)){
-				System.out.println("aaaaaaaaaaa");
-				return -val;
-			}	
-			else if (!a1.contains(inComplexMinerID) && !a2.contains(inComplexMinerID))
-				return 0;
-			else
-				return 1;
-		}
-	}
-	*/
+	
 	
 // ************************ grouping
 	// Group by similarity

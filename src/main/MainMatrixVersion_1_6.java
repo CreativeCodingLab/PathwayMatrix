@@ -39,7 +39,6 @@ import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
 import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.model.level2.biochemicalReaction;
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.EntityReference;
@@ -110,7 +109,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
-//	public static ArrayList<String>[] genes;
 	public static ArrayList<Integer>[][] geneRelationList;
 	public static int[][] gene_gene_InComplex; 
 	public static int maxGeneInComplex; 
@@ -811,7 +809,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				this.translate(xx+ww/2+5,marginY-8);
 				this.rotate(al);
 				this.text(ggg.get(i).name, 0,0);
-				this.text(ggg.get(i).name.replace("phospho-", ""), 0,0);
 				this.rotate(-al);
 				this.translate(-(xx+ww/2+5), -(marginY-8));
 			}
@@ -825,9 +822,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			if (hh>3){
 				this.textSize(14);
 				this.textAlign(PApplet.RIGHT);
-				this.text(ggg.get(i).name.replace("phospho-", ""), marginX-6, yy+hh/2+5);
 				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
-				
 			}
 			
 		}
@@ -891,7 +886,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 		for (int i=0;i<a.size();i++){
 			int indexI = getProteinOrderByName(a.get(i));
 			if (indexI<0) { // Exception *******************************
-				System.out.println("drawComplex()	CAN NOT FIND protein = "+a.get(i));
+				System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(i));
 				continue;
 			}	
 			float yy =  ggg.get(indexI).iY.value;
@@ -899,7 +894,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			for (int j=0;j<a.size();j++){
 				int indexJ = getProteinOrderByName(a.get(j));
 				if (indexJ<0) { // Exception *******************************
-					System.out.println("drawComplex()	CAN NOT FIND protein = "+a.get(j));
+					System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(j));
 					continue;
 				}
 				
@@ -956,7 +951,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				buttonLoop.mouseClicked();
 			}
 			if (buttonDelete.b){
-				System.out.println(buttonDelete.s);
 				buttonDelete.mouseClicked();
 			}
 			else if (PopupReaction.check11.b){
@@ -1119,6 +1113,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 			SimpleIOHandler io = new SimpleIOHandler();
 			Model model;
 			try{
+				System.out.println();
 				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
 				mapElementRef = new HashMap<String,String>();
@@ -1153,9 +1148,10 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
 					 
 					 // Gloabal data 
-					ggg.add(new Gene(currentMolecule.getDisplayName(),ggg.size()));
-					
-					 
+					 String displayName = currentMolecule.getDisplayName();
+					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
+							ggg.add(new Gene(currentMolecule.getDisplayName(),ggg.size()));
+					 }		
 					 i2++;
 				 }
 				 
@@ -1174,7 +1170,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 				 
 				 complexSet = model.getObjects(Complex.class);
 				 complexList = new ArrayList<Complex>();
-				 i2=0;
+				 /*i2=0;
 				 for (Complex current : complexSet){
 					 System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
@@ -1185,13 +1181,13 @@ public class MainMatrixVersion_1_6 extends PApplet {
 						 }
 					 i2++;
 				 }
-				 i2=0;
+				 i2=0;*/
 				 
 				 proteinsInComplex = new ArrayList[complexSet.size()];
 				 computeProteinsInComplex();
 				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				 i2=0;
+				 /*i2=0;
 				 for (BiochemicalReaction current : reactionSet){
 					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
 					  Object[] s = current.getLeft().toArray();
@@ -1234,7 +1230,7 @@ public class MainMatrixVersion_1_6 extends PApplet {
 					// System.out.println("  		getLeft() = "+current.getLeft());
 					// System.out.println("  		getRight() ="+ current.getRight());
 					 i2++;
-				 }
+				 }*/
 				 
 				 
 				
@@ -1282,32 +1278,22 @@ public class MainMatrixVersion_1_6 extends PApplet {
 						String s1 = getProteinName(match.getFirst().toString());
 						String s2 = getProteinName(match.getLast().toString());
 						
+						if (s1==null) 
+							s1 = match.getFirst().toString();
+						if (s2==null) 
+							s2 = match.getFirst().toString();
+						
 						if (s1!=null && s2!=null)
 							storeData(s1+"\t"+s2, s1, s2);
 						else{
 							System.out.println();
 							System.out.println("	NULLLLLLLLL");
 							System.out.println(match);
-							System.out.println();
-							System.out.println(match);
 							System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+s1);
 							System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+s2);
 						}
 					}	
 				}
-				 
-				/*
-				try{
-					FileOutputStream os = new FileOutputStream(outFile);
-					min.writeResult(matches, os);
-					
-					os.close();
- 				}
-				catch (IOException e){
-					e.printStackTrace();
-					return;
-				}*/
-				
 			}
 			System.out.println();
 		
@@ -1444,29 +1430,6 @@ public class MainMatrixVersion_1_6 extends PApplet {
 	
 	
 		
-	
-	
-	//Update genes for drawing
-	public void write(){	
-		String outFile =  currentFile.replace(".owl", ".txt");
-		int total =0;
-		for (int m=0;m<Venn_Overview.minerGlobalIDof.length;m++){
-			int globalMinerId = Venn_Overview.minerGlobalIDof[m];
-			total += pairs[globalMinerId].size();
-		}	
-	
-		String[] outStrings = new String[total];
-		int count=0;
-		for (int m=0;m<Venn_Overview.minerGlobalIDof.length;m++){
-			int globalMinerId = Venn_Overview.minerGlobalIDof[m];
-			for (int p=0;p<pairs[globalMinerId].size();p++){
-				outStrings[count] = pairs[globalMinerId].get(p)+"\t"+minerList.get(globalMinerId).getName();
-				count++;
-			}
-		}	
-		this.saveStrings(outFile, outStrings);
-	}
-	
 	
 	// Thread for ordering
 	class ThreadLoader2 implements Runnable {

@@ -308,7 +308,7 @@ public class PopupReaction{
 					unidentifiedList.add(ufo);
 			}
 		}
-		System.out.println(unidentifiedList);
+	//	System.out.println(unidentifiedList);
 	}
 	
 	public ArrayList<String> getUnidentifiedElements2(Object[] s) {
@@ -330,7 +330,7 @@ public class PopupReaction{
 				 a.add(s[i3].toString());
 			 } 
 		}
-		System.out.println(a);
+	//	System.out.println(a);
 		return a;
 	}
 	
