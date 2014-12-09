@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-public class PopupOrder{
+public class PopupCausality{
 	public int b = -1;
 	public static int s=-1;
 	public PApplet parent;
@@ -16,10 +16,10 @@ public class PopupOrder{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"Random","Reading order", "Name", "Similarity"}; 
+	public static String[] items={"All Causality","Knockout a protein", "Shortest path", "Feedback loop"}; 
 	public Slider slider;
 
-	public PopupOrder(PApplet parent_){
+	public PopupCausality(PApplet parent_){
 		parent = parent_;
 		slider =  new Slider(parent_,5);
 	}
@@ -36,6 +36,7 @@ public class PopupOrder{
 			parent.fill(200);
 			parent.stroke(0,150);
 			parent.rect(x, y+25, w,h);
+			
 			// Max number of relations
 			float max =-1;
 			for (int j=0;j<main.MainMatrixVersion_1_6.pairs.length;j++){
@@ -59,56 +60,42 @@ public class PopupOrder{
 				parent.textAlign(PApplet.LEFT);
 				parent.text(items[i],x+30,y+itemH*(i+1)+25);  // 
 			}	
-			
-			if (items[s].equals("Similarity")) 
-				slider.draw(x+110, y+itemH*4-14+25);
-			
 		}
-		parent.fill(150);
-		parent.noStroke();
-		parent.rect(x,y,w1,25);
+		System.out.println(s);
+		if (s>=0 && s<items.length){
+			for (int i=0;i<w1;i++){
+				parent.stroke(255,255-i*2.55f,i*2.55f);
+				parent.line(x+i, y, x+i, y+24);
+			}
+		}
+		else{
+			parent.fill(150);
+			parent.noStroke();
+			parent.rect(x,y,w1,25);
+		}
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
 		parent.textSize(13);
-		parent.text("Order by",x+w1/2,y+18);
+		parent.text("Causality",x+w1/2,y+18);
 		
 	}
 	
 	 public void mouseClicked() {
-		if (b<items.length){
+		if(s!=b){
 			s = b;
-			if (items[s].equals("Random")) { 
-				main.MainMatrixVersion_1_6.stateAnimation=0;
-				main.MainMatrixVersion_1_6.check2.s =false;
-				Gene.orderByRandom(parent);
-			}	
-			else if (items[s].equals("Reading order"))  {
-				main.MainMatrixVersion_1_6.stateAnimation=0;
-				main.MainMatrixVersion_1_6.check2.s =false;
-				Gene.orderByReadingOrder();
-			}	
-			else if (items[s].equals("Name"))  {
-				main.MainMatrixVersion_1_6.stateAnimation=0;
-				main.MainMatrixVersion_1_6.check2.s =false;
-				Gene.orderByName();
-			}	
-			else if (items[s].equals("Similarity"))  {
-				main.MainMatrixVersion_1_6.stateAnimation=0;
-				main.MainMatrixVersion_1_6.check2.s =false;
-				Gene.orderBySimilarity();
-			}	
-			
 		}
+		else{
+			s = -100;
+		}
+		
 	}
 	 
 	public void checkBrushing() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
-		if (b==-1){
-			if (x<mX && mX<x+w1 && y<=mY && mY<=itemH+5){
-				b =100;
-				return;
-			}	
+		if (x<mX && mX<x+w1 && y<=mY && mY<=itemH+5){
+			b =100;
+			return;
 		}
 		else{
 			for (int i=0; i<items.length; i++){
@@ -117,8 +104,9 @@ public class PopupOrder{
 					return;
 				}	
 			}
-			if (x<=mX && mX<=x+w && y<=mY && mY<=y+h)
+			if (x<=mX && mX<=x+w && y<=mY && mY<=y+h){
 				return;
+			}	
 		}
 		b =-1;
 	}

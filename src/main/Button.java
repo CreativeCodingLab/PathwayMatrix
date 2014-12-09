@@ -30,11 +30,7 @@ public class Button{
 		parent.rect(x, y, w, h);
 		
 		if (s){
-			if (text.contains("Causality"))
-				for (int i=0;i<w;i++){
-					parent.stroke(255,255-i*2.55f,i*2.55f);
-					parent.line(x+i, y, x+i, y+h-1);
-				}
+				
 			if (text.contains("Loop")){
 				float y1 = y+3;
 				float y2 = y+h-3;
