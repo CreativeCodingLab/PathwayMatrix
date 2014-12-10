@@ -468,7 +468,7 @@ public abstract class MinerAdapter implements Miner
 	 */
 	public void writeResultAsSIF(Map<BioPAXElement, List<Match>> matches, OutputStream out,
 		boolean directed, String label1, String label2) throws IOException{
-		System.out.println("processingMiner="+main.MainMatrixVersion_1_6.processingMiner+"	"+this.getName()+"	directed="+directed);
+		System.out.println("processingMiner="+main.MainPathwayViewer_1_7.processingMiner+"	"+this.getName()+"	directed="+directed);
 		
 		if (matches.isEmpty()) {
 			return;
@@ -621,7 +621,7 @@ public abstract class MinerAdapter implements Miner
 	public void writeResultDetailed(Map<BioPAXElement, List<Match>> matches, OutputStream out,
 		int columns) throws IOException
 	{
-		System.out.println("writeResultDetailed="+main.MainMatrixVersion_1_6.processingMiner+
+		System.out.println("writeResultDetailed="+main.MainPathwayViewer_1_7.processingMiner+
 				"	"+this.getName()+"	directed=");
 		
 		OutputStreamWriter writer = new OutputStreamWriter(out);

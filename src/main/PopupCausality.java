@@ -16,7 +16,7 @@ public class PopupCausality{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"All Causality","Knockout a protein", "Shortest path", "Feedback loop"}; 
+	public static String[] items={"All Causalities","Knockout a protein", "Shortest path", "Feedback loop"}; 
 	public Slider slider;
 
 	public PopupCausality(PApplet parent_){
@@ -26,7 +26,7 @@ public class PopupCausality{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainMatrixVersion_1_6.popupRelation.b<0)
+		if (main.MainPathwayViewer_1_7.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -39,8 +39,8 @@ public class PopupCausality{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrixVersion_1_6.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1_6.pairs[j].size());
+			for (int j=0;j<main.MainPathwayViewer_1_7.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainPathwayViewer_1_7.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -61,7 +61,7 @@ public class PopupCausality{
 				parent.text(items[i],x+30,y+itemH*(i+1)+25);  // 
 			}	
 		}
-		System.out.println(s);
+		
 		if (s>=0 && s<items.length){
 			for (int i=0;i<w1;i++){
 				parent.stroke(255,255-i*2.55f,i*2.55f);

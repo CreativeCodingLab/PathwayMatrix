@@ -16,13 +16,13 @@ import processing.core.PApplet;
 
 import edu.uic.ncdm.venn.Venn_Overview;
 
-import static main.MainMatrixVersion_1_6.pairs;
-import static main.MainMatrixVersion_1_6.ggg;
-import static main.MainMatrixVersion_1_6.geneRelationList;
-import static main.MainMatrixVersion_1_6.gene_gene_InComplex;
-import static main.MainMatrixVersion_1_6.maxGeneInComplex;
-import static main.MainMatrixVersion_1_6.leaderSortedMap;
-import static main.MainMatrixVersion_1_6.locals;
+import static main.MainPathwayViewer_1_7.pairs;
+import static main.MainPathwayViewer_1_7.ggg;
+import static main.MainPathwayViewer_1_7.geneRelationList;
+import static main.MainPathwayViewer_1_7.gene_gene_InComplex;
+import static main.MainPathwayViewer_1_7.maxGeneInComplex;
+import static main.MainPathwayViewer_1_7.leaderSortedMap;
+import static main.MainPathwayViewer_1_7.locals;
 import static edu.uic.ncdm.venn.Venn_Overview.numMinerContainData;
 import static edu.uic.ncdm.venn.Venn_Overview.minerGlobalIDof;;
 
@@ -34,23 +34,20 @@ public class Gene {
 	public String name = "????";
 	public Integrator iX, iY, iH,iW;
 	public int order;
-//	public int orderReading;
 	
 	public Gene(String name_, int order_){
 		name = name_;
-		iX = new Integrator(main.MainMatrixVersion_1_6.marginX,.5f,.1f);
-		iY = new Integrator(main.MainMatrixVersion_1_6.marginY,.5f,.1f);
+		iX = new Integrator(main.MainPathwayViewer_1_7.marginX,.5f,.1f);
+		iY = new Integrator(main.MainPathwayViewer_1_7.marginY,.5f,.1f);
 		iW = new Integrator(0,.5f,.1f);
 		iH = new Integrator(0,.5f,.1f);
 		order = order_;
-	//	orderReading = order;
-	//	orderParent = order;
 	}
 	
 	public static void compute(){
 		 hGenes = new Hashtable<String,int[]>();
-		 for (int i=0; i<main.MainMatrixVersion_1_6.ggg.size();i++){
-			 hGenes.put(main.MainMatrixVersion_1_6.ggg.get(i).name, new int[numMinerContainData]);
+		 for (int i=0; i<main.MainPathwayViewer_1_7.ggg.size();i++){
+			 hGenes.put(main.MainPathwayViewer_1_7.ggg.get(i).name, new int[numMinerContainData]);
 		 }
 		 maxRelationOfGenes = -1;
 		 for (int j=0; j<numMinerContainData;j++){
@@ -82,14 +79,46 @@ public class Gene {
 					}
 				}
 			}
-		 }	
+		}	
+		
+		ArrayList<Integer> removeList = new ArrayList<Integer>();
+	    for (int i=0;i<ggg.size();i++){
+	    	int count = 0;
+			for (int j=0;j<ggg.size();j++){
+				if (geneRelationList[i][j]!=null || geneRelationList[j][i]!=null){
+					count++;
+				}
+			}
+			if (count==0)
+				removeList.add(i);
+		}
+		System.out.println(" non-intereact proteins="+removeList);
+		for (int i=removeList.size()-1;i>=0;i--){
+			int index = removeList.get(i);
+			System.out.println("	"+i+":"+ggg.get(index).name);
+			ggg.remove(index);
+		}
+		    
+		geneRelationList = new ArrayList[ggg.size()][ggg.size()];
+		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
+			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
+		    for (int i=0;i<ggg.size();i++){
+				for (int j=0;j<ggg.size();j++){
+					if (pairs[globalMinerId].contains(ggg.get(i).name+"\t"+ggg.get(j).name)){
+						if (geneRelationList[i][j]==null)
+							geneRelationList[i][j] = new ArrayList<Integer>();
+						geneRelationList[i][j].add(localMinerID);
+					}
+				}
+			}
+		}	
 	 }	 
 	
 	public static void computeGeneGeneInComplex(){
 		maxGeneInComplex = 0;
 		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
-		for (int c=0;c<main.MainMatrixVersion_1_6.complexSet.size();c++){
-			ArrayList<String> a = main.MainMatrixVersion_1_6.proteinsInComplex[c];
+		for (int c=0;c<main.MainPathwayViewer_1_7.complexSet.size();c++){
+			ArrayList<String> a = main.MainPathwayViewer_1_7.proteinsInComplex[c];
 			for (int i=0;i<ggg.size();i++){
 				for (int j=0;j<ggg.size();j++){
 					if (a.indexOf(ggg.get(i).name)>=0 && a.indexOf(ggg.get(j).name)>=0){
@@ -237,7 +266,7 @@ public class Gene {
 		
 		// Find the smallest molecule
 		for (int p=0;p<ggg.size();p++){
-			if (main.MainMatrixVersion_1_6.isSmallMolecule(ggg.get(p).name)){
+			if (main.MainPathwayViewer_1_7.isSmallMolecule(ggg.get(p).name)){
 				int count = getNumberRelationOfProtein(p);
 				if (count>maxRelation){
 					maxRelation = count;
@@ -250,7 +279,7 @@ public class Gene {
 		double minRelation = Double.POSITIVE_INFINITY;
 		if (maxminIndex<0){
 			for (int p=0;p<ggg.size();p++){
-				if (main.MainMatrixVersion_1_6.isSmallMolecule(ggg.get(p).name)){
+				if (main.MainPathwayViewer_1_7.isSmallMolecule(ggg.get(p).name)){
 					continue;
 				}
 				int count = getNumberRelationOfProtein(p);
@@ -271,7 +300,7 @@ public class Gene {
 		
 		// Eliminate proteins
 		for (int i=0;i<ggg.size();i++){
-			if (!main.MainMatrixVersion_1_6.isSmallMolecule(ggg.get(i).name)){
+			if (!main.MainPathwayViewer_1_7.isSmallMolecule(ggg.get(i).name)){
 				processedProteins.add(i);
 			}
 		}	
@@ -289,7 +318,7 @@ public class Gene {
 		
 		// Eliminate small molecules
 		for (int i=0;i<ggg.size();i++){
-			if (main.MainMatrixVersion_1_6.isSmallMolecule(ggg.get(i).name)){
+			if (main.MainPathwayViewer_1_7.isSmallMolecule(ggg.get(i).name)){
 				processedGenes.add(i);
 			}
 		}
@@ -377,6 +406,8 @@ public class Gene {
 	}
 	*/
 	
+	/*
+	
 	// Order by Complex
 	public static void orderByComplex(){	
 		Map<String, Integer> unsortMap = new HashMap<String, Integer>();
@@ -404,17 +435,7 @@ public class Gene {
 			orderReading1 = index1;
 		}
 	}
-	public static int getNumberRelationOfProtein(int p){
-		int count=0;
-		for (int i=0;i<ggg.size();i++){
-			if (geneRelationList[p][i]!=null)
-				count+=geneRelationList[p][i].size();
-			if (geneRelationList[i][p]!=null)
-				count+=geneRelationList[i][p].size();
-		}
-		return count;
-	}
-		
+	
 	
 	public static int getSimilarGeneComplex(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
@@ -432,8 +453,19 @@ public class Gene {
 		return minIndex;
 	}
 	
+		*/
+	
 		
-		
+	public static int getNumberRelationOfProtein(int p){
+		int count=0;
+		for (int i=0;i<ggg.size();i++){
+			if (geneRelationList[p][i]!=null)
+				count+=geneRelationList[p][i].size();
+			if (geneRelationList[i][p]!=null)
+				count+=geneRelationList[i][p].size();
+		}
+		return count;
+	}
 	
 	public static int getSimilarGene(int orderReading1, ArrayList<Integer> a){
 		float minDis = Float.POSITIVE_INFINITY;
@@ -442,7 +474,7 @@ public class Gene {
 			int orderReading2 = i;
 			if (orderReading1==orderReading2) continue;
 			if (a.contains(orderReading2)) continue;
-			float dis = computeDis(orderReading1,orderReading2, main.MainMatrixVersion_1_6.popupOrder.slider.val);
+			float dis = computeDis(orderReading1,orderReading2, main.MainPathwayViewer_1_7.popupOrder.slider.val);
 			if (dis<minDis){
 				minDis = dis;
 				minIndex = i;
@@ -484,41 +516,7 @@ public class Gene {
 		// main.MainViewer.popupOrder.slider.val=2    We consider only the different;
 	}
 	
-	/*
-	public static float computeDisOfArrayListComplex(ArrayList<Integer> a1, ArrayList<Integer> a2, float val){
-		int inComplexMinerID = -1;
-		for (int localMinerID=0;localMinerID<Venn_Overview.minerGlobalIDof.length;localMinerID++){
-			int globalMinerId = Venn_Overview.minerGlobalIDof[localMinerID];
-			if (main.MainMatrix.minerList.get(globalMinerId).toString().contains("in-complex-with")){
-				inComplexMinerID = localMinerID;
-			}
-		}	
-		if (a1==null && a2==null) return 0;
-		else if (a1==null) {
-			if (a2.contains(inComplexMinerID))
-				return 1;
-			else 
-				return 0;
-			
-		}
-		else if (a2==null){
-			if (a1.contains(inComplexMinerID))
-				return 1;
-			else 
-				return 0;
-		}
-		else{
-			if (a1.contains(inComplexMinerID) && a2.contains(inComplexMinerID)){
-				System.out.println("aaaaaaaaaaa");
-				return -val;
-			}	
-			else if (!a1.contains(inComplexMinerID) && !a2.contains(inComplexMinerID))
-				return 0;
-			else
-				return 1;
-		}
-	}
-	*/
+	
 	
 // ************************ grouping
 	// Group by similarity

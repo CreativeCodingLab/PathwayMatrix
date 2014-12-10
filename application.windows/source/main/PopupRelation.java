@@ -21,11 +21,11 @@ public class PopupRelation{
 	
 	public PopupRelation(PApplet parent_){
 		parent = parent_;
-		items = new String [MainMatrixVersion_1_6.minerList.size()];
-		for (int i = 0; i < MainMatrixVersion_1_6.minerList.size(); i++) {
-			items[i] = MainMatrixVersion_1_6.minerList.get(i).toString();
+		items = new String [MainPathwayViewer_1_7.minerList.size()];
+		for (int i = 0; i < MainPathwayViewer_1_7.minerList.size(); i++) {
+			items[i] = MainPathwayViewer_1_7.minerList.get(i).toString();
 		}	
-		s = new boolean[MainMatrixVersion_1_6.minerList.size()];
+		s = new boolean[MainPathwayViewer_1_7.minerList.size()];
 	}
 	
 	public void draw(float x_){
@@ -39,8 +39,8 @@ public class PopupRelation{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainMatrixVersion_1_6.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainMatrixVersion_1_6.pairs[j].size());
+			for (int j=0;j<main.MainPathwayViewer_1_7.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.MainPathwayViewer_1_7.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -49,20 +49,20 @@ public class PopupRelation{
 					parent.noStroke();
 					parent.fill(0);
 					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-					parent.fill(main.MainMatrixVersion_1_6.colorRelations[i]);
+					parent.fill(main.MainPathwayViewer_1_7.colorRelations[i]);
 				}
 				else if (i==b){
-					parent.fill(main.MainMatrixVersion_1_6.colorRelations[i]);
+					parent.fill(main.MainPathwayViewer_1_7.colorRelations[i]);
 				}
 				else{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
 				parent.text(items[i],x+50,y+itemH*(i+1));
-				float r = PApplet.map(PApplet.sqrt(main.MainMatrixVersion_1_6.pairs[i].size()), 0, max, 0, 25);
+				float r = PApplet.map(PApplet.sqrt(main.MainPathwayViewer_1_7.pairs[i].size()), 0, max, 0, 25);
 				
 				parent.noStroke();
-				parent.fill(main.MainMatrixVersion_1_6.colorRelations[i]);
+				parent.fill(main.MainPathwayViewer_1_7.colorRelations[i]);
 				parent.ellipse(x+30,y+itemH*(i)+15, r, r);
 			
 				// Order By drawing

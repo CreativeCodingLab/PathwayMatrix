@@ -1,4 +1,0 @@
-#!/bin/sh
-
-APPDIR=$(dirname "$0")
-java -Xmx10g -Djava.library.path="$APPDIR" -cp "lib/MainMatrixVersion_1_6.jar"main.MainMatrixVersion_1_6

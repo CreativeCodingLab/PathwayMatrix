@@ -41,8 +41,8 @@ public class PopupComplex{
 		maxSize =0;
 		Map<Complex, Integer> unsortMap  =  new HashMap<Complex, Integer>();
 		s=-400;
-		for (Complex current : main.MainMatrixVersion_1_6.complexSet){
-			int size = main.MainMatrixVersion_1_6.proteinsInComplex[i].size();
+		for (Complex current : main.MainPathwayViewer_1_7.complexSet){
+			int size = main.MainPathwayViewer_1_7.proteinsInComplex[i].size();
 			unsortMap.put(current, size);
 			if (size>maxSize)
 				maxSize = size;
@@ -127,9 +127,9 @@ public class PopupComplex{
 			}
 		
 		
-			//parent.fill(200);
-			parent.fill(255);
-			//parent.stroke(0,150);
+			parent.fill(200);
+			//parent.fill(255);
+			parent.stroke(0,150);
 			parent.noStroke();
 			
 			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
@@ -213,7 +213,7 @@ public class PopupComplex{
 		 for (Map.Entry<Complex, Integer> entryParent : itemHash.entrySet()) {
 			 if (indexHashParent<indexHash){
 				 int indexSetParent = getIndexInSet(indexHashParent);
-				 ArrayList<String> components = main.MainMatrixVersion_1_6.getComplexById(indexSetParent);
+				 ArrayList<String> components = main.MainPathwayViewer_1_7.getComplexById(indexSetParent);
 				 //System.out.println("    components="+components+"	"+entry.getKey().getRDFId());
 				 if (components.contains(entry.getKey().getRDFId()))
 					 results.add(indexSetParent);
@@ -235,7 +235,7 @@ public class PopupComplex{
 			float yy = (yy1+yy2)/2;
 			parent.noFill();
 			
-			float num = main.MainMatrixVersion_1_6.proteinsInComplex[indexSet].size();
+			float num = main.MainPathwayViewer_1_7.proteinsInComplex[indexSet].size();
 			float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 			int g2 = g+40*level;
 			if (g2>255)
@@ -261,10 +261,10 @@ public class PopupComplex{
 	 
 	// DOWN STREAM
 	public void drawRelationshipDownStream(int indexSet, int indexHash, int r, int g, int b, int alpha, boolean recursive, int level) {
-		 ArrayList<String> components = main.MainMatrixVersion_1_6.getComplexById(indexSet);
+		 ArrayList<String> components = main.MainPathwayViewer_1_7.getComplexById(indexSet);
 		 for (int i=0;i<components.size();i++){
-			 if (main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(components.get(i))!=null){
-				 int indexSet2 = main.MainMatrixVersion_1_6.mapComplexRDFId_index.get(components.get(i));
+			 if (main.MainPathwayViewer_1_7.mapComplexRDFId_index.get(components.get(i))!=null){
+				 int indexSet2 = main.MainPathwayViewer_1_7.mapComplexRDFId_index.get(components.get(i));
 				 int indexHash2 = getIndexInHash(indexSet2);
 				float yy1 =  iY[indexHash].value-iH[indexHash].value/2;
 				float yy2 =  iY[indexHash2].value-iH[indexHash2].value/2;
@@ -272,7 +272,7 @@ public class PopupComplex{
 				float yy = (yy1+yy2)/2;
 				parent.noFill();
 				
-				float num = main.MainMatrixVersion_1_6.proteinsInComplex[indexSet2].size();
+				float num = main.MainPathwayViewer_1_7.proteinsInComplex[indexSet2].size();
 				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 				int g2 = g+0*level;
 				if (g2>255)
@@ -308,7 +308,7 @@ public class PopupComplex{
 	
 	 public int getIndexSetByName(String name) {
 	 	 int i=0;
-		 for (Complex current : main.MainMatrixVersion_1_6.complexSet){
+		 for (Complex current : main.MainPathwayViewer_1_7.complexSet){
 			 if (current.getDisplayName().equals(name)){
 				 return i;
 			 }
@@ -340,7 +340,7 @@ public class PopupComplex{
 		}	
 		
 		i=0;
-		for (Complex current : main.MainMatrixVersion_1_6.complexSet){
+		for (Complex current : main.MainPathwayViewer_1_7.complexSet){
 			if (current.getDisplayName().equals(name))
 				return i;
 			i++;
@@ -351,7 +351,7 @@ public class PopupComplex{
 	public int getIndexInHash(int indexSet) {
 		int i=0;
 		String name = "";
-		for (Complex current : main.MainMatrixVersion_1_6.complexSet){
+		for (Complex current : main.MainPathwayViewer_1_7.complexSet){
 			if (indexSet==i)
 				name = current.getDisplayName();
 			i++;
