@@ -698,6 +698,7 @@ public class PopupReaction{
 		
 		// Draw seach box
 		textbox1.draw(xRect);
+		parent.smooth();
 		
 		
 		if (proteins==null) return;
