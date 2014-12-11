@@ -26,7 +26,7 @@ public class PopupCausality{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.MainPathwayViewer_1_7.popupRelation.b<0)
+		if (main.PathwayViewer_1_7.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -39,8 +39,8 @@ public class PopupCausality{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.MainPathwayViewer_1_7.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.MainPathwayViewer_1_7.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_1_7.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_1_7.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
