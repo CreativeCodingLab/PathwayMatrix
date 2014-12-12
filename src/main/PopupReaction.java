@@ -833,7 +833,7 @@ public class PopupReaction{
 					parent.line(xL-leng,y3-4,xL+5,y3-4);
 				}
 			}
-			else if (bRect>=0 || bProteinL>=0 || bProteinR>=0 || !textbox1.searchText.equals("")){
+			else if (bRect>=0 || bProteinL>=0 || bComplexL>=0 || bProteinR>=0 || bComplexR>=0 || !textbox1.searchText.equals("")){
 				for (int p=0; p<proteins.length;p++){
 					// Get protein in the brushing reactions
 					if (p==bProteinL || bProteinLeft.indexOf(p)>=0)
@@ -933,7 +933,7 @@ public class PopupReaction{
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 25);
 				}
 			}
-			else if (bProteinL>=0){
+			else if (bProteinL>=0 || bComplexL>=0){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					if (bRectListL.indexOf(r)>=0)
@@ -942,7 +942,7 @@ public class PopupReaction{
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 25);
 				}
 			}
-			else if (bProteinR>=0){
+			else if (bProteinR>=0|| bComplexR>=0 ){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					if (bRectListR.indexOf(r)>=0){
@@ -1205,7 +1205,12 @@ public class PopupReaction{
 						  String[] pieces = ref.split("/");
 						  if (pieces.length>=1)
 								name = pieces[pieces.length-1];
-						}	  
+						  else{
+								pieces = ref.split("/");
+								if (pieces.length>1)
+									name = pieces[pieces.length-1];
+						  }
+					  }	  
 					  if (mapProteinRDFId_index.get(name)!=null){
 						  name = proteins[mapProteinRDFId_index.get(name)];
 							
@@ -1796,9 +1801,14 @@ public class PopupReaction{
 		}
 		else if (unidentifiedList.contains(proteins[p])){
 			c = unidentifiedElementColor;
-			String[] pieces = name.split("/");
+			String[] pieces = name.split("#");
 			if (pieces.length>1)
 				name = pieces[pieces.length-1];
+			else{
+				pieces = name.split("/");
+				if (pieces.length>1)
+					name = pieces[pieces.length-1];
+			}
 		}
 		
 		if (sat>=255 && textSixe<10)
@@ -1822,9 +1832,14 @@ public class PopupReaction{
 		}
 		else if (unidentifiedList.contains(proteins[p])){
 			c = unidentifiedElementColor;
-			String[] pieces = name.split("/");
+			String[] pieces = name.split("#");
 			if (pieces.length>1)
 				name = pieces[pieces.length-1];
+			else{
+				pieces = name.split("/");
+				if (pieces.length>1)
+					name = pieces[pieces.length-1];
+			}
 		}
 		
 		if (sat>=255 && textSixe<10)
@@ -1850,13 +1865,13 @@ public class PopupReaction{
 				parent.ellipse(xRect,iY[i].value, r, r);
 			}
 		}	
-		else if (bProteinL>=0){
+		else if (bProteinL>=0 || bComplexL>=0 ){
 			if (bRectListL.indexOf(i)>=0){
 				parent.fill(100,0,0);
 				parent.ellipse(xRect,iY[i].value, r, r);
 			}
 		}
-		else if (bProteinR>=0){
+		else if (bProteinR>=0 || bComplexR>=0 ){
 			if (bRectListR.indexOf(i)>=0){
 				parent.fill(100,0,0);
 				parent.ellipse(xRect,iY[i].value, r, r);
