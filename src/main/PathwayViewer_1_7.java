@@ -922,7 +922,9 @@ public class PathwayViewer_1_7 extends PApplet {
 	}
 		
 	public void mouseMoved() {
-		
+		if (isAllowedDrawing && PopupReaction.sPopup){
+			popupReaction.mouseMoved();
+		}
 	}
 		
 	public void mouseClicked() {
