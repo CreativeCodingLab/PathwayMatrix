@@ -921,7 +921,10 @@ public class PathwayViewer_1_7 extends PApplet {
 		}
 	}
 		
-	
+	public void mouseMoved() {
+		
+	}
+		
 	public void mouseClicked() {
 		if (button.b>=0){
 			thread4=new Thread(loader4);
@@ -1257,7 +1260,6 @@ public class PathwayViewer_1_7 extends PApplet {
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
-			
 			stateAnimation=0;
 			isAllowedDrawing =  true;  //******************* Start drawing **************
 			
@@ -1268,7 +1270,6 @@ public class PathwayViewer_1_7 extends PApplet {
 			Gene.computeGeneGeneInComplex();
 			Gene.orderByRandom(p);
 			//write();
-			
 			
 			vennOverview.compute();
 			check2.s  = false;
