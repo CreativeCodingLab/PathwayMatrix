@@ -413,7 +413,7 @@ public class PopupReaction{
 			float sum = 0;
 			for (int i=0;i<a.size();i++){
 				int index1 = a.get(i);
-				sum += scoresComplex[index1][j]*(a.size()-i)*10;
+				sum += scoresComplex[index1][j]*(a.size()-i);
 				sum += scoresReaction[index1][j]*(a.size()-i);
 			}
 			if (sum>maxScore){
@@ -718,78 +718,6 @@ public class PopupReaction{
 			  		
 			
 			
-			
-			// Obtain the proteins on the left and right *****************************************************************************************************
-			bProteinLeft =  new ArrayList<Integer>();
-			bProteinRight =  new ArrayList<Integer>();
-			
-			if (bRect>=0){
-				BiochemicalReaction rect = rectList.get(bRect);
-				Object[] aLeft = rect.getLeft().toArray();
-				Object[] aRight = rect.getRight().toArray();
-				bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
-				bProteinRight = getProteinsInOneSideOfReaction(aRight);
-			}	
-			else if (!textbox1.searchText.equals("")){
-				for (int r=0;r<sRectListByText.size();r++) {
-					BiochemicalReaction rect = rectList.get(sRectListByText.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
-			else if (bRectListL.size()>0){
-				for (int r=0;r<bRectListL.size();r++) {
-					BiochemicalReaction rect = rectList.get(bRectListL.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
-			else if (bRectListR.size()>0){
-				for (int r=0;r<bRectListR.size();r++) {
-					BiochemicalReaction rect = rectList.get(bRectListR.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
 			
 			
 			// Draw Protein names ***************************************************************************************
@@ -2375,6 +2303,79 @@ public class PopupReaction{
 			
 			if (bProteinRold!=bProteinR){
 				resetIntegrators();
+			}
+		}
+		
+		
+		// Obtain the proteins on the left and right *****************************************************************************************************
+		bProteinLeft =  new ArrayList<Integer>();
+		bProteinRight =  new ArrayList<Integer>();
+		
+		if (bRect>=0){
+			BiochemicalReaction rect = rectList.get(bRect);
+			Object[] aLeft = rect.getLeft().toArray();
+			Object[] aRight = rect.getRight().toArray();
+			bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
+			bProteinRight = getProteinsInOneSideOfReaction(aRight);
+		}	
+		else if (!textbox1.searchText.equals("")){
+			for (int r=0;r<sRectListByText.size();r++) {
+				BiochemicalReaction rect = rectList.get(sRectListByText.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
+			}
+		}
+		else if (bRectListL.size()>0){
+			for (int r=0;r<bRectListL.size();r++) {
+				BiochemicalReaction rect = rectList.get(bRectListL.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
+			}
+		}
+		else if (bRectListR.size()>0){
+			for (int r=0;r<bRectListR.size();r++) {
+				BiochemicalReaction rect = rectList.get(bRectListR.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
 			}
 		}
 	}

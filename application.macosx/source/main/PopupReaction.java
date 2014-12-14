@@ -413,7 +413,7 @@ public class PopupReaction{
 			float sum = 0;
 			for (int i=0;i<a.size();i++){
 				int index1 = a.get(i);
-				sum += scoresComplex[index1][j]*(a.size()-i)*10;
+				sum += scoresComplex[index1][j]*(a.size()-i);
 				sum += scoresReaction[index1][j]*(a.size()-i);
 			}
 			if (sum>maxScore){
@@ -719,78 +719,6 @@ public class PopupReaction{
 			
 			
 			
-			// Draw proteins *****************************************************************************************************
-			bProteinLeft =  new ArrayList<Integer>();
-			bProteinRight =  new ArrayList<Integer>();
-			
-			if (bRect>=0){
-				BiochemicalReaction rect = rectList.get(bRect);
-				Object[] aLeft = rect.getLeft().toArray();
-				Object[] aRight = rect.getRight().toArray();
-				bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
-				bProteinRight = getProteinsInOneSideOfReaction(aRight);
-			}	
-			else if (!textbox1.searchText.equals("")){
-				for (int r=0;r<sRectListByText.size();r++) {
-					BiochemicalReaction rect = rectList.get(sRectListByText.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
-			else if (bRectListL.size()>0){
-				for (int r=0;r<bRectListL.size();r++) {
-					BiochemicalReaction rect = rectList.get(bRectListL.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
-			else if (bRectListR.size()>0){
-				for (int r=0;r<bRectListR.size();r++) {
-					BiochemicalReaction rect = rectList.get(bRectListR.get(r));
-					Object[] aLeft = rect.getLeft().toArray();
-					Object[] aRight = rect.getRight().toArray();
-					
-					ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
-					for (int i=0;i<a1.size();i++){
-						int ind = a1.get(i);
-						if (bProteinLeft.indexOf(ind)<0)
-							bProteinLeft.add(ind);
-					}
-					ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
-					for (int i=0;i<a2.size();i++){
-						int ind = a2.get(i);
-						if (bProteinRight.indexOf(ind)<0)
-							bProteinRight.add(ind);
-					}
-				}
-			}
-			
 			
 			// Draw Protein names ***************************************************************************************
 			if (simulationRectList.size()>0){
@@ -833,15 +761,15 @@ public class PopupReaction{
 					parent.line(xL-leng,y3-4,xL+5,y3-4);
 				}
 			}
-			else if (bRect>=0 || !textbox1.searchText.equals("") || bRectListL.size()>0 || bRectListR.size()>0){
+			else if (bRect>=0 || bProteinL>=0 || bComplexL>=0 || bProteinR>=0 || bComplexR>=0 || !textbox1.searchText.equals("")){
 				for (int p=0; p<proteins.length;p++){
 					// Get protein in the brushing reactions
-					if (bProteinLeft.indexOf(p)>=0)
+					if (p==bProteinL || bProteinLeft.indexOf(p)>=0)
 						drawProteinLeft(p,255);
 					else
 						drawProteinLeft(p,25);
 					
-					if (bProteinRight.indexOf(p)>=0)
+					if (p==bProteinR || bProteinRight.indexOf(p)>=0)
 						drawProteinRight(p,255);
 					else
 						drawProteinRight(p,25);
@@ -855,87 +783,6 @@ public class PopupReaction{
 			}
 			
 			
-			// Compute brushing complexes ************************************************************************
-			bRectListL = new ArrayList<Integer>();
-			bRectListR = new ArrayList<Integer>();
-			int bComplexLold = bComplexL;
-			bComplexL=-1;
-			for (int c=0;c<yComplexesL.length;c++){
-				if (PApplet.dist(xL2,yComplexesL[c].value, parent.mouseX, parent.mouseY)<=rComplexesL[c]){
-					bComplexL = c;
-					for (int r=0;r<rectList.size();r++) {
-						BiochemicalReaction rect = rectList.get(r);
-						Object[] sLeft = rect.getLeft().toArray();
-						for (int i3=0;i3<sLeft.length;i3++){
-							  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
-								  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString());
-								  if (id==c && !bRectListL.contains(r))
-									  bRectListL.add(r);
-							  }	
-						}	  
-					 }
-					break; // Only allow to brushing 1 complex
-				 }
-			}
-			if (bComplexLold!=bComplexL){
-				resetIntegrators();
-			}
-			int bComplexRold = bComplexR;
-			bComplexR=-1;
-			for (int c=0;c<yComplexesR.length;c++){
-				if (PApplet.dist(xR2,yComplexesR[c].value, parent.mouseX, parent.mouseY)<=rComplexesR[c]){
-					bComplexR = c;
-					for (int r=0;r<rectList.size();r++) {
-						BiochemicalReaction rect = rectList.get(r);
-						Object[] sRight = rect.getRight().toArray();
-						for (int i3=0;i3<sRight.length;i3++){
-							  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
-								  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(sRight[i3].toString());
-								  if (id==c && !bRectListR.contains(r))
-									  bRectListR.add(r);
-							  }	
-						}	  
-					 }
-					break; // Only allow to brushing 1 complex
-				 }
-			}
-			if (bComplexRold!=bComplexR){
-				resetIntegrators();
-			}
-			
-			// Brushing proteins *******************************************************************
-			if (bRectListL.size()==0){
-				int bProteinLold = bProteinL;
-				bProteinL =-1;
-				for (int p=0; p<proteins.length;p++){
-					if (xL-80<=parent.mouseX && parent.mouseX<= xL &&
-							iP[p].value-hProtein*2/3<=parent.mouseY && parent.mouseY<=iP[p].value+hProtein*1/3){
-						bProteinL =p;
-						break;
-					}	
-				}
-				bRectListL = getDirectReactionsOfProteinLeft(bProteinL);
-				
-				if (bProteinLold!=bProteinL){
-					resetIntegrators();
-				}
-			}
-		    if (bRectListR.size()==0){
-		    	int bProteinRold = bProteinR;
-				bProteinR =-1;
-				for (int p=0; p<proteins.length;p++){
-					if (xR<=parent.mouseX && parent.mouseX<= xR+80 &&
-							iP[p].value-hProtein<=parent.mouseY && parent.mouseY<=iP[p].value){
-						bProteinR =p;
-						break;
-					}	
-				}
-				bRectListR = getDirectReactionsOfProteinRight(bProteinR);
-				
-				if (bProteinRold!=bProteinR){
-					resetIntegrators();
-				}
-			}
 			
 			
 			// Reaction Links ******************************************************************************************************************************
@@ -1014,7 +861,7 @@ public class PopupReaction{
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 25);
 				}
 			}
-			else if (bRectListL.size()>0){
+			else if (bProteinL>=0 || bComplexL>=0){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					if (bRectListL.indexOf(r)>=0)
@@ -1023,7 +870,7 @@ public class PopupReaction{
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 25);
 				}
 			}
-			else if (bRectListR.size()>0){
+			else if (bProteinR>=0|| bComplexR>=0 ){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
 					if (bRectListR.indexOf(r)>=0){
@@ -1046,7 +893,6 @@ public class PopupReaction{
 			
 			// Draw reaction causation ******************************************************************************
 			loopReactionList =new ArrayList<Integer>();
-			
 			
 			if (simulationRectList.size()>0){  // Simulation always happens anytime.
 				ArrayList<Integer> processedList = new ArrayList<Integer>();
@@ -1287,7 +1133,12 @@ public class PopupReaction{
 						  String[] pieces = ref.split("/");
 						  if (pieces.length>=1)
 								name = pieces[pieces.length-1];
-						}	  
+						  else{
+								pieces = ref.split("/");
+								if (pieces.length>1)
+									name = pieces[pieces.length-1];
+						  }
+					  }	  
 					  if (mapProteinRDFId_index.get(name)!=null){
 						  name = proteins[mapProteinRDFId_index.get(name)];
 							
@@ -1619,8 +1470,8 @@ public class PopupReaction{
 		for (int r=0;r<rectList.size();r++) {
 			iS1[r].set(0);
 			iS1[r].target(0);
-			iS2[r].set(0);
-			iS2[r].target(0);
+			iS2[r].set(50);
+			iS2[r].target(50);
 			iS3[r].set(0);
 			iS3[r].target(0);
 			iS4[r].set(0);
@@ -1878,9 +1729,14 @@ public class PopupReaction{
 		}
 		else if (unidentifiedList.contains(proteins[p])){
 			c = unidentifiedElementColor;
-			String[] pieces = name.split("/");
+			String[] pieces = name.split("#");
 			if (pieces.length>1)
 				name = pieces[pieces.length-1];
+			else{
+				pieces = name.split("/");
+				if (pieces.length>1)
+					name = pieces[pieces.length-1];
+			}
 		}
 		
 		if (sat>=255 && textSixe<10)
@@ -1904,9 +1760,14 @@ public class PopupReaction{
 		}
 		else if (unidentifiedList.contains(proteins[p])){
 			c = unidentifiedElementColor;
-			String[] pieces = name.split("/");
+			String[] pieces = name.split("#");
 			if (pieces.length>1)
 				name = pieces[pieces.length-1];
+			else{
+				pieces = name.split("/");
+				if (pieces.length>1)
+					name = pieces[pieces.length-1];
+			}
 		}
 		
 		if (sat>=255 && textSixe<10)
@@ -1932,13 +1793,13 @@ public class PopupReaction{
 				parent.ellipse(xRect,iY[i].value, r, r);
 			}
 		}	
-		else if (bRectListL.size()>0){
+		else if (bProteinL>=0 || bComplexL>=0 ){
 			if (bRectListL.indexOf(i)>=0){
 				parent.fill(100,0,0);
 				parent.ellipse(xRect,iY[i].value, r, r);
 			}
 		}
-		else if (bRectListR.size()>0){
+		else if (bProteinR>=0 || bComplexR>=0 ){
 			if (bRectListR.indexOf(i)>=0){
 				parent.fill(100,0,0);
 				parent.ellipse(xRect,iY[i].value, r, r);
@@ -2017,7 +1878,7 @@ public class PopupReaction{
 							  iS2[i2].target(1000);
 						  }
 						  else{
-							  iS2[i2].set(0);
+							  iS2[i2].set(50);
 						  }
 						  float percent = iS2[i2].value/1000;
 						  float xDel = (xRect-xL)*percent;
@@ -2362,6 +2223,163 @@ public class PopupReaction{
 	}
 		
 	
+	public void mouseMoved() {
+		// Compute brushing complexes ************************************************************************
+		bRectListL = new ArrayList<Integer>();
+		bRectListR = new ArrayList<Integer>();
+		int bComplexLold = bComplexL;
+		bComplexL=-1;
+		for (int c=0;c<yComplexesL.length;c++){
+			if (PApplet.dist(xL2,yComplexesL[c].value, parent.mouseX, parent.mouseY)<=rComplexesL[c]){
+				bComplexL = c;
+				for (int r=0;r<rectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(r);
+					Object[] sLeft = rect.getLeft().toArray();
+					for (int i3=0;i3<sLeft.length;i3++){
+						  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+							  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString());
+							  if (id==c && !bRectListL.contains(r))
+								  bRectListL.add(r);
+						  }	
+					}	  
+				 }
+				break; // Only allow to brushing 1 complex
+			 }
+		}
+		if (bComplexLold!=bComplexL){
+			resetIntegrators();
+		}
+		int bComplexRold = bComplexR;
+		bComplexR=-1;
+		for (int c=0;c<yComplexesR.length;c++){
+			if (PApplet.dist(xR2,yComplexesR[c].value, parent.mouseX, parent.mouseY)<=rComplexesR[c]){
+				bComplexR = c;
+				for (int r=0;r<rectList.size();r++) {
+					BiochemicalReaction rect = rectList.get(r);
+					Object[] sRight = rect.getRight().toArray();
+					for (int i3=0;i3<sRight.length;i3++){
+						  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
+							  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(sRight[i3].toString());
+							  if (id==c && !bRectListR.contains(r))
+								  bRectListR.add(r);
+						  }	
+					}	  
+				 }
+				break; // Only allow to brushing 1 complex
+			 }
+		}
+		if (bComplexRold!=bComplexR){
+			resetIntegrators();
+		}
+		
+		// Brushing proteins *******************************************************************
+		bProteinL =-1;
+		if (bRectListL.size()==0){
+			int bProteinLold = bProteinL;
+			for (int p=0; p<proteins.length;p++){
+				if (xL-80<=parent.mouseX && parent.mouseX<= xL &&
+						iP[p].value-hProtein*2/3<=parent.mouseY && parent.mouseY<=iP[p].value+hProtein*1/3){
+					bProteinL =p;
+					break;
+				}	
+			}
+			bRectListL = getDirectReactionsOfProteinLeft(bProteinL);
+			
+			if (bProteinLold!=bProteinL){
+				resetIntegrators();
+			}
+		}
+		bProteinR =-1;
+		if (bRectListR.size()==0){
+	    	int bProteinRold = bProteinR;
+			for (int p=0; p<proteins.length;p++){
+				if (xR<=parent.mouseX && parent.mouseX<= xR+80 &&
+						iP[p].value-hProtein<=parent.mouseY && parent.mouseY<=iP[p].value){
+					bProteinR =p;
+					break;
+				}	
+			}
+			bRectListR = getDirectReactionsOfProteinRight(bProteinR);
+			
+			if (bProteinRold!=bProteinR){
+				resetIntegrators();
+			}
+		}
+		
+		
+		// Obtain the proteins on the left and right *****************************************************************************************************
+		bProteinLeft =  new ArrayList<Integer>();
+		bProteinRight =  new ArrayList<Integer>();
+		
+		if (bRect>=0){
+			BiochemicalReaction rect = rectList.get(bRect);
+			Object[] aLeft = rect.getLeft().toArray();
+			Object[] aRight = rect.getRight().toArray();
+			bProteinLeft = getProteinsInOneSideOfReaction(aLeft);
+			bProteinRight = getProteinsInOneSideOfReaction(aRight);
+		}	
+		else if (!textbox1.searchText.equals("")){
+			for (int r=0;r<sRectListByText.size();r++) {
+				BiochemicalReaction rect = rectList.get(sRectListByText.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
+			}
+		}
+		else if (bRectListL.size()>0){
+			for (int r=0;r<bRectListL.size();r++) {
+				BiochemicalReaction rect = rectList.get(bRectListL.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
+			}
+		}
+		else if (bRectListR.size()>0){
+			for (int r=0;r<bRectListR.size();r++) {
+				BiochemicalReaction rect = rectList.get(bRectListR.get(r));
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				ArrayList<Integer> a1 = getProteinsInOneSideOfReaction(aLeft);
+				for (int i=0;i<a1.size();i++){
+					int ind = a1.get(i);
+					if (bProteinLeft.indexOf(ind)<0)
+						bProteinLeft.add(ind);
+				}
+				ArrayList<Integer> a2 = getProteinsInOneSideOfReaction(aRight);
+				for (int i=0;i<a2.size();i++){
+					int ind = a2.get(i);
+					if (bProteinRight.indexOf(ind)<0)
+						bProteinRight.add(ind);
+				}
+			}
+		}
+	}
+		
 	public void mouseClicked1() {
 		 sPopup = !sPopup;
 	}
@@ -2469,9 +2487,6 @@ public class PopupReaction{
 				s = bRect;
 				simulationRectList.add(s);
 				simulationRectListLevel.add(0);
-				
-				System.out.println("AAAAAAA");
-				
 			}
 			else if (bProteinL>=0){
 				deleteReactionList = new ArrayList<Integer>();
