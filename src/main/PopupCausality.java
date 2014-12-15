@@ -26,8 +26,6 @@ public class PopupCausality{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.PathwayViewer_1_7.popupRelation.b<0)
-			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
@@ -90,7 +88,7 @@ public class PopupCausality{
 		
 	}
 	 
-	public void checkBrushing() {
+	public void mouseMoved() {
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		if (x<mX && mX<x+w1 && y<=mY && mY<=itemH+5){
@@ -99,12 +97,12 @@ public class PopupCausality{
 		}
 		else{
 			for (int i=0; i<items.length; i++){
-				if (x<=mX && mX<=x+w && y+itemH*i+25<=mY && mY<=y+itemH*(i+1)+6+25){
+				if (x<=mX && mX<=x+100 && y+itemH*i+25<=mY && mY<=y+itemH*(i+1)+6+25){
 					b =i;
 					return;
 				}	
 			}
-			if (x<=mX && mX<=x+w && y<=mY && mY<=y+h){
+			if (x<=mX && mX<=x+100 && y<=mY && mY<=y+h){
 				return;
 			}	
 		}
