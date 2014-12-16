@@ -37,16 +37,15 @@ public class PopupComplex{
 	}
 	
 	public void setItems(){
-		int i=0;
 		maxSize =0;
 		Map<Complex, Integer> unsortMap  =  new HashMap<Complex, Integer>();
 		s=-400;
-		for (Complex current : main.PathwayViewer_1_7.complexSet){
+		for (int i=0; i<main.PathwayViewer_1_7.complexList.size();i++){
+			Complex com = main.PathwayViewer_1_7.complexList.get(i);
 			int size = main.PathwayViewer_1_7.proteinsInComplex[i].size();
-			unsortMap.put(current, size);
+			unsortMap.put(com, size);
 			if (size>maxSize)
 				maxSize = size;
-			i++;
 		}
 		itemHash = sortByComparator(unsortMap);
 		
@@ -54,14 +53,14 @@ public class PopupComplex{
 		iX = new Integrator[itemHash.size()];
 		iY = new Integrator[itemHash.size()];
 		iH = new Integrator[itemHash.size()];
-		for (i=0;i<itemHash.size();i++){
+		for (int i=0;i<itemHash.size();i++){
 			iX[i] = new Integrator(x, 0.5f,0.1f);
 			iY[i] = new Integrator(20, 0.5f,0.1f);
 			iH[i] = new Integrator(10, 0.5f,0.1f);
 		}
 		
 		hightlightList =  new int[itemHash.size()];
-		for (i=0;i<itemHash.size();i++){
+		for (int i=0;i<itemHash.size();i++){
 			hightlightList[i] = -1;
 		}
 	}
@@ -307,13 +306,12 @@ public class PopupComplex{
 	 }
 	
 	 public int getIndexSetByName(String name) {
-	 	 int i=0;
-		 for (Complex current : main.PathwayViewer_1_7.complexSet){
-			 if (current.getDisplayName().equals(name)){
+	 	for (int i=0; i<main.PathwayViewer_1_7.complexList.size();i++){
+			Complex com = main.PathwayViewer_1_7.complexList.get(i);
+			if (com.getDisplayName().equals(name)){
 				 return i;
 			 }
 		 }
-		i++;		
 		 return -33;
 	 }
 	 
@@ -339,25 +337,18 @@ public class PopupComplex{
 			i++;
 		}	
 		
-		i=0;
-		for (Complex current : main.PathwayViewer_1_7.complexSet){
-			if (current.getDisplayName().equals(name))
+		for (i=0; i<main.PathwayViewer_1_7.complexList.size();i++){
+			Complex com = main.PathwayViewer_1_7.complexList.get(i);
+			if (com.getDisplayName().equals(name))
 				return i;
-			i++;
 		}
 		return -5;	
 	}
 	
 	public int getIndexInHash(int indexSet) {
-		int i=0;
-		String name = "";
-		for (Complex current : main.PathwayViewer_1_7.complexSet){
-			if (indexSet==i)
-				name = current.getDisplayName();
-			i++;
-		}
+		String name = main.PathwayViewer_1_7.complexList.get(indexSet).getDisplayName();
 		
-		i=0;
+		int i=0;
 		for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
 			if (entry.getKey().getDisplayName().equals(name)){
 				return i;

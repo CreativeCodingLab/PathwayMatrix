@@ -1876,8 +1876,8 @@ public class PopupReaction{
 		Object[] sLeft = rect.getLeft().toArray();
 		
 		float newSatForSimulation = getReactionSaturation(i2);
-		float yReact = iY[i2].value;
 		boolean isContainedComplexL =false; // checking if there is a complex;
+		float yReact = iY[i2].value;
 		  for (int i3=0;i3<sLeft.length;i3++){
 			  String name = main.PathwayViewer_1_7.getProteinName(sLeft[i3].toString());
 			  if (name==null)
@@ -1922,81 +1922,7 @@ public class PopupReaction{
 			  // Complex LEFT
 			  else if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
 				  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(sLeft[i3].toString());
-				  ArrayList<String> components = main.PathwayViewer_1_7.proteinsInComplex[id];
-				  yComplexesL[id].update();
-				  float yL2 = yComplexesL[id].value;
-				  if (processedComplexLeft.indexOf(id)<0 || sat==255){  // if not drawn yet
-					  if (processedComplexLeft.indexOf(id)<0)
-							  processedComplexLeft.add(id);
-					  for (int k=0;k<components.size();k++){
-						  isContainedComplexL = true;
-						  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
-						  if (mapProteinRDFId_index.get(components.get(k))!=null){
-							  float y4 = iP[mapProteinRDFId_index.get(components.get(k))].value-hProtein/4f;
-							  if (check13.s && sat==200)
-								  drawGradientLine(xL, y4, xL2, yL2, formComplexColor, sat);
-							  else{
-								  if (sat==255){ // Draw simulation lines
-									  iS1[i2].target(1000);
-									  float percent = iS1[i2].value/1000;
-									  float xDel = (xL2-xL)*percent;
-									  float yDel = (yL2-y4)*percent;
-									  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),newSatForSimulation);
-									  parent.line(xL, y4, xL+xDel, y4+yDel);
-								  }
-								  else{
-									  parent.line(xL, y4, xL2, yL2);
-								  }	  
-							  }	  
-						  }	
-						  else{
-							  if (check12.s && sat==200)
-								  drawGradientLine(xL, yUFO, xL2, yL2, unidentifiedElementColor, sat);
-							  else{
-								  parent.stroke(unidentifiedElementColor.getRed(),unidentifiedElementColor.getGreen(),unidentifiedElementColor.getBlue(),sat);
-								  parent.line(xL, yUFO, xL2, yL2);
-							  }
-						  }
-					  }
-					  
-					  // Draw complex node
-					  parent.noStroke();
-					  if ( iS1[i2].value>=990 && simulationRectList.size()>0)
-						  parent.fill(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),newSatForSimulation);
-					  else
-						  parent.fill(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
-					  parent. pushMatrix();
-					  parent.translate(xL2, yL2);
-					  polygon(0, 0, rComplexesL[id]/2+1, 4); 
-					  parent.popMatrix();
-					  
-					  if (sat==255 && check5.s){
-						  parent.textAlign(PApplet.CENTER);
-						  parent.textSize(12);
-						  parent.text(main.PathwayViewer_1_7.complexList.get(id).getDisplayName(),xL2,yL2-5);
-					  }
-				  }
-				  if (check14.s && sat==200)
-					  drawGradientLine(xL2, yL2, xRect, yReact, complexRectionColor, sat);
-				  else{	
-					  if (sat==255){ // Draw simulation lines
-						  if (iS1[i2].value>=990){
-							  iS2[i2].target(1000);
-						  }
-						  else{
-							  iS2[i2].set(0);
-						  }
-						  float percent = iS2[i2].value/1000;
-						  float xDel = (xRect-xL2)*percent;
-						  float yDel = (yReact-yL2)*percent;
-						  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),newSatForSimulation);
-						  parent.line(xL2, yL2, xL2+xDel, yL2+yDel);
-					  }
-					  else{
-						  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
-						  parent.line(xL2, yL2, xRect, yReact);
-					  }	  
-				  }
+				  drawComplex(i2, id, yReact, sat, newSatForSimulation, isContainedComplexL);
 			  }
 			  else if (unidentifiedList.contains(sLeft[i3].toString())){
 				  if (check12.s && sat==200)
@@ -2012,7 +1938,7 @@ public class PopupReaction{
 		  }
 		  if (!isContainedComplexL)
 			  iS1[i2].target(1000);
-
+		  
 		  boolean isContainedComplexR =false; // checking if there is a complex;
 		  Object[] sRight = rect.getRight().toArray();
 		  for (int i3=0;i3<sRight.length;i3++){
@@ -2156,13 +2082,91 @@ public class PopupReaction{
 			  else{
 				//	 System.out.println("drawReactionLink Right: CAN NOT FIND ="+sRight[i3]);
 			  }
-			  
 		  }
 		 	if (!isContainedComplexR && iS3[i2].value>=990){
 		 	 iS4[i2].set(1000);
 		  }
-			  
 	 }
+	
+	
+	public void drawComplex(int r, int id, float yReact, float sat, float newSatForSimulation, boolean isContainedComplexL) {
+		  ArrayList<String> components = main.PathwayViewer_1_7.proteinsInComplex[id];
+		  yComplexesL[id].update();
+		  float yL2 = yComplexesL[id].value;
+		  if (processedComplexLeft.indexOf(id)<0 || sat==255){  // if not drawn yet
+			  if (processedComplexLeft.indexOf(id)<0)
+					  processedComplexLeft.add(id);
+			  for (int k=0;k<components.size();k++){
+				  isContainedComplexL = true;
+				  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),sat);
+				  if (mapProteinRDFId_index.get(components.get(k))!=null){
+					  float y4 = iP[mapProteinRDFId_index.get(components.get(k))].value-hProtein/4f;
+					  if (check13.s && sat==200)
+						  drawGradientLine(xL, y4, xL2, yL2, formComplexColor, sat);
+					  else{
+						  if (sat==255){ // Draw simulation lines
+							  iS1[r].target(1000);
+							  float percent = iS1[r].value/1000;
+							  float xDel = (xL2-xL)*percent;
+							  float yDel = (yL2-y4)*percent;
+							  parent.stroke(formComplexColor.getRed(), formComplexColor.getGreen(), formComplexColor.getBlue(),newSatForSimulation);
+							  parent.line(xL, y4, xL+xDel, y4+yDel);
+						  }
+						  else{
+							  parent.line(xL, y4, xL2, yL2);
+						  }	  
+					  }	  
+				  }	
+				  else{
+					  if (check12.s && sat==200)
+						  drawGradientLine(xL, yUFO, xL2, yL2, unidentifiedElementColor, sat);
+					  else{
+						  parent.stroke(unidentifiedElementColor.getRed(),unidentifiedElementColor.getGreen(),unidentifiedElementColor.getBlue(),sat);
+						  parent.line(xL, yUFO, xL2, yL2);
+					  }
+				  }
+			  }
+			  
+			  // Draw complex node
+			  parent.noStroke();
+			  if ( iS1[r].value>=990 && simulationRectList.size()>0)
+				  parent.fill(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),newSatForSimulation);
+			  else
+				  parent.fill(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
+			  parent. pushMatrix();
+			  parent.translate(xL2, yL2);
+			  polygon(0, 0, rComplexesL[id]/2+1, 4); 
+			  parent.popMatrix();
+			  
+			  if (sat==255 && check5.s){
+				  parent.textAlign(PApplet.CENTER);
+				  parent.textSize(12);
+				  parent.text(main.PathwayViewer_1_7.complexList.get(id).getDisplayName(),xL2,yL2-5);
+			  }
+		  }
+		  if (check14.s && sat==200)
+			  drawGradientLine(xL2, yL2, xRect, yReact, complexRectionColor, sat);
+		  else{	
+			  if (sat==255){ // Draw simulation lines
+				  if (iS1[r].value>=990){
+					  iS2[r].target(1000);
+				  }
+				  else{
+					  iS2[r].set(0);
+				  }
+				  float percent = iS2[r].value/1000;
+				  float xDel = (xRect-xL2)*percent;
+				  float yDel = (yReact-yL2)*percent;
+				  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),newSatForSimulation);
+				  parent.line(xL2, yL2, xL2+xDel, yL2+yDel);
+			  }
+			  else{
+				  parent.stroke(complexRectionColor.getRed(),complexRectionColor.getGreen(),complexRectionColor.getBlue(),sat);
+				  parent.line(xL2, yL2, xRect, yReact);
+			  }	  
+		  }
+	}
+		
 	
 	public void polygon(float x, float y, float radius, int npoints) {
 		  float angle = 2*PApplet.PI / npoints;

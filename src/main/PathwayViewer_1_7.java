@@ -170,7 +170,6 @@ public class PathwayViewer_1_7 extends PApplet {
 	public static  Map<String,String> mapElementRDFId;
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
-	public static Set<Complex> complexSet; 
 	public static ArrayList<Complex> complexList; 
 	public static  Map<String,Integer> mapComplexRDFId_index;
 	public static Set<BiochemicalReaction> reactionSet; 
@@ -874,7 +873,7 @@ public class PathwayViewer_1_7 extends PApplet {
 		for (int i=0;i<a.size();i++){
 			int indexI = getProteinOrderByName(a.get(i));
 			if (indexI<0) { // Exception *******************************
-				System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(i));
+			//	System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(i));
 				continue;
 			}	
 			float yy =  ggg.get(indexI).iY.value;
@@ -882,7 +881,7 @@ public class PathwayViewer_1_7 extends PApplet {
 			for (int j=0;j<a.size();j++){
 				int indexJ = getProteinOrderByName(a.get(j));
 				if (indexJ<0) { // Exception *******************************
-					System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(j));
+				//	System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(j));
 					continue;
 				}
 				
@@ -1088,7 +1087,7 @@ public class PathwayViewer_1_7 extends PApplet {
 					 String displayName = currentProtein.getDisplayName();
 					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
 						 ggg.add(new Gene(displayName,ggg.size()));
-					//	 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
+						 System.out.println(" Proteins "+displayName+"		"+currentProtein.getRDFId());
 					}	 
 					i2++;
 				 }
@@ -1123,24 +1122,28 @@ public class PathwayViewer_1_7 extends PApplet {
 					 i2++;
 				 }*/
 				 
-				 complexSet = model.getObjects(Complex.class);
+				 Set<Complex> complexSet = model.getObjects(Complex.class);
 				
 				 complexList = new ArrayList<Complex>();
 				 i2=0;
 				 for (Complex current : complexSet){
-					 //System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
+					// System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
 					 complexList.add(current);
 					 ArrayList<String> components = getComplexById(i2);
 					 for (int i=0;i<components.size();i++){
-					//	 System.out.println("	"+components.get(i));
-						 }
+						// System.out.println("	"+components.get(i));
+					 }
 					 i2++;
 				 }
 				 i2=0;
 				 
+				 
+				 // Compute proteins in complexes
 				 proteinsInComplex = new ArrayList[complexSet.size()];
-				 computeProteinsInComplex();
+				 for (int i=0; i<complexList.size();i++){
+						proteinsInComplex[i] = getProteinsInComplexById(i);
+				 }
 				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
 				 i2=0;
@@ -1279,7 +1282,7 @@ public class PathwayViewer_1_7 extends PApplet {
 			Gene.orderByRandom(p);
 			//write();
 			
-			vennOverview.compute();
+			//vennOverview.compute();
 			check2.s  = false;
 		}
 	}
@@ -1312,68 +1315,43 @@ public class PathwayViewer_1_7 extends PApplet {
 	
 	public static ArrayList<String> getComplexById(int id){	
 		ArrayList<String> components = new ArrayList<String>(); 
-		int i2=0;
-		for (Complex current : complexSet){
-			 if (i2==id){
-				  Object[] s2 = current.getComponent().toArray();
-				  for (int i=0;i<s2.length;i++){
-					  if (getProteinName(s2[i].toString())!=null)
-						  components.add(getProteinName(s2[i].toString()));
-					  else
-						  components.add(s2[i].toString());
-				 }
-			 }
-			 i2++;
+		Complex com = complexList.get(id);
+		  Object[] s2 = com.getComponent().toArray();
+		  for (int i=0;i<s2.length;i++){
+			  if (getProteinName(s2[i].toString())!=null)
+				  components.add(getProteinName(s2[i].toString()));
+			  else
+				  components.add(s2[i].toString());
 		 }
-		 return components;
+		return	 components;
 	}
 	
-	public static void computeProteinsInComplex(){	
-		int i2=0;
-		for (Complex current : complexSet){
-			proteinsInComplex[i2] = getProteinsInComplexById(i2);
-			i2++;
-		}
-			
-		
-	}
+	
 		
 	public static ArrayList<String> getProteinsInComplexById(int id){	
 		ArrayList<String> components = new ArrayList<String>(); 
-		int i2=0;
 		
-		 boolean found = false;
-		 for (Complex current : complexSet){
-			 if (i2==id){
-				  Object[] s2 = current.getComponent().toArray();
-				  for (int i=0;i<s2.length;i++){
-					  if (getProteinName(s2[i].toString())!=null)
-						  components.add(getProteinName(s2[i].toString()));
-					  else {
-						  if (mapComplexRDFId_index.get(s2[i].toString())==null){
-							  String name = s2[i].toString();
-							  String[] pieces = s2[i].toString().split("/");
-							  if (pieces.length>=1)
-									name = pieces[pieces.length-1];
-							  components.add(name);
-						  }
-						  else{
-							  int id4 = mapComplexRDFId_index.get(s2[i].toString());
-							  ArrayList<String> s4 = getProteinsInComplexById(id4);
-							  for (int k=0;k<s4.size();k++){
-								  components.add(s4.get(k));
-							  }
-						  }
-						 
-							  
+		 Complex com = complexList.get(id);
+		  Object[] s2 = com.getComponent().toArray();
+		  for (int i=0;i<s2.length;i++){
+			  if (getProteinName(s2[i].toString())!=null)
+				  components.add(getProteinName(s2[i].toString()));
+			  else {
+				  if (mapComplexRDFId_index.get(s2[i].toString())==null){
+					  String name = s2[i].toString();
+					  String[] pieces = s2[i].toString().split("/");
+					  if (pieces.length>=1)
+							name = pieces[pieces.length-1];
+					  components.add(name);
+				  }
+				  else{
+					  int id4 = mapComplexRDFId_index.get(s2[i].toString());
+					  ArrayList<String> s4 = getProteinsInComplexById(id4);
+					  for (int k=0;k<s4.size();k++){
+						  components.add(s4.get(k));
 					  }
-				 }
-				  found = true;
-			 }
-			 i2++;
-		 }
-		 if (!found ){
-			 System.err.println("********** CAN NOT find complex id = "+id);
+				  }
+			  }
 		 }
 		 return components;
 	}

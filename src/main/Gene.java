@@ -117,7 +117,7 @@ public class Gene {
 	public static void computeGeneGeneInComplex(){
 		maxGeneInComplex = 0;
 		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
-		for (int c=0;c<main.PathwayViewer_1_7.complexSet.size();c++){
+		for (int c=0;c<main.PathwayViewer_1_7.complexList.size();c++){
 			ArrayList<String> a = main.PathwayViewer_1_7.proteinsInComplex[c];
 			for (int i=0;i<ggg.size();i++){
 				for (int j=0;j<ggg.size();j++){

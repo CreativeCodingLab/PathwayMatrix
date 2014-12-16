@@ -869,32 +869,6 @@ public class PathwayViewer_1_7 extends PApplet {
 		}
 	}	
 	
-	public void drawComplex(int complex, int r, int g, int b) {
-		ArrayList<String> a = proteinsInComplex[complex];
-		for (int i=0;i<a.size();i++){
-			int indexI = getProteinOrderByName(a.get(i));
-			if (indexI<0) { // Exception *******************************
-				System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(i));
-				continue;
-			}	
-			float yy =  ggg.get(indexI).iY.value;
-			float hh = ggg.get(indexI).iH.value;
-			for (int j=0;j<a.size();j++){
-				int indexJ = getProteinOrderByName(a.get(j));
-				if (indexJ<0) { // Exception *******************************
-					System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(j));
-					continue;
-				}
-				
-				float xx =  ggg.get(indexJ).iX.value;
-				float ww =ggg.get(indexJ).iW.value;
-					
-				this.fill(r,g,b,200);
-				this.noStroke();
-				this.rect(xx, yy, ww, hh);
-			}
-		}
-	}
 	
 	public void setValue(Integrator inter, float value) {
 		if (ggg.size()<500){
