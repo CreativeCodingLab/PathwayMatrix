@@ -111,7 +111,7 @@ public class PopupReaction{
 	// Shortest path
 	
 	ArrayList<Integer> loopReactionList = new ArrayList<Integer>();
-	ArrayList<Integer> deleteReactionList = new ArrayList<Integer>();
+	ArrayList<Integer> deleteRea1ctionList = new ArrayList<Integer>();
 	
 	int deleteProtein =-1;
 	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
@@ -775,6 +775,7 @@ public class PopupReaction{
 			}
 			if (PopupCausality.s==2 )  // Shortest path
 				computeShortestPath();
+			
 			if (simulationRectList.size()>0 ){
 				for (int r=0;r<simulationRectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(simulationRectList.get(r));
@@ -793,7 +794,8 @@ public class PopupReaction{
 			else if (PopupCausality.s==1 ){
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
-					if (r==bRect) // Draw brushing reactions ***************
+					System.out.println(r);
+					if (r==bRect || bRectListL.indexOf(r)>=0) // Draw brushing reactions ***************
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 255);
 					else 
 						drawReactionLink(rect, r, xL, xL2, xRect, xR, xR2, 20);
@@ -2227,7 +2229,7 @@ public class PopupReaction{
 				break; // Only allow to brushing 1 complex
 			 }
 		}
-		if (bComplexLold!=bComplexL&& PopupReaction.simulationRectList.size()==0){
+		if (bComplexLold!=bComplexL && PopupReaction.simulationRectList.size()==0){
 			resetIntegrators();
 		}
 		int bComplexRold = bComplexR;
@@ -2254,9 +2256,9 @@ public class PopupReaction{
 		}
 		
 		// Brushing proteins *******************************************************************
+		int bProteinLold = bProteinL;
 		bProteinL =-1;
 		if (bRectListL.size()==0){
-			int bProteinLold = bProteinL;
 			for (int p=0; p<proteins.length;p++){
 				if (xL-80<=parent.mouseX && parent.mouseX<= xL &&
 						iP[p].value-hProtein*2/3<=parent.mouseY && parent.mouseY<=iP[p].value+hProtein*1/3){
@@ -2270,10 +2272,10 @@ public class PopupReaction{
 				resetIntegrators();
 			}
 		}
+		int bProteinRold = bProteinR;
 		bProteinR =-1;
 		if (bRectListR.size()==0){
-	    	int bProteinRold = bProteinR;
-			for (int p=0; p<proteins.length;p++){
+	    	for (int p=0; p<proteins.length;p++){
 				if (xR<=parent.mouseX && parent.mouseX<= xR+80 &&
 						iP[p].value-hProtein<=parent.mouseY && parent.mouseY<=iP[p].value){
 					bProteinR =p;
@@ -2370,8 +2372,9 @@ public class PopupReaction{
 					iY[i].value-iH[i].value/2<=parent.mouseY && parent.mouseY<=iY[i].value+iH[i].value/2){
 				if ((textbox1.searchText.equals("") || (!textbox1.searchText.equals("") && sRectListByText.indexOf(i)>=0)) && simulationRectList.size()==0) {
 					bRect =i;
-					if(oldRect!=bRect)
+					if (oldRect!=bRect){
 						resetIntegrators();
+					}	
 					hightlightList[i] = 1; 
 					return;
 				}
