@@ -941,6 +941,7 @@ public class PathwayViewer_1_7 extends PApplet {
 			popupReaction.mouseClicked1();
 		}
 		else if (PopupReaction.sPopup){
+			// Click on word cloud
 			popupReaction.mouseClicked2();
 		}
 		else {

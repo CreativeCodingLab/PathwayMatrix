@@ -75,14 +75,21 @@ public class WordCloud{
 	
 	public void mouseClicked(){
 		if (b>=0){
-			
 			if (s==b){
 				s=-100;
+				main.PopupReaction.textbox1.searchText = "";
+				PopupReaction.textbox1.updateReactions();
+				main.PathwayViewer_1_7.popupReaction.mouseMoved();  // to update protein names in current reactions
 			}
-			else
+			else{
 				s=b;
+				main.PopupReaction.textbox1.searchText = words[b].word.toLowerCase();
+				PopupReaction.textbox1.updateReactions();
+				main.PathwayViewer_1_7.popupReaction.mouseMoved();	// to update protein names in current reactions
+			}	
 		}
 		else{
+			
 			s=-1;
 		}
 	}
@@ -173,11 +180,10 @@ public class WordCloud{
 		}
 
 		public int checkBrushing(PApplet p) {
+			
 			if (x-word_width/2<=parent.mouseX && parent.mouseX<=x+word_width/2 &&
 				y-font_size<=parent.mouseY && parent.mouseY<=y){
 				b=id;
-				main.PopupReaction.textbox1.searchText = words[b].word.toLowerCase();
-				PopupReaction.textbox1.updateReactions();
 				return b;
 			}	
 			else{
@@ -191,10 +197,10 @@ public class WordCloud{
 			parent.textAlign(PApplet.LEFT);
 			parent.fill(color.getRGB());
 			if (id==b){
-				parent.fill(Color.RED.getRGB());
+				parent.fill(255,100,0);
 			}
 			if (id==s)
-				parent.fill(Color.BLACK.getRGB());
+				parent.fill(255,0,0);
 				
 			parent.textFont(font2, font_size);
 					
