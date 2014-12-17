@@ -21,11 +21,11 @@ public class PopupRelation{
 	
 	public PopupRelation(PApplet parent_){
 		parent = parent_;
-		items = new String [PathwayViewer_1_7.minerList.size()];
-		for (int i = 0; i < PathwayViewer_1_7.minerList.size(); i++) {
-			items[i] = PathwayViewer_1_7.minerList.get(i).toString();
+		items = new String [PathwayViewer_1_8.minerList.size()];
+		for (int i = 0; i < PathwayViewer_1_8.minerList.size(); i++) {
+			items[i] = PathwayViewer_1_8.minerList.get(i).toString();
 		}	
-		s = new boolean[PathwayViewer_1_7.minerList.size()];
+		s = new boolean[PathwayViewer_1_8.minerList.size()];
 	}
 	
 	public void draw(float x_){
@@ -39,8 +39,8 @@ public class PopupRelation{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_1_7.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_1_7.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_1_8.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_1_8.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -49,20 +49,20 @@ public class PopupRelation{
 					parent.noStroke();
 					parent.fill(0);
 					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-					parent.fill(main.PathwayViewer_1_7.colorRelations[i]);
+					parent.fill(main.PathwayViewer_1_8.colorRelations[i]);
 				}
 				else if (i==b){
-					parent.fill(main.PathwayViewer_1_7.colorRelations[i]);
+					parent.fill(main.PathwayViewer_1_8.colorRelations[i]);
 				}
 				else{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
 				parent.text(items[i],x+50,y+itemH*(i+1));
-				float r = PApplet.map(PApplet.sqrt(main.PathwayViewer_1_7.pairs[i].size()), 0, max, 0, 25);
+				float r = PApplet.map(PApplet.sqrt(main.PathwayViewer_1_8.pairs[i].size()), 0, max, 0, 25);
 				
 				parent.noStroke();
-				parent.fill(main.PathwayViewer_1_7.colorRelations[i]);
+				parent.fill(main.PathwayViewer_1_8.colorRelations[i]);
 				parent.ellipse(x+30,y+itemH*(i)+15, r, r);
 			
 				// Order By drawing
