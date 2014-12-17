@@ -39,15 +39,8 @@ import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
 import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.model.level3.BiochemicalReaction;
-import org.biopax.paxtools.model.level3.Complex;
-import org.biopax.paxtools.model.level3.EntityReference;
-import org.biopax.paxtools.model.level3.PhysicalEntity;
-import org.biopax.paxtools.model.level3.Protein;
-import org.biopax.paxtools.model.level3.SmallMolecule;
-import org.biopax.paxtools.model.level3.SmallMoleculeReference;
-import org.biopax.paxtools.model.level3.XReferrable;
-import org.biopax.paxtools.model.level3.Xref;
+import org.biopax.paxtools.model.level3.*;
+import org.biopax.paxtools.model.level3.Process;
 import org.biopax.paxtools.pattern.Match;
 import org.biopax.paxtools.pattern.Pattern;
 import org.biopax.paxtools.pattern.Searcher;
@@ -1145,9 +1138,11 @@ public class PathwayViewer_1_7 extends PApplet {
 						proteinsInComplex[i] = getProteinsInComplexById(i);
 				 }
 				 
+				 
+				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				 i2=0;
-				 /*
+						
+				 /*i2=0;
 				 for (BiochemicalReaction current : reactionSet){
 					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
 					  Object[] s = current.getLeft().toArray();
@@ -1194,7 +1189,35 @@ public class PathwayViewer_1_7 extends PApplet {
 				 	}*/
 				 
 				 
-				
+				 Set<Stoichiometry> set = 	 model.getObjects(Stoichiometry.class);
+				 i2=0;
+				 System.out.println("SET ******:"+set);
+				 for (Stoichiometry current : set){
+					 System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity());
+					 
+					 i2++;
+				 }
+				 
+
+				 Set<Conversion> set2 = 	 model.getObjects(Conversion.class);
+				 i2=0;
+				 System.out.println("SET2 ******:"+set2);
+				 for (Conversion current : set2){
+					 System.out.println("Conversion"+i2+"	"+current.getDisplayName());
+					 
+					 i2++;
+				 }
+				 
+				 /* PATHWAY excited
+				 for (Pathway aPathway : model.getObjects(Pathway.class)){
+					 System.out.println();
+					 System.out.println();
+					 System.out.println();
+					  System.out.println("aPathway ******:"+aPathway.getDisplayName());
+					  extractProteinUrefsFromPathway(aPathway);
+						
+				 }*/
+				 
 				/* SIF
 				// Iterate through all BioPAX Elements and print basic info
 				 SimpleInteractionConverter converter =
@@ -1287,6 +1310,52 @@ public class PathwayViewer_1_7 extends PApplet {
 		}
 	}
 	
+	public void extractProteinUrefsFromPathway(Pathway aPathway)
+	{
+	 for(Process aProcess: aPathway.getPathwayComponent())
+	 {
+	  if(aProcess instanceof Pathway)
+	  { //Dig into the nested structure recursively
+		  //extractProteinUrefsFromPathway((Pathway)aProcess);
+		  System.out.println("------Sub-pathway:"+aProcess.getDisplayName());
+			
+	  }  else
+	  { //It must be an Interaction
+	   extractAndPrintProteinUrefs((Interaction)aProcess);
+	  }
+	  }
+	 }
+	
+	public void extractAndPrintProteinUrefs(Interaction anInteraction) {
+		// System.out.println();
+		System.out.println("extract Interaction =  "
+				+ anInteraction.getDisplayName());
+
+		for (Entity participant : anInteraction.getParticipant()) {
+			
+			if (participant instanceof Protein) {
+				System.out.println("	 Protein=   " + participant.getDisplayName());
+
+				EntityReference entityReference = ((Protein) participant)
+						.getEntityReference();
+				if (entityReference != null) {
+					Set<Xref> xrefSet = entityReference.getXref();
+					for (Xref currentRef : xrefSet) {
+						// if (currentRef instanceof UnificationXref)
+						// System.out.println("Unification XRef: " +
+						// currentRef.getDb() + ": " +
+						// currentRef.getId()+"	"+currentRef.toString());
+					}
+				}
+			}
+			else{
+				System.out.println("	 " + participant.getDisplayName());
+
+			}
+		}
+	}
+	
+	
 	
 	public int getProteinOrderByName(String name) {
 		for (int i=0;i<ggg.size();i++){
@@ -1297,7 +1366,7 @@ public class PathwayViewer_1_7 extends PApplet {
 	}
 	
 	public static String getProteinName(String ref){	
-		String s1 = mapElementRDFId.get(ref);
+		  String s1 = mapElementRDFId.get(ref);
 		if (s1==null)
 			 s1= mapElementRef.get(ref);
 		return s1;
