@@ -1333,18 +1333,11 @@ public class PopupReaction{
 					parent.fill(proteinRectionColor.getRed(), proteinRectionColor.getGreen(), proteinRectionColor.getBlue(),sat);
 						
 				}
-				for (SmallMolecule currentMolecule : main.PathwayViewer_1_8.smallMoleculeSet){
-					if (proteins[p].equals(currentMolecule.getDisplayName())){
-						parent .fill(smallMoleculeColor.getRGB());
-						if (level==currentLevel+1){
-							float sat = (parent.frameCount*20)%200;
-							parent.fill(smallMoleculeColor.getRed(), smallMoleculeColor.getGreen(), smallMoleculeColor.getBlue(),sat);
-						}
-					}
+				if (!main.PathwayViewer_1_8.isSmallMolecule(proteins[p])){
+					parent.textSize(12);
+					parent.textAlign(PApplet.RIGHT);
+					parent.text(level,xR-15,y3);
 				}
-				parent.textSize(12);
-				parent.textAlign(PApplet.RIGHT);
-				parent.text(level,xR-15,y3);
 			}
 			for (int i=0;i<proteinsDownStreamList2.size();i++){
 				int p=proteinsDownStreamList2.get(i);
@@ -2420,9 +2413,9 @@ public class PopupReaction{
 					bRect =i;
 					if (oldRect!=bRect){
 						resetIntegrators();
-						System.out.println("Brushing reaction: "+rectList.get(bRect));
-						System.out.println("	"+rectList.get(bRect).getLeft());
-						System.out.println("	"+getProteinsInOneSideOfReaction(rectList.get(bRect).getLeft().toArray()));
+						System.out.println("Reaction: "+rectList.get(bRect)+"	DisplayName: "+rectList.get(bRect).getDisplayName());
+						System.out.println("	getLeft() = "+rectList.get(bRect).getLeft());
+						System.out.println("	getRight() = "+rectList.get(bRect).getRight());
 					}	
 					hightlightList[i] = 1; 
 					return;
@@ -2575,7 +2568,6 @@ public class PopupReaction{
 	 
 	public void checkBrushing() {
 		if (rectHash==null || iH==null || iH.length==0) return;
-		
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		if (xButton<mX && mX<xButton+w1 && 0<=mY && mY<=yBegin){
