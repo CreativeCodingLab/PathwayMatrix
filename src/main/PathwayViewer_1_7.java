@@ -159,7 +159,6 @@ public class PathwayViewer_1_7 extends PApplet {
 	
 	
 	// New to read data 
-	public static  Map<String,String> mapElementRef;
 	public static  Map<String,String> mapElementRDFId;
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
@@ -1063,62 +1062,46 @@ public class PathwayViewer_1_7 extends PApplet {
 				System.out.println();
 				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
-				mapElementRef = new HashMap<String,String>();
 				mapElementRDFId = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
 					
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
-				 int i2=0;
 				 for (Protein currentProtein : proteinSet){
-					 if (currentProtein.getEntityReference()==null) continue;
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
-					 
-					 // Gloabal data 
-					 String displayName = currentProtein.getDisplayName();
-					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
-						 ggg.add(new Gene(displayName,ggg.size()));
-						 System.out.println(" Proteins "+displayName+"		"+currentProtein.getRDFId());
-					}	 
-					i2++;
+					// if (currentProtein.getEntityReference()==null) continue;
+					// mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 				 }
 					
 				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
-				 i2=0;
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
-					 if (currentMolecule.getEntityReference()==null) continue;
 					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
 					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
-					 
-					 // Gloabal data 
-					 String displayName = currentMolecule.getDisplayName();
-					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
-							ggg.add(new Gene(currentMolecule.getDisplayName(),ggg.size()));
-					 }		
-					 i2++;
 				 }
 				 
 				 
-				 /*
 				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
-				 i2=0;
 				 for (PhysicalEntity current : physicalEntitySet){
-					// Object[] s =   current.getRDFId().toArray();
-					 
-					 System.out.println(i2+" PhysicalEntity() = "+current.getDisplayName());
-					  
-					 System.out.println("	PhysicalEntity() = "+current.getRDFId()+"	PhysicalEntity ="+ current.getComment());
-					 i2++;
-				 }*/
+					 if (current.getRDFId().contains("PhysicalEntity")){
+						 mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+					 }	 
+				 }
+				 
+				 int j=0;
+				 for (Map.Entry<String,String> entry : mapElementRDFId.entrySet()){
+					 String displayName = entry.getValue();
+					// if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
+					ggg.add(new Gene(displayName,ggg.size()));
+					System.out.println("Protein"+j+"	"+displayName);
+					j++;
+				 }
+						
 				 
 				 Set<Complex> complexSet = model.getObjects(Complex.class);
 				
 				 complexList = new ArrayList<Complex>();
-				 i2=0;
+				 int i2=0;
 				 for (Complex current : complexSet){
 					// System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
@@ -1193,7 +1176,7 @@ public class PathwayViewer_1_7 extends PApplet {
 				 i2=0;
 				 System.out.println("SET ******:"+set);
 				 for (Stoichiometry current : set){
-					 System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity());
+					// System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity());
 					 i2++;
 				 }
 				 
@@ -1202,8 +1185,7 @@ public class PathwayViewer_1_7 extends PApplet {
 				 i2=0;
 				 System.out.println("SET2 ******:"+set2);
 				 for (Catalysis current : set2){
-					 System.out.println("Catalysis"+i2+"	"+current.getDisplayName()+"	"+current.getParticipant());
-					 
+					// System.out.println("Catalysis"+i2+"	"+current.getDisplayName()+"	"+current.getParticipant());
 					 i2++;
 				 }
 				 
@@ -1365,9 +1347,7 @@ public class PathwayViewer_1_7 extends PApplet {
 	}
 	
 	public static String getProteinName(String ref){	
-		  String s1 = mapElementRDFId.get(ref);
-		if (s1==null)
-			 s1= mapElementRef.get(ref);
+		String s1 = mapElementRDFId.get(ref);
 		return s1;
 	}
 	
@@ -1407,9 +1387,9 @@ public class PathwayViewer_1_7 extends PApplet {
 			  else {
 				  if (mapComplexRDFId_index.get(s2[i].toString())==null){
 					  String name = s2[i].toString();
-					  String[] pieces = s2[i].toString().split("/");
-					  if (pieces.length>=1)
-							name = pieces[pieces.length-1];
+					 // String[] pieces = s2[i].toString().split("/");
+					 // if (pieces.length>=1)
+					//		name = pieces[pieces.length-1];
 					  components.add(name);
 				  }
 				  else{

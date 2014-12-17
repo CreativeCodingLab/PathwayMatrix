@@ -218,29 +218,33 @@ public class PopupReaction{
 			hightlightList[i] = -1;
 		}
 			
-		int numValid = main.PathwayViewer_1_7.ggg.size();
+		int numValid = main.PathwayViewer_1_7.mapElementRDFId.size();
 		mapProteinRDFId_index = new HashMap<String,Integer>();
-		for (int p=0; p<numValid;p++){
-			mapProteinRDFId_index.put( main.PathwayViewer_1_7.ggg.get(p).name, p);
+		int p1=0;
+		for (Map.Entry<String,String> entry : main.PathwayViewer_1_7.mapElementRDFId.entrySet()){
+			String displayName = entry.getValue();
+			mapProteinRDFId_index.put(displayName, p1);
+			p1++;
 		}
 		updateComplexList();
+		
 		updateUnidentifiedElements();
 		int numInvalid = unidentifiedList.size();
-		
 		proteins =  new String[numValid+numInvalid];
 		iP =  new Integrator[numValid+numInvalid];
 		
-		for (int p=0; p<numValid;p++){
-			proteins[p] =  main.PathwayViewer_1_7.ggg.get(p).name;
-			iP[p] =   new Integrator(20, 0.5f,0.1f);
+		int p2=0;
+		for (Map.Entry<String,String> entry : main.PathwayViewer_1_7.mapElementRDFId.entrySet()){
+			String displayName = entry.getValue();
+			proteins[p2] = displayName;
+			iP[p2] =   new Integrator(20, 0.5f,0.1f);
+			p2++;
 		}
 		for (int p=0; p<numInvalid;p++){
 			proteins[numValid+p] =  unidentifiedList.get(p);
 			mapProteinRDFId_index.put(unidentifiedList.get(p), numValid+p);
 			iP[numValid+p] =   new Integrator(20, 0.5f,0.1f);
 		}
-		
-		
 		simulationRectList = new ArrayList<Integer>();
 		simulationRectListLevel = new ArrayList<Integer>();
 			
@@ -306,29 +310,31 @@ public class PopupReaction{
 					unidentifiedList.add(ufo);
 			}
 		}
-	//	System.out.println(unidentifiedList);
+		//System.out.println(unidentifiedList);
 	}
 	
 	public ArrayList<String> getUnidentifiedElements2(Object[] s) {
 		ArrayList<String> a = new ArrayList<String>();
-		for (int i3=0;i3<s.length;i3++){
-			  String name = main.PathwayViewer_1_7.getProteinName(s[i3].toString());
+		for (int i=0;i<s.length;i++){
+			  String name = main.PathwayViewer_1_7.getProteinName(s[i].toString());
 			  if (mapProteinRDFId_index.get(name)!=null){
 			  }
-			  else  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(s[i3].toString())!=null){
-				  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(s[i3].toString());
+			  else  if (main.PathwayViewer_1_7.mapComplexRDFId_index.get(s[i].toString())!=null){
+				  int id = main.PathwayViewer_1_7.mapComplexRDFId_index.get(s[i].toString());
 				  ArrayList<String> components = main.PathwayViewer_1_7.proteinsInComplex[id];
 				  for (int k=0;k<components.size();k++){
 					 if (mapProteinRDFId_index.get(components.get(k))==null){
-						 a.add(components.get(k));
+						 if (!a.contains(components.get(k)))
+							 a.add(components.get(k));
 					 }	  
 				  }
 			  }
 			  else{
-				 a.add(s[i3].toString());
+				  if (!a.contains(s[i].toString()))
+					  a.add(s[i].toString());
+			
 			 } 
 		}
-	//	System.out.println(a);
 		return a;
 	}
 	
@@ -402,19 +408,20 @@ public class PopupReaction{
 	public int getSimilarProtein(ArrayList<Integer> reactProteinList, ArrayList<Integer> a, int[][] scoresComplex, int[][] scoresReaction){
 		float maxScore = Float.NEGATIVE_INFINITY;
 		int maxIndex = -1;
-		for (int j=0;j<proteins.length;j++){
-			if (reactProteinList.indexOf(j)<0) continue;
-			if (a.contains(j)) continue;
+		for (int p=0;p<proteins.length;p++){
+			if (reactProteinList.indexOf(p)<0) continue;
+			if (a.contains(p)) continue;
 			
 			float sum = 0;
 			for (int i=0;i<a.size();i++){
 				int index1 = a.get(i);
-				sum += scoresComplex[index1][j]*(a.size()-i);
-				sum += scoresReaction[index1][j]*(a.size()-i);
+				sum += scoresComplex[index1][p]*(a.size()-i)*2;
+				if (!main.PathwayViewer_1_7.isSmallMolecule(proteins[p])) // do not include small molecules into reactions
+					sum += scoresReaction[index1][p]*(a.size()-i);
 			}
 			if (sum>maxScore){
 				maxScore = sum;
-				maxIndex = j;
+				maxIndex = p;
 			}
 		}
 		
@@ -515,7 +522,7 @@ public class PopupReaction{
 					if (pOrder>=0 && !main.PathwayViewer_1_7.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
 						score -= iP[pOrder].target;
 						size++;
-					}	
+					}
 				}
 				for (int i=0; i<proteinRight.size();i++){
 					int pOrder = proteinRight.get(i);
@@ -523,11 +530,14 @@ public class PopupReaction{
 						score -= iP[pOrder].target;
 						size++;
 					}	
+					
 				}
 				
 				if (size>0)
 					score = score/size;
 				
+				if (size==0)
+					score = -1000;
 				unsortMap.put(indexOfItemHash, score);	
 				indexOfItemHash++;
 			}
@@ -678,8 +688,6 @@ public class PopupReaction{
 				countLitems++;
 			}
 		}
-		
-		
 	}
 	
 	
