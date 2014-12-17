@@ -1194,16 +1194,15 @@ public class PathwayViewer_1_7 extends PApplet {
 				 System.out.println("SET ******:"+set);
 				 for (Stoichiometry current : set){
 					 System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity());
-					 
 					 i2++;
 				 }
 				 
 
-				 Set<Conversion> set2 = 	 model.getObjects(Conversion.class);
+				 Set<Catalysis> set2 = 	 model.getObjects(Catalysis.class);
 				 i2=0;
 				 System.out.println("SET2 ******:"+set2);
-				 for (Conversion current : set2){
-					 System.out.println("Conversion"+i2+"	"+current.getDisplayName());
+				 for (Catalysis current : set2){
+					 System.out.println("Catalysis"+i2+"	"+current.getDisplayName()+"	"+current.getParticipant());
 					 
 					 i2++;
 				 }
