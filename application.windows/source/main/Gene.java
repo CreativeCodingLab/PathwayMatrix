@@ -81,6 +81,7 @@ public class Gene {
 			}
 		}	
 		
+		// Remove non-interact proteins
 		ArrayList<Integer> removeList = new ArrayList<Integer>();
 	    for (int i=0;i<ggg.size();i++){
 	    	int count = 0;
@@ -92,10 +93,8 @@ public class Gene {
 			if (count==0)
 				removeList.add(i);
 		}
-		System.out.println(" non-intereact proteins="+removeList);
 		for (int i=removeList.size()-1;i>=0;i--){
 			int index = removeList.get(i);
-			System.out.println("	"+i+":"+ggg.get(index).name);
 			ggg.remove(index);
 		}
 		    
@@ -117,7 +116,7 @@ public class Gene {
 	public static void computeGeneGeneInComplex(){
 		maxGeneInComplex = 0;
 		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
-		for (int c=0;c<main.PathwayViewer_1_7.complexSet.size();c++){
+		for (int c=0;c<main.PathwayViewer_1_7.complexList.size();c++){
 			ArrayList<String> a = main.PathwayViewer_1_7.proteinsInComplex[c];
 			for (int i=0;i<ggg.size();i++){
 				for (int j=0;j<ggg.size();j++){

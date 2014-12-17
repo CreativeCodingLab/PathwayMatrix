@@ -60,7 +60,7 @@ public class PopupOrder{
 				parent.text(items[i],x+30,y+itemH*(i+1)+25);  // 
 			}	
 			
-			if (items[s].equals("Similarity")) 
+			if (s>=0 && items[s].equals("Similarity")) 
 				slider.draw(x+110, y+itemH*4-14+25);
 			
 		}

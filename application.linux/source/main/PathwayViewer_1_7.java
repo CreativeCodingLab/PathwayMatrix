@@ -39,15 +39,8 @@ import org.biopax.paxtools.io.sif.SimpleInteractionConverter;
 import org.biopax.paxtools.io.sif.level3.ControlRule;
 import org.biopax.paxtools.model.BioPAXElement;
 import org.biopax.paxtools.model.Model;
-import org.biopax.paxtools.model.level3.BiochemicalReaction;
-import org.biopax.paxtools.model.level3.Complex;
-import org.biopax.paxtools.model.level3.EntityReference;
-import org.biopax.paxtools.model.level3.PhysicalEntity;
-import org.biopax.paxtools.model.level3.Protein;
-import org.biopax.paxtools.model.level3.SmallMolecule;
-import org.biopax.paxtools.model.level3.SmallMoleculeReference;
-import org.biopax.paxtools.model.level3.XReferrable;
-import org.biopax.paxtools.model.level3.Xref;
+import org.biopax.paxtools.model.level3.*;
+import org.biopax.paxtools.model.level3.Process;
 import org.biopax.paxtools.pattern.Match;
 import org.biopax.paxtools.pattern.Pattern;
 import org.biopax.paxtools.pattern.Searcher;
@@ -166,11 +159,9 @@ public class PathwayViewer_1_7 extends PApplet {
 	
 	
 	// New to read data 
-	public static  Map<String,String> mapElementRef;
 	public static  Map<String,String> mapElementRDFId;
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
-	public static Set<Complex> complexSet; 
 	public static ArrayList<Complex> complexList; 
 	public static  Map<String,Integer> mapComplexRDFId_index;
 	public static Set<BiochemicalReaction> reactionSet; 
@@ -869,6 +860,32 @@ public class PathwayViewer_1_7 extends PApplet {
 		}
 	}	
 	
+	public void drawComplex(int complex, int r, int g, int b) {
+		ArrayList<String> a = proteinsInComplex[complex];
+		for (int i=0;i<a.size();i++){
+			int indexI = getProteinOrderByName(a.get(i));
+			if (indexI<0) { // Exception *******************************
+			//	System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(i));
+				continue;
+			}	
+			float yy =  ggg.get(indexI).iY.value;
+			float hh = ggg.get(indexI).iH.value;
+			for (int j=0;j<a.size();j++){
+				int indexJ = getProteinOrderByName(a.get(j));
+				if (indexJ<0) { // Exception *******************************
+				//	System.out.println("drawComplex in Maxtrix View:	CAN NOT FIND protein = "+a.get(j));
+					continue;
+				}
+				
+				float xx =  ggg.get(indexJ).iX.value;
+				float ww =ggg.get(indexJ).iW.value;
+					
+				this.fill(r,g,b,200);
+				this.noStroke();
+				this.rect(xx, yy, ww, hh);
+			}
+		}
+	}
 	
 	public void setValue(Integrator inter, float value) {
 		if (ggg.size()<500){
@@ -1045,80 +1062,70 @@ public class PathwayViewer_1_7 extends PApplet {
 				System.out.println();
 				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
-				mapElementRef = new HashMap<String,String>();
 				mapElementRDFId = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
 					
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
-				 int i2=0;
 				 for (Protein currentProtein : proteinSet){
-					 if (currentProtein.getEntityReference()==null) continue;
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-					 mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
-					 
-					 // Gloabal data 
-					 String displayName = currentProtein.getDisplayName();
-					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
-						 ggg.add(new Gene(displayName,ggg.size()));
-					//	 System.out.println(" Proteins "+currentProtein.getDisplayName()+"		"+currentProtein.getRDFId());
-					}	 
-					i2++;
+					// if (currentProtein.getEntityReference()==null) continue;
+					// mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 				 }
 					
 				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
-				 i2=0;
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
-					 if (currentMolecule.getEntityReference()==null) continue;
 					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 mapElementRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
 					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 // System.out.println(i2+"	"+currentMolecule.getEntityReference().toString()+"	getStandardName ="+ currentMolecule.getStandardName());
-					 
-					 // Gloabal data 
-					 String displayName = currentMolecule.getDisplayName();
-					 if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
-							ggg.add(new Gene(currentMolecule.getDisplayName(),ggg.size()));
-					 }		
-					 i2++;
 				 }
 				 
 				 
-				 /*
 				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
-				 i2=0;
 				 for (PhysicalEntity current : physicalEntitySet){
-					// Object[] s =   current.getRDFId().toArray();
-					 
-					 System.out.println(i2+" PhysicalEntity() = "+current.getDisplayName());
-					  
-					 System.out.println("	PhysicalEntity() = "+current.getRDFId()+"	PhysicalEntity ="+ current.getComment());
-					 i2++;
-				 }*/
+					 if (current.getRDFId().contains("PhysicalEntity")){
+						 mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+					 }	 
+				 }
 				 
-				 complexSet = model.getObjects(Complex.class);
+				 int j=0;
+				 for (Map.Entry<String,String> entry : mapElementRDFId.entrySet()){
+					 String displayName = entry.getValue();
+					// if (getProteinOrderByName(displayName)<0){// && !displayName.equals("BRCA1")&& !displayName.equals("NBS1")){
+					ggg.add(new Gene(displayName,ggg.size()));
+					System.out.println("Protein"+j+"	"+displayName);
+					j++;
+				 }
+						
+				 
+				 Set<Complex> complexSet = model.getObjects(Complex.class);
 				
 				 complexList = new ArrayList<Complex>();
-				 i2=0;
+				 int i2=0;
 				 for (Complex current : complexSet){
-					 //System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
+					// System.out.println("Complex getDisplayName() = "+current.getDisplayName()+"	getRDFId = "+current.getRDFId());
 					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
 					 complexList.add(current);
 					 ArrayList<String> components = getComplexById(i2);
 					 for (int i=0;i<components.size();i++){
-					//	 System.out.println("	"+components.get(i));
-						 }
+						// System.out.println("	"+components.get(i));
+					 }
 					 i2++;
 				 }
 				 i2=0;
 				 
+				 
+				 // Compute proteins in complexes
 				 proteinsInComplex = new ArrayList[complexSet.size()];
-				 computeProteinsInComplex();
+				 for (int i=0; i<complexList.size();i++){
+						proteinsInComplex[i] = getProteinsInComplexById(i);
+				 }
+				 
+				 
 				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				 i2=0;
-				 /*
+						
+				 /*i2=0;
 				 for (BiochemicalReaction current : reactionSet){
 					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
 					  Object[] s = current.getLeft().toArray();
@@ -1165,7 +1172,33 @@ public class PathwayViewer_1_7 extends PApplet {
 				 	}*/
 				 
 				 
-				
+				 Set<Stoichiometry> set = 	 model.getObjects(Stoichiometry.class);
+				 i2=0;
+				 System.out.println("SET ******:"+set);
+				 for (Stoichiometry current : set){
+					// System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity());
+					 i2++;
+				 }
+				 
+
+				 Set<Catalysis> set2 = 	 model.getObjects(Catalysis.class);
+				 i2=0;
+				 System.out.println("SET2 ******:"+set2);
+				 for (Catalysis current : set2){
+					// System.out.println("Catalysis"+i2+"	"+current.getDisplayName()+"	"+current.getParticipant());
+					 i2++;
+				 }
+				 
+				 /* PATHWAY excited
+				 for (Pathway aPathway : model.getObjects(Pathway.class)){
+					 System.out.println();
+					 System.out.println();
+					 System.out.println();
+					  System.out.println("aPathway ******:"+aPathway.getDisplayName());
+					  extractProteinUrefsFromPathway(aPathway);
+						
+				 }*/
+				 
 				/* SIF
 				// Iterate through all BioPAX Elements and print basic info
 				 SimpleInteractionConverter converter =
@@ -1253,10 +1286,56 @@ public class PathwayViewer_1_7 extends PApplet {
 			Gene.orderByRandom(p);
 			//write();
 			
-			vennOverview.compute();
+			//vennOverview.compute();
 			check2.s  = false;
 		}
 	}
+	
+	public void extractProteinUrefsFromPathway(Pathway aPathway)
+	{
+	 for(Process aProcess: aPathway.getPathwayComponent())
+	 {
+	  if(aProcess instanceof Pathway)
+	  { //Dig into the nested structure recursively
+		  //extractProteinUrefsFromPathway((Pathway)aProcess);
+		  System.out.println("------Sub-pathway:"+aProcess.getDisplayName());
+			
+	  }  else
+	  { //It must be an Interaction
+	   extractAndPrintProteinUrefs((Interaction)aProcess);
+	  }
+	  }
+	 }
+	
+	public void extractAndPrintProteinUrefs(Interaction anInteraction) {
+		// System.out.println();
+		System.out.println("extract Interaction =  "
+				+ anInteraction.getDisplayName());
+
+		for (Entity participant : anInteraction.getParticipant()) {
+			
+			if (participant instanceof Protein) {
+				System.out.println("	 Protein=   " + participant.getDisplayName());
+
+				EntityReference entityReference = ((Protein) participant)
+						.getEntityReference();
+				if (entityReference != null) {
+					Set<Xref> xrefSet = entityReference.getXref();
+					for (Xref currentRef : xrefSet) {
+						// if (currentRef instanceof UnificationXref)
+						// System.out.println("Unification XRef: " +
+						// currentRef.getDb() + ": " +
+						// currentRef.getId()+"	"+currentRef.toString());
+					}
+				}
+			}
+			else{
+				System.out.println("	 " + participant.getDisplayName());
+
+			}
+		}
+	}
+	
 	
 	
 	public int getProteinOrderByName(String name) {
@@ -1269,8 +1348,6 @@ public class PathwayViewer_1_7 extends PApplet {
 	
 	public static String getProteinName(String ref){	
 		String s1 = mapElementRDFId.get(ref);
-		if (s1==null)
-			 s1= mapElementRef.get(ref);
 		return s1;
 	}
 	
@@ -1286,68 +1363,43 @@ public class PathwayViewer_1_7 extends PApplet {
 	
 	public static ArrayList<String> getComplexById(int id){	
 		ArrayList<String> components = new ArrayList<String>(); 
-		int i2=0;
-		for (Complex current : complexSet){
-			 if (i2==id){
-				  Object[] s2 = current.getComponent().toArray();
-				  for (int i=0;i<s2.length;i++){
-					  if (getProteinName(s2[i].toString())!=null)
-						  components.add(getProteinName(s2[i].toString()));
-					  else
-						  components.add(s2[i].toString());
-				 }
-			 }
-			 i2++;
+		Complex com = complexList.get(id);
+		  Object[] s2 = com.getComponent().toArray();
+		  for (int i=0;i<s2.length;i++){
+			  if (getProteinName(s2[i].toString())!=null)
+				  components.add(getProteinName(s2[i].toString()));
+			  else
+				  components.add(s2[i].toString());
 		 }
-		 return components;
+		return	 components;
 	}
 	
-	public static void computeProteinsInComplex(){	
-		int i2=0;
-		for (Complex current : complexSet){
-			proteinsInComplex[i2] = getProteinsInComplexById(i2);
-			i2++;
-		}
-			
-		
-	}
+	
 		
 	public static ArrayList<String> getProteinsInComplexById(int id){	
 		ArrayList<String> components = new ArrayList<String>(); 
-		int i2=0;
 		
-		 boolean found = false;
-		 for (Complex current : complexSet){
-			 if (i2==id){
-				  Object[] s2 = current.getComponent().toArray();
-				  for (int i=0;i<s2.length;i++){
-					  if (getProteinName(s2[i].toString())!=null)
-						  components.add(getProteinName(s2[i].toString()));
-					  else {
-						  if (mapComplexRDFId_index.get(s2[i].toString())==null){
-							  String name = s2[i].toString();
-							  String[] pieces = s2[i].toString().split("/");
-							  if (pieces.length>=1)
-									name = pieces[pieces.length-1];
-							  components.add(name);
-						  }
-						  else{
-							  int id4 = mapComplexRDFId_index.get(s2[i].toString());
-							  ArrayList<String> s4 = getProteinsInComplexById(id4);
-							  for (int k=0;k<s4.size();k++){
-								  components.add(s4.get(k));
-							  }
-						  }
-						 
-							  
+		 Complex com = complexList.get(id);
+		  Object[] s2 = com.getComponent().toArray();
+		  for (int i=0;i<s2.length;i++){
+			  if (getProteinName(s2[i].toString())!=null)
+				  components.add(getProteinName(s2[i].toString()));
+			  else {
+				  if (mapComplexRDFId_index.get(s2[i].toString())==null){
+					  String name = s2[i].toString();
+					 // String[] pieces = s2[i].toString().split("/");
+					 // if (pieces.length>=1)
+					//		name = pieces[pieces.length-1];
+					  components.add(name);
+				  }
+				  else{
+					  int id4 = mapComplexRDFId_index.get(s2[i].toString());
+					  ArrayList<String> s4 = getProteinsInComplexById(id4);
+					  for (int k=0;k<s4.size();k++){
+						  components.add(s4.get(k));
 					  }
-				 }
-				  found = true;
-			 }
-			 i2++;
-		 }
-		 if (!found ){
-			 System.err.println("********** CAN NOT find complex id = "+id);
+				  }
+			  }
 		 }
 		 return components;
 	}
