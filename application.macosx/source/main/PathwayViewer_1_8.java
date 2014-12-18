@@ -1064,6 +1064,9 @@ public class PathwayViewer_1_8 extends PApplet {
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
 					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 
+					 System.out.println("Small molecules "+currentMolecule.getRDFId());
+						
 				 }
 				 
 				 
@@ -1162,7 +1165,7 @@ public class PathwayViewer_1_8 extends PApplet {
 				 i2=0;
 				 System.out.println("SET ******:"+set);
 				 for (Stoichiometry current : set){
-					 System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity()+"	="+current.getStoichiometricCoefficient());
+					// System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity()+"	="+current.getStoichiometricCoefficient());
 					 i2++;
 				 }
 				 
@@ -1179,8 +1182,8 @@ public class PathwayViewer_1_8 extends PApplet {
 				 i2=0;
 				 System.out.println("SET2 ******:"+set2);
 				 for (PathwayStep current : set3){
-					 System.out.println("PathwayStep"+i2+"	"+current.getNextStepOf()+"	"+current.getPathwayOrderOf());
-					 System.out.println("		"+current.getNextStep());
+				//	 System.out.println("PathwayStep"+i2+"	"+current.getNextStepOf()+"	"+current.getPathwayOrderOf());
+				//	 System.out.println("		"+current.getNextStep());
 					 i2++;
 				 }
 				 
