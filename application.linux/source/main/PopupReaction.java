@@ -1953,7 +1953,6 @@ public class PopupReaction{
 				  else if (check15.s && !main.PathwayViewer_1_8.isSmallMolecule(name) && sat==200){
 					  drawGradientLine(xRect, yReact, xR, y6, proteinRectionColor, sat);
 				  }
-						
 				  else{
 					   if (sat==255){ // Draw simulation lines
 						  if (iS2[i2].value>=990){
