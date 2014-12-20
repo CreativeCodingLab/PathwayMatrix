@@ -160,6 +160,7 @@ public class PathwayViewer_1_8 extends PApplet {
 	
 	// New to read data 
 	public static  Map<String,String> mapElementRDFId;
+	public static  Map<String,String> mapElementRef;
 	public static  Map<String,String> mapSmallMoleculeRDFId;
 	public static  Map<String,String> mapPhysicalEntity;
 	public static ArrayList<Complex> complexList; 
@@ -369,6 +370,13 @@ public class PathwayViewer_1_8 extends PApplet {
 			if (maxDis<1){
 				stateAnimation=1;
 			}
+		}
+
+		if (check2.s && stateAnimation==1){
+			drawGroups();
+		}	
+		else{
+			drawGenes();
 		}
 		
 		float x2 = this.width-500;
@@ -883,19 +891,29 @@ public class PathwayViewer_1_8 extends PApplet {
 	}
 				
 	public void mousePressed() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mousePressed();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider1();
 		}
 	}
 	public void mouseReleased() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mouseReleased();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider2();
 		}
 	}
 	public void mouseDragged() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mouseDragged();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider3();
 		}
+		
 	}
 		
 	public void mouseMoved() {
@@ -904,7 +922,7 @@ public class PathwayViewer_1_8 extends PApplet {
 			PopupReaction.popupCausality.mouseMoved();
 			popupReaction.checkReactionBrushing();
 		}
-		if (isAllowedDrawing && PopupReaction.sPopup){
+		if (isAllowedDrawing && PopupReaction.sPopup && PopupReaction.simulationRectList.size()==0){
 			popupReaction.mouseMoved();
 		}
 	}
@@ -1049,6 +1067,7 @@ public class PathwayViewer_1_8 extends PApplet {
 				System.out.println("***************** Load data: "+modFile+" ***************************");
 				model = io.convertFromOWL(new FileInputStream(modFile));
 				mapElementRDFId = new HashMap<String,String>();
+				mapElementRef = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
 					
@@ -1056,8 +1075,8 @@ public class PathwayViewer_1_8 extends PApplet {
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
 				 for (Protein currentProtein : proteinSet){
 					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-					// if (currentProtein.getEntityReference()==null) continue;
-					// mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+					 if (currentProtein.getEntityReference()==null) continue;
+					 	mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 				 }
 					
 				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
@@ -1346,6 +1365,10 @@ public class PathwayViewer_1_8 extends PApplet {
 	
 	public static String getProteinName(String ref){	
 		String s1 = mapElementRDFId.get(ref);
+		if (s1==null){
+			s1 = mapElementRef.get(ref);
+			
+		}
 		return s1;
 	}
 	

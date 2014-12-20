@@ -16,6 +16,7 @@ import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 
 public class PopupReaction{
 	public static boolean sPopup = true;
@@ -93,17 +94,20 @@ public class PopupReaction{
 	public int bComplexR =-1;
 	
 	// Reaction simulation
-	public Integrator[][] iS;
-	public Integrator[] iS1;
-	public Integrator[] iS2;
-	public Integrator[] iS3;
-	public Integrator[] iS4;
+	public static Integrator[][] iS;
+	public static Integrator[] iS1;
+	public static Integrator[] iS2;
+	public static Integrator[] iS3;
+	public static Integrator[] iS4;
 	
 	public int minSatSimulation =15;
 	public int level1SatSimulation =50;
 	public int stepSatSimulation =15;
 	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
 	public static ArrayList<Integer> simulationRectListLevel = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectListAll = new ArrayList<Integer>();
+	public static ArrayList<Integer> simulationRectListLevelAll = new ArrayList<Integer>();
+	
 	public static ArrayList<String> interElements = new ArrayList<String>();
 	public static ArrayList<Integer> interElementsLevel = new ArrayList<Integer>();
 
@@ -115,6 +119,12 @@ public class PopupReaction{
 	
 	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
 	public static PopupCausality popupCausality;
+	
+	public ButtonSimulation buttonPlay;
+	public ButtonSimulation buttonStop;
+	public ButtonSimulation buttonPause;
+	public ButtonSimulation buttonReset;
+	public SliderSimulation slider;
 	
 	
 	public PopupReaction(PApplet parent_){
@@ -132,6 +142,15 @@ public class PopupReaction{
 		
 		popupCausality = new PopupCausality(parent);
 		
+		PImage im1 =  parent.loadImage("img/buttonPlay.png");
+		buttonPlay = new ButtonSimulation(parent, im1);
+		PImage im2 =  parent.loadImage("img/buttonStop.png");
+		buttonStop = new ButtonSimulation(parent, im2);
+		PImage im3 =  parent.loadImage("img/buttonPause.png");
+		buttonPause = new ButtonSimulation(parent, im3);
+		PImage im4 =  parent.loadImage("img/buttonReset.png");
+		buttonReset = new ButtonSimulation(parent, im4);
+		slider = new SliderSimulation(parent);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -310,7 +329,6 @@ public class PopupReaction{
 					unidentifiedList.add(ufo);
 			}
 		}
-		//System.out.println(unidentifiedList);
 	}
 	
 	public ArrayList<String> getUnidentifiedElements2(Object[] s) {
@@ -773,12 +791,7 @@ public class PopupReaction{
 			processedComplexLeft =  new ArrayList<Integer>();
 			processedComplexRight =  new ArrayList<Integer>();
 			
-			for (int r=0;r<rectList.size();r++) {
-				iS1[r].update();
-				iS2[r].update();
-				iS3[r].update();
-				iS4[r].update();
-			}
+			
 			if (PopupCausality.s==2 )  // Shortest path
 				computeShortestPath();
 			
@@ -1253,9 +1266,9 @@ public class PopupReaction{
 				check14.draw((int) x7, (int) y7+82);
 				check15.draw((int) x7, (int) y7+101);
 				// Draw word cloud
-				wordCloud.x1=parent.width-200; 
-				wordCloud.x2=parent.width; 
-				wordCloud.draw(parent);
+				//wordCloud.x1=parent.width-200; 
+				//wordCloud.x2=parent.width; 
+				//wordCloud.draw(parent);
 				
 				// Draw word relationship
 				int[][] rel =  new int[numTop][numTop];
@@ -1269,8 +1282,37 @@ public class PopupReaction{
 						}
 					}		
 				}
-				drawRelationship(wordCloud, rel, Color.BLACK);
+			//	drawRelationship(wordCloud, rel, Color.BLACK);
 			}
+			
+// ****************** Draw Button simulations ***********************************************************************************************
+			if (!buttonPause.s){
+				for (int r=0;r<rectList.size();r++) {
+					iS1[r].update();
+					iS2[r].update();
+					iS3[r].update();
+					iS4[r].update();
+				}
+			}
+			//if (simulationRectList.size()>0){
+			//System.out.println(simulationRectList);
+			//System.out.println(simulationRectListLevel);
+			//System.out.println("downstreamList = "+simulationRectListAll);
+			//System.out.println("levelDownstreamList = "+simulationRectListLevelAll);
+			int maxLevel = -1;
+			for (int i=0;i<simulationRectListLevelAll.size();i++){
+				int level = simulationRectListLevelAll.get(i);
+				if (level>maxLevel)
+					maxLevel = level;
+			}
+			
+				buttonPlay.draw(parent.width-350, 260);
+				buttonStop.draw(parent.width-300, 260);
+				buttonPause.draw(parent.width-250, 260);
+				buttonReset.draw(parent.width-200, 260);
+				slider.draw(parent.width-450, 330, maxLevel);
+			//}
+				
 			
 			parent.fill(0);
 			parent.textSize(13);
@@ -1463,7 +1505,8 @@ public class PopupReaction{
 			if (commonElements.size()>0){
 				if (iProcess>990){
 					iS[r][g].target(1000);
-					iS[r][g].update();
+					if (!buttonPause.s)   // Pause Button clicked
+						iS[r][g].update();
 					drawArc(r,g, iS[r][g], recursive, sat);
 					if (recursive>=0){
 						if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
@@ -1478,6 +1521,13 @@ public class PopupReaction{
 									interElementsLevel.add(recursive+1);	
 								}
 							}	
+						}
+						int lastIndex=simulationRectList.get(simulationRectList.size()-1);
+						if (iS[r][g].value<=1000 && lastIndex==r){
+							SliderSimulation.transitionProcess = iS[r][g].value;
+						}
+						else{
+							SliderSimulation.transitionProcess =0;
 						}
 					}
 				}
@@ -1982,9 +2032,6 @@ public class PopupReaction{
 			  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
 				  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString());
 				  isContainedComplexR = drawComplexRight(i2, id, yReact, sat, newSatForSimulation);
-				  if (sat>200)
-					  System.out.println("	isContainedComplexR 2= "+isContainedComplexR);
-				
 			  }
 			  else if (unidentifiedList.contains(sRight[i3].toString())){
 				  if (check12.s && sat==200)
@@ -2000,8 +2047,7 @@ public class PopupReaction{
 			  }
 		  }
 		   if (!isContainedComplexR && iS3[i2].value>=990){
-			   System.out.println(isContainedComplexR);
-		 	 iS4[i2].set(1000);
+			 iS4[i2].set(1000);
 		  }
 	 }
 	
@@ -2439,17 +2485,49 @@ public class PopupReaction{
 			}	
 		}
 	}
-		
-	//http://www.reactome.org/biopax/50/187037#Complex94
-	//http://www.reactome.org/biopax/50/187037#Complex42
 	
+	public void mousePressed() {
+		if (slider.b)
+			slider.mousePresses();
+	}
+	public void mouseReleased() {
+		slider.mouseReleased();
+	}
+		
+	public void mouseDragged() {
+		if (slider.b)
+			slider.mouseDragged();
+	}
+		
 	public void mouseClicked1() {
 		 sPopup = !sPopup;
 	}
 		
 	public void mouseClicked2() {
-		
-		if (popupCausality.b>=0){
+		if (buttonPlay.b){
+			buttonPlay.mouseClicked();
+			if (buttonPlay.s)
+				buttonPause.s = false;
+		}
+		else if (buttonStop.b){
+			deleteReactionList = new ArrayList<Integer>();
+			simulationRectList = new ArrayList<Integer>();
+			simulationRectListLevel = new ArrayList<Integer>();
+			interElements =  new ArrayList<String>();
+			interElementsLevel =  new ArrayList<Integer>();
+			resetIntegrators();
+			resetCausality();
+			this.mouseMoved();
+		}
+		else if (buttonPause.b){
+			buttonPause.mouseClicked();
+			if (buttonPause.s)
+				buttonPlay.s = false;
+		}
+		else if (buttonReset.b){
+			resetSelectionSimulation();
+		}
+		else if (popupCausality.b>=0){
 			popupCausality.mouseClicked();
 			// reset simulation
 			deleteReactionList = new ArrayList<Integer>();
@@ -2497,6 +2575,7 @@ public class PopupReaction{
 			PopupReaction.check5.mouseClicked();
 		}
 		else{
+			resetSelectionSimulation();
 			/*
 			if (PopupCausality.s==1){
 				deleteReactionList = new ArrayList<Integer>();
@@ -2540,47 +2619,64 @@ public class PopupReaction{
 				}
 			}
 			else*/
-			if (bRect>=0){
-				deleteReactionList = new ArrayList<Integer>();
-				simulationRectList = new ArrayList<Integer>();
-				simulationRectListLevel = new ArrayList<Integer>();
-				interElements =  new ArrayList<String>();
-				interElementsLevel =  new ArrayList<Integer>();
-				
-				resetIntegrators();
-				resetCausality();
-				
-				simulationRectList.add(bRect);
-				simulationRectListLevel.add(0);
-			}
-			else if (bProteinL>=0 || bComplexL>=0){
-				deleteReactionList = new ArrayList<Integer>();
-				simulationRectList = new ArrayList<Integer>();
-				simulationRectListLevel = new ArrayList<Integer>();
-				interElements =  new ArrayList<String>();
-				interElementsLevel =  new ArrayList<Integer>();
-				
-				for (int i=0;i<bRectListL.size();i++){
-					int r = bRectListL.get(i);
-					if (!simulationRectList.contains(r)){
-					    simulationRectList.add(r);
-						simulationRectListLevel.add(0);
-					}	
-				}  
-				resetIntegrators();
-				resetCausality();
-			}
-			else {
-				deleteReactionList = new ArrayList<Integer>();
-				simulationRectList = new ArrayList<Integer>();
-				simulationRectListLevel = new ArrayList<Integer>();
-				interElements =  new ArrayList<String>();
-				interElementsLevel =  new ArrayList<Integer>();
-				resetIntegrators();
-				resetCausality();
-			}
+			
 		}
 	}
+	
+	public void resetSelectionSimulation() {
+		if (bRect>=0){
+			deleteReactionList = new ArrayList<Integer>();
+			simulationRectList = new ArrayList<Integer>();
+			simulationRectListLevel = new ArrayList<Integer>();
+			interElements =  new ArrayList<String>();
+			interElementsLevel =  new ArrayList<Integer>();
+			
+			resetIntegrators();
+			resetCausality();
+			
+			simulationRectList.add(bRect);
+			simulationRectListLevel.add(0);
+			
+			
+			simulationRectListAll = new ArrayList<Integer>();
+			simulationRectListAll.add(bRect);
+			ArrayList<Integer> parentList = new ArrayList<Integer>();
+			simulationRectListLevelAll = new ArrayList<Integer>();
+			simulationRectListLevelAll.add(0);
+			listReactionDownStream(bRect,0,simulationRectListAll, parentList,simulationRectListLevelAll);
+		}
+		else if (bProteinL>=0 || bComplexL>=0){
+			deleteReactionList = new ArrayList<Integer>();
+			simulationRectList = new ArrayList<Integer>();
+			simulationRectListLevel = new ArrayList<Integer>();
+			interElements =  new ArrayList<String>();
+			interElementsLevel =  new ArrayList<Integer>();
+			
+			for (int i=0;i<bRectListL.size();i++){
+				int r = bRectListL.get(i);
+				if (!simulationRectList.contains(r)){
+				    simulationRectList.add(r);
+					simulationRectListLevel.add(0);
+				}	
+			}  
+			
+			simulationRectListAll = new ArrayList<Integer>();
+			ArrayList<Integer> parentList = new ArrayList<Integer>();
+			simulationRectListLevelAll = new ArrayList<Integer>();
+			for (int i=0;i<bRectListL.size();i++){
+				int r = bRectListL.get(i);
+				simulationRectListAll.add(r);
+				simulationRectListLevelAll.add(0);
+				listReactionDownStream(r,0,simulationRectListAll, parentList,simulationRectListLevelAll);
+			}
+			
+			
+			resetIntegrators();
+			resetCausality();
+		}
+	}
+		
+	
 	 
 	public void checkBrushing() {
 		if (rectHash==null || iH==null || iH.length==0) return;
