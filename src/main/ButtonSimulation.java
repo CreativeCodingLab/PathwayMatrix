@@ -25,8 +25,7 @@ public class ButtonSimulation{
 		parent.textSize(12);
 		
 		if (s){
-			float sat = (parent.frameCount*20)%255;
-			parent.fill(sat,0,0);
+			parent.fill(200,0,0);
 			parent.noStroke();
 			parent.rect(x, y, w,h);
 		}
@@ -39,7 +38,10 @@ public class ButtonSimulation{
 	}
 	
 	public void mouseClicked() {
+		System.out.println("	s1="+s);
 		s = !s;
+		System.out.println("	s2="+s);
+		
 	}
 		
 	 

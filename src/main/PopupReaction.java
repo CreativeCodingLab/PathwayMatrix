@@ -120,10 +120,12 @@ public class PopupReaction{
 	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
 	public static PopupCausality popupCausality;
 	
-	public static ButtonSimulation buttonPlay;
+	//public static ButtonSimulation buttonPlay;
 	public static ButtonSimulation buttonStop;
 	public static ButtonSimulation buttonPause;
 	public static ButtonSimulation buttonReset;
+	public static ButtonSimulation buttonBack;
+	public static ButtonSimulation buttonForward;
 	public static SliderSimulation slider;
 	
 	
@@ -142,14 +144,18 @@ public class PopupReaction{
 		
 		popupCausality = new PopupCausality(parent);
 		
-		PImage im1 =  parent.loadImage("img/buttonPlay.png");
-		buttonPlay = new ButtonSimulation(parent, im1);
+		//PImage im1 =  parent.loadImage("img/buttonPlay.png");
+		//buttonPlay = new ButtonSimulation(parent, im1);
 		PImage im2 =  parent.loadImage("img/buttonStop.png");
 		buttonStop = new ButtonSimulation(parent, im2);
 		PImage im3 =  parent.loadImage("img/buttonPause.png");
 		buttonPause = new ButtonSimulation(parent, im3);
 		PImage im4 =  parent.loadImage("img/buttonReset.png");
 		buttonReset = new ButtonSimulation(parent, im4);
+		PImage im5 =  parent.loadImage("img/buttonBack.png");
+		buttonBack = new ButtonSimulation(parent, im5);
+		PImage im6 =  parent.loadImage("img/buttonForward.png");
+		buttonForward = new ButtonSimulation(parent, im6);
 		slider = new SliderSimulation(parent);
 	}
 	
@@ -1302,10 +1308,12 @@ public class PopupReaction{
 				}
 				float y3 = 130;
 			
-				buttonPlay.draw(parent.width-400, y3);
+				//buttonPlay.draw(parent.width-400, y3);
 				buttonStop.draw(parent.width-350, y3);
 				buttonPause.draw(parent.width-300, y3);
 				buttonReset.draw(parent.width-250, y3);
+				buttonBack.draw(parent.width-200, y3);
+				buttonForward.draw(parent.width-150, y3);
 				slider.draw(parent.width-400, y3+80, maxLevel);
 			}
 				
@@ -2500,12 +2508,8 @@ public class PopupReaction{
 	}
 		
 	public void mouseClicked2() {
-		if (buttonPlay.b){
-			buttonPlay.mouseClicked();
-			if (buttonPlay.s)
-				buttonPause.s = false;
-		}
-		else if (buttonStop.b){
+		if (buttonStop.b){
+			buttonStop.b = false;
 			deleteReactionList = new ArrayList<Integer>();
 			simulationRectList = new ArrayList<Integer>();
 			simulationRectListLevel = new ArrayList<Integer>();
@@ -2517,8 +2521,43 @@ public class PopupReaction{
 		}
 		else if (buttonPause.b){
 			buttonPause.mouseClicked();
-			if (buttonPause.s)
-				buttonPlay.s = false;
+			System.out.println(buttonPause.s);
+		}
+		else if (buttonBack.b){
+			int size = simulationRectList.size();
+			int currentLevel = simulationRectListLevel.get(size-1);
+			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
+				int level = PopupReaction.simulationRectListLevel.get(i);
+				if (level==currentLevel || level==currentLevel-1){
+					int currentReact = PopupReaction.simulationRectList.get(i);
+					SliderSimulation.resetLevel(currentReact);       // User the function in Slider Simulation
+					if (level>0){
+						PopupReaction.simulationRectList.remove(i);
+						PopupReaction.simulationRectListLevel.remove(i);
+					}
+				}
+			}
+			// Remove interElements
+			for (int i = PopupReaction.interElements.size()-1;i>=0;i--){
+				int level = PopupReaction.interElementsLevel.get(i);
+				if ((level==currentLevel || level==currentLevel-1) && level>0){
+					PopupReaction.interElements.remove(i);
+					PopupReaction.interElementsLevel.remove(i);
+				}	
+			}
+			
+			
+		}
+		else if (buttonForward.b){
+			int size = simulationRectList.size();
+			int currentLevel = simulationRectListLevel.get(size-1);
+			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
+				int level = PopupReaction.simulationRectListLevel.get(i);
+				if (level==currentLevel){
+					int currentReact = PopupReaction.simulationRectList.get(i);
+					SliderSimulation.foward(currentReact);        // User the function in Slider Simulation
+				}
+			}
 		}
 		else if (buttonReset.b){
 			resetSelectionSimulation();
