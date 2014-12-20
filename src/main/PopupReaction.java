@@ -120,11 +120,11 @@ public class PopupReaction{
 	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
 	public static PopupCausality popupCausality;
 	
-	public ButtonSimulation buttonPlay;
-	public ButtonSimulation buttonStop;
-	public ButtonSimulation buttonPause;
-	public ButtonSimulation buttonReset;
-	public SliderSimulation slider;
+	public static ButtonSimulation buttonPlay;
+	public static ButtonSimulation buttonStop;
+	public static ButtonSimulation buttonPause;
+	public static ButtonSimulation buttonReset;
+	public static SliderSimulation slider;
 	
 	
 	public PopupReaction(PApplet parent_){
@@ -1154,8 +1154,8 @@ public class PopupReaction{
 			// ****************** Draw output list ***********************************************************************
 			if (simulationRectList.size()>0){
 				float x2 = parent.width*3/4f;
-				float y3 = 150;
-				float y2 = 450;
+				float y3 = 320;
+				float y2 = 520;
 				parent.fill(0,20);
 				parent.noStroke();
 				parent.rect(x2-30, y3-40, parent.width-x2+50, parent.height-y3+50);
@@ -1163,7 +1163,7 @@ public class PopupReaction{
 				// Print out Reaction list
 				parent.fill(0);
 				parent.textSize(12);
-				parent.text("Reaction list: ", x2-25,y2-20);
+				parent.text("Reaction list: ", x2-25,y2-18);
 				
 				boolean flashing = false;
 				for (int i=0;i<simulationRectList.size();i++){
@@ -1180,18 +1180,17 @@ public class PopupReaction{
 						parent .fill(sat,0,0);
 						flashing = true;
 					}
-					parent.text(name, x2+rLevel*25,y2+20*i);
+					parent.text(name, x2+rLevel*25,y2+17*i);
 					
 				}
 				
 				// Print out intermediate proteins and complexes
 				parent.fill(0);
 				parent.textSize(12);
-				parent.text("Intermediate proteins/complexes: ", x2-25,y3-20);
+				parent.text("Intermediate proteins/complexes: ", x2-25,y3-18);
 				for (int i=0;i<interElements.size();i++){
 					String ref = interElements.get(i);
 					parent.fill(0);
-					
 					String name = main.PathwayViewer_1_8.getProteinName(ref);
 					  if (name==null){
 						  String[] pieces = ref.split("/");
@@ -1219,7 +1218,7 @@ public class PopupReaction{
 						float sat = 55+ (parent.frameCount*20)%200;
 						parent .fill(sat,0,0);
 					}
-					parent.text(name, x2+(eLevel)*25,y3+20*i);
+					parent.text(name, x2+(eLevel)*25,y3+17*i);
 					
 				}
 				
@@ -1294,24 +1293,21 @@ public class PopupReaction{
 					iS4[r].update();
 				}
 			}
-			//if (simulationRectList.size()>0){
-			//System.out.println(simulationRectList);
-			//System.out.println(simulationRectListLevel);
-			//System.out.println("downstreamList = "+simulationRectListAll);
-			//System.out.println("levelDownstreamList = "+simulationRectListLevelAll);
-			int maxLevel = -1;
-			for (int i=0;i<simulationRectListLevelAll.size();i++){
-				int level = simulationRectListLevelAll.get(i);
-				if (level>maxLevel)
-					maxLevel = level;
-			}
+			if (simulationRectList.size()>0){
+				int maxLevel = -1;
+				for (int i=0;i<simulationRectListLevelAll.size();i++){
+					int level = simulationRectListLevelAll.get(i);
+					if (level>maxLevel)
+						maxLevel = level;
+				}
+				float y3 = 130;
 			
-				buttonPlay.draw(parent.width-350, 260);
-				buttonStop.draw(parent.width-300, 260);
-				buttonPause.draw(parent.width-250, 260);
-				buttonReset.draw(parent.width-200, 260);
-				slider.draw(parent.width-450, 330, maxLevel);
-			//}
+				buttonPlay.draw(parent.width-400, y3);
+				buttonStop.draw(parent.width-350, y3);
+				buttonPause.draw(parent.width-300, y3);
+				buttonReset.draw(parent.width-250, y3);
+				slider.draw(parent.width-400, y3+80, maxLevel);
+			}
 				
 			
 			parent.fill(0);
@@ -2575,7 +2571,19 @@ public class PopupReaction{
 			PopupReaction.check5.mouseClicked();
 		}
 		else{
-			resetSelectionSimulation();
+			if (simulationRectList.size()>0){ // running the simulation  -> exit simulation
+				deleteReactionList = new ArrayList<Integer>();
+				simulationRectList = new ArrayList<Integer>();
+				simulationRectListLevel = new ArrayList<Integer>();
+				interElements =  new ArrayList<String>();
+				interElementsLevel =  new ArrayList<Integer>();
+				resetIntegrators();
+				resetCausality();
+				this.mouseMoved();
+			}
+			else{
+				resetSelectionSimulation();
+			}
 			/*
 			if (PopupCausality.s==1){
 				deleteReactionList = new ArrayList<Integer>();
