@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 
 public class SliderSpeed{
 	public int pair =-1;
@@ -14,15 +15,18 @@ public class SliderSpeed{
 	
 	public boolean b = false;
 	public boolean s = false;
-	public float ggg =10;
 	public float v =w;
 	public static float transitionProcess =0;
 	public static float speed =0.9f;
+	public PImage imRabbit =  null;
+	public PImage imTurtle =  null;
 	
 	public SliderSpeed(PApplet parent_){
 		parent = parent_;
-		w= 300;
+		w= 200;
 		v=w/4;
+		 imRabbit =  parent.loadImage("img/speedRabbit.png");
+		 imTurtle =  parent.loadImage("img/speedTurtle.png");
 	}
 		
 	
@@ -32,10 +36,12 @@ public class SliderSpeed{
 		x = x_;
 		y = y_;
 		
-		for (int k=0; k<=10; k++ ){
-			float x1 = x+k*ggg;
-			parent.stroke(PopupReaction.formComplexColor.getRGB());
-			parent.line(x, y, x1, y);
+		
+		parent.image(imTurtle, x-50, y-15,50,33);
+		parent.image(imRabbit, x+w, y-14, 48,30);
+			for (int k=0; k<=10; k++ ){
+			parent.stroke(0,100);
+			parent.line(x, y, x+w, y);
 		}
 		
 		Color color = new Color(0,0,0);
@@ -46,7 +52,7 @@ public class SliderSpeed{
 			color = new Color(200,150,0);
 		}
 		else{
-			color = new Color(0,100,255);
+			color = new Color(0,0,0,100);
 		}
 		
 		int lastIndex = PopupReaction.simulationRectList.size()-1;

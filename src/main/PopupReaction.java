@@ -157,6 +157,7 @@ public class PopupReaction{
 		buttonBack = new ButtonSimulation(parent, im5);
 		PImage im6 =  parent.loadImage("img/buttonForward.png");
 		buttonForward = new ButtonSimulation(parent, im6);
+		 
 		slider = new SliderSimulation(parent);
 		slider2 = new SliderSpeed(parent);
 	}
@@ -166,19 +167,19 @@ public class PopupReaction{
 		int i=0;
 		maxSize =0;
 		Map<BiochemicalReaction, Integer> unsortMap  =  new HashMap<BiochemicalReaction, Integer>();
-		for (BiochemicalReaction current : main.PathwayViewer_1_8.reactionSet){
+		for (BiochemicalReaction current : main.PathwayViewer_1_9.reactionSet){
 			Object[] s = current.getLeft().toArray();
 			
 			// Compute size of reaction
 			int size = 0;
 			for (int i3=0;i3<s.length;i3++){
-				  String name = main.PathwayViewer_1_8.getProteinName(s[i3].toString());
+				  String name = main.PathwayViewer_1_9.getProteinName(s[i3].toString());
 				  if (name!=null){
 					  size++;
 				  }	  
-				  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i3].toString())!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i3].toString());
-					  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+				  else if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i3].toString())!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i3].toString());
+					  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 					  size += components.size();
 				  }
 				  else 
@@ -245,10 +246,10 @@ public class PopupReaction{
 			hightlightList[i] = -1;
 		}
 			
-		int numValid = main.PathwayViewer_1_8.mapElementRDFId.size();
+		int numValid = main.PathwayViewer_1_9.mapElementRDFId.size();
 		mapProteinRDFId_index = new HashMap<String,Integer>();
 		int p1=0;
-		for (Map.Entry<String,String> entry : main.PathwayViewer_1_8.mapElementRDFId.entrySet()){
+		for (Map.Entry<String,String> entry : main.PathwayViewer_1_9.mapElementRDFId.entrySet()){
 			String displayName = entry.getValue();
 			mapProteinRDFId_index.put(displayName, p1);
 			p1++;
@@ -261,7 +262,7 @@ public class PopupReaction{
 		iP =  new Integrator[numValid+numInvalid];
 		
 		int p2=0;
-		for (Map.Entry<String,String> entry : main.PathwayViewer_1_8.mapElementRDFId.entrySet()){
+		for (Map.Entry<String,String> entry : main.PathwayViewer_1_9.mapElementRDFId.entrySet()){
 			String displayName = entry.getValue();
 			proteins[p2] = displayName;
 			iP[p2] =   new Integrator(20, 0.5f,0.1f);
@@ -288,8 +289,8 @@ public class PopupReaction{
 			Object[] aLeft = rect.getLeft().toArray();
 			Object[] aRight = rect.getRight().toArray();
 			for (int i3=0;i3<aLeft.length;i3++){
-				  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(aLeft[i3].toString());
+				  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(aLeft[i3].toString());
 					  if (id>maxID)
 						  maxID =id;
 					  if(complexList.indexOf(id)<0)
@@ -297,8 +298,8 @@ public class PopupReaction{
 				  }
 			}
 			for (int i3=0;i3<aRight.length;i3++){
-				  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(aRight[i3].toString());
+				  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(aRight[i3].toString());
 					  if (id>maxID)
 						  maxID =id;
 					  if(complexList.indexOf(id)<0)
@@ -342,12 +343,12 @@ public class PopupReaction{
 	public ArrayList<String> getUnidentifiedElements2(Object[] s) {
 		ArrayList<String> a = new ArrayList<String>();
 		for (int i=0;i<s.length;i++){
-			  String name = main.PathwayViewer_1_8.getProteinName(s[i].toString());
+			  String name = main.PathwayViewer_1_9.getProteinName(s[i].toString());
 			  if (mapProteinRDFId_index.get(name)!=null){
 			  }
-			  else  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i].toString())!=null){
-				  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i].toString());
-				  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+			  else  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i].toString())!=null){
+				  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i].toString());
+				  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 				  for (int k=0;k<components.size();k++){
 					 if (mapProteinRDFId_index.get(components.get(k))==null){
 						 if (!a.contains(components.get(k)))
@@ -442,7 +443,7 @@ public class PopupReaction{
 			for (int i=0;i<a.size();i++){
 				int index1 = a.get(i);
 				sum += scoresComplex[index1][p]*(a.size()-i)*2;
-				if (!main.PathwayViewer_1_8.isSmallMolecule(proteins[p])) // do not include small molecules into reactions
+				if (!main.PathwayViewer_1_9.isSmallMolecule(proteins[p])) // do not include small molecules into reactions
 					sum += scoresReaction[index1][p]*(a.size()-i);
 			}
 			if (sum>maxScore){
@@ -457,7 +458,7 @@ public class PopupReaction{
 	public int[][] computeScoreComplex(){
 		int[][] score = new int [proteins.length][proteins.length];
 		for (int c=0;c<complexList.size();c++){
-			 ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[complexList.get(c)];
+			 ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[complexList.get(c)];
 			 for (int k=0;k<components.size();k++){
 				 int index1 = mapProteinRDFId_index.get(components.get(k));
 				 for (int l=0;l<components.size();l++){
@@ -545,14 +546,14 @@ public class PopupReaction{
 				float size = 0;
 				for (int i=0; i<proteinLeft.size();i++){
 					int pOrder = proteinLeft.get(i);
-					if (pOrder>=0 && !main.PathwayViewer_1_8.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
+					if (pOrder>=0 && !main.PathwayViewer_1_9.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
 						score -= iP[pOrder].target;
 						size++;
 					}
 				}
 				for (int i=0; i<proteinRight.size();i++){
 					int pOrder = proteinRight.get(i);
-					if (pOrder>=0 &&  !main.PathwayViewer_1_8.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
+					if (pOrder>=0 &&  !main.PathwayViewer_1_9.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
 						score -= iP[pOrder].target;
 						size++;
 					}	
@@ -590,9 +591,9 @@ public class PopupReaction{
 			Object[] aLeft = rect.getLeft().toArray();
 			Object[] aRight = rect.getRight().toArray();
 			for (int i3=0;i3<aLeft.length;i3++){
-				  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(aLeft[i3].toString());
-					  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+				  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(aLeft[i3].toString());
+					  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 					  float yL2 = 0;
 					  int numAvailableComponents = 0;
 					  for (int k=0;k<components.size();k++){
@@ -614,9 +615,9 @@ public class PopupReaction{
 				  }
 			}
 			for (int i3=0;i3<aRight.length;i3++){
-				  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(aRight[i3].toString());
-					  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+				  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(aRight[i3].toString());
+					  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 					  float yR2 = 0;
 				      int numAvailableComponents = 0;
 					  for (int k=0;k<components.size();k++){
@@ -1199,7 +1200,7 @@ public class PopupReaction{
 				for (int i=0;i<interElements.size();i++){
 					String ref = interElements.get(i);
 					parent.fill(0);
-					String name = main.PathwayViewer_1_8.getProteinName(ref);
+					String name = main.PathwayViewer_1_9.getProteinName(ref);
 					  if (name==null){
 						  String[] pieces = ref.split("/");
 						  if (pieces.length>=1)
@@ -1214,9 +1215,9 @@ public class PopupReaction{
 						  name = proteins[mapProteinRDFId_index.get(name)];
 							
 					  }	  
-					  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(ref)!=null){
-						  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(ref);
-						  name = main.PathwayViewer_1_8.proteinsInComplex[id].toString();
+					  else if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(ref)!=null){
+						  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(ref);
+						  name = main.PathwayViewer_1_9.proteinsInComplex[id].toString();
 					  }
 						
 					int currentLevel = interElementsLevel.get(interElementsLevel.size()-1);
@@ -1312,13 +1313,13 @@ public class PopupReaction{
 				float x3 = parent.width*3/4f-20;
 				
 				//buttonPlay.draw(parent.width-400, y3);
-				buttonPause.draw(x3, y3);
-				buttonStop.draw(x3+50, y3);
-				buttonReset.draw(x3+100, y3);
-				buttonBack.draw(x3+150, y3);
-				buttonForward.draw(x3+200, y3);
+				buttonPause.draw(x3+20, y3);
+				buttonStop.draw(x3+70, y3);
+				buttonReset.draw(x3+120, y3);
+				buttonBack.draw(x3+170, y3);
+				buttonForward.draw(x3+220, y3);
 				slider.draw(x3, y3+80, maxLevel);
-				slider2.draw(x3, y3+110);
+				slider2.draw(x3+50, y3+110);
 			}
 				
 			
@@ -1383,7 +1384,7 @@ public class PopupReaction{
 					parent.fill(proteinRectionColor.getRed(), proteinRectionColor.getGreen(), proteinRectionColor.getBlue(),sat);
 						
 				}
-				if (!main.PathwayViewer_1_8.isSmallMolecule(proteins[p])){
+				if (!main.PathwayViewer_1_9.isSmallMolecule(proteins[p])){
 					parent.textSize(12);
 					parent.textAlign(PApplet.RIGHT);
 					parent.text(level,xR-15,y3);
@@ -1446,7 +1447,7 @@ public class PopupReaction{
 		Object[] sRight1 = rectSelected.getRight().toArray();
 		// List output protein in current reaction
 		 for (int i3=0;i3<sRight1.length;i3++){
-			  String name = main.PathwayViewer_1_8.getProteinName(sRight1[i3].toString());
+			  String name = main.PathwayViewer_1_9.getProteinName(sRight1[i3].toString());
 			  if (name==null)
 				  name = sRight1[i3].toString();
 			  if (mapProteinRDFId_index.get(name)!=null){
@@ -1456,9 +1457,9 @@ public class PopupReaction{
 					  levelDownStreamList.add(recursive+1);
 				  }	  
 			  }	
-			  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(name)!=null){
-					  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(name);
-					  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+			  else if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(name)!=null){
+					  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(name);
+					  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 					  for (int i=0;i<components.size();i++){
 						  int pId = mapProteinRDFId_index.get(components.get(i));
 						  if (downstreamList2.indexOf(pId)<0){
@@ -1672,8 +1673,8 @@ public class PopupReaction{
 			for (int j=0; j<b.length;j++){
 				String str2 = b[j].toString();
 				if (str1.equals(str2)){
-					 String name = main.PathwayViewer_1_8.getProteinName(str1);
-					 if (!main.PathwayViewer_1_8.isSmallMolecule(name)){
+					 String name = main.PathwayViewer_1_9.getProteinName(str1);
+					 if (!main.PathwayViewer_1_9.isSmallMolecule(name)){
 						 results.add(str1);
 					 }	 
 				}	
@@ -1765,15 +1766,15 @@ public class PopupReaction{
 	public ArrayList<Integer> getProteinsInOneSideOfReaction(Object[] s) {
 		ArrayList<Integer> a = new ArrayList<Integer>();
 		for (int i3=0;i3<s.length;i3++){
-			  String name = main.PathwayViewer_1_8.getProteinName(s[i3].toString());
+			  String name = main.PathwayViewer_1_9.getProteinName(s[i3].toString());
 			  if (name==null)
 				  name = s[i3].toString();
 			  if (mapProteinRDFId_index.get(name)!=null){
 				  a.add(mapProteinRDFId_index.get(name));
 			  }
-			  else  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i3].toString())!=null){
-				  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(s[i3].toString());
-				  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+			  else  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i3].toString())!=null){
+				  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(s[i3].toString());
+				  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 				  for (int k=0;k<components.size();k++){
 					  if (mapProteinRDFId_index.get(components.get(k))!=null){
 						  a.add(mapProteinRDFId_index.get(components.get(k)));
@@ -1803,7 +1804,7 @@ public class PopupReaction{
 		parent.textSize(textSixe);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
-		if (main.PathwayViewer_1_8.isSmallMolecule(proteins[p])){
+		if (main.PathwayViewer_1_9.isSmallMolecule(proteins[p])){
 			c = smallMoleculeColor;
 		}
 		else if (unidentifiedList.contains(proteins[p])){
@@ -1834,7 +1835,7 @@ public class PopupReaction{
 		parent.textSize(textSixe);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
-		if (main.PathwayViewer_1_8.isSmallMolecule(proteins[p])){
+		if (main.PathwayViewer_1_9.isSmallMolecule(proteins[p])){
 			c = smallMoleculeColor;
 		}
 		else if (unidentifiedList.contains(proteins[p])){
@@ -1938,15 +1939,15 @@ public class PopupReaction{
 		boolean isContainedComplexL =false; // checking if there is a complex;
 		float yReact = iY[i2].value;
 		  for (int i3=0;i3<sLeft.length;i3++){
-			  String name = main.PathwayViewer_1_8.getProteinName(sLeft[i3].toString());
+			  String name = main.PathwayViewer_1_9.getProteinName(sLeft[i3].toString());
 			  if (name==null)
 				  name = sLeft[i3].toString();
 
 			  if (mapProteinRDFId_index.get(name)!=null){
 				  float y5 = iP[mapProteinRDFId_index.get(name)].value-hProtein/4f;
-				  if (check11.s && main.PathwayViewer_1_8.isSmallMolecule(name) && sat==200)
+				  if (check11.s && main.PathwayViewer_1_9.isSmallMolecule(name) && sat==200)
 					  drawGradientLine(xL, y5, xRect, yReact, smallMoleculeColor, sat);
-				  else if (check15.s && !main.PathwayViewer_1_8.isSmallMolecule(name) && sat==200){
+				  else if (check15.s && !main.PathwayViewer_1_9.isSmallMolecule(name) && sat==200){
 					  drawGradientLine(xL, y5, xRect, yReact, proteinRectionColor, sat);
 				  }
 				  else  {
@@ -1964,14 +1965,14 @@ public class PopupReaction{
 						  float yDel = (yReact-y5)*percent;
 						  
 						  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),newSatForSimulation);
-						  if (main.PathwayViewer_1_8.isSmallMolecule(name)){
+						  if (main.PathwayViewer_1_9.isSmallMolecule(name)){
 								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),newSatForSimulation);
 						  }
 						  parent.line(xL, y5, xL+xDel, y5+yDel);
 					  }
 					  else  {
 						  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),sat);
-					  	  if (main.PathwayViewer_1_8.isSmallMolecule(name)){
+					  	  if (main.PathwayViewer_1_9.isSmallMolecule(name)){
 								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
 						  }
 						  parent.line(xL, y5, xRect, yReact);
@@ -1979,8 +1980,8 @@ public class PopupReaction{
 				  }
 			  }	  
 			  // Complex LEFT
-			  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
-				  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(sLeft[i3].toString());
+			  else if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+				  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(sLeft[i3].toString());
 				  isContainedComplexL = drawComplexLeft(i2, id, yReact, sat, newSatForSimulation);
 			  }
 			  else if (unidentifiedList.contains(sLeft[i3].toString())){
@@ -2001,14 +2002,14 @@ public class PopupReaction{
 		  boolean isContainedComplexR =false; // checking if there is a complex;
 		  Object[] sRight = rect.getRight().toArray();
 		  for (int i3=0;i3<sRight.length;i3++){
-			  String name = main.PathwayViewer_1_8.getProteinName(sRight[i3].toString());
+			  String name = main.PathwayViewer_1_9.getProteinName(sRight[i3].toString());
 			  if (name==null)
 				  name = sRight[i3].toString();
 			  if (mapProteinRDFId_index.get(name)!=null){
 				  float y6 = iP[mapProteinRDFId_index.get(name)].value-hProtein/4f;
-				  if (check11.s && main.PathwayViewer_1_8.isSmallMolecule(name) &&sat==200)
+				  if (check11.s && main.PathwayViewer_1_9.isSmallMolecule(name) &&sat==200)
 					  drawGradientLine(xRect, yReact, xR, y6, smallMoleculeColor, sat);
-				  else if (check15.s && !main.PathwayViewer_1_8.isSmallMolecule(name) && sat==200){
+				  else if (check15.s && !main.PathwayViewer_1_9.isSmallMolecule(name) && sat==200){
 					  drawGradientLine(xRect, yReact, xR, y6, proteinRectionColor, sat);
 				  }
 				  else{
@@ -2024,21 +2025,21 @@ public class PopupReaction{
 						  float xDel = (xR-xRect)*percent;
 						  float yDel = (y6-yReact)*percent;
 						  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),newSatForSimulation);
-						  if (main.PathwayViewer_1_8.isSmallMolecule(name))
+						  if (main.PathwayViewer_1_9.isSmallMolecule(name))
 								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),newSatForSimulation);
 						  parent.line(xRect, yReact, xRect+xDel, yReact+yDel);
 						  
 					  }
 					  else{
 						  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),sat);
-						  if (main.PathwayViewer_1_8.isSmallMolecule(name))
+						  if (main.PathwayViewer_1_9.isSmallMolecule(name))
 								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
 						 parent.line(xRect, yReact,xR, y6);
 					  }	  
 				  }	  
 			  }
-			  else if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
-				  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString());
+			  else if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
+				  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(sRight[i3].toString());
 				  isContainedComplexR = drawComplexRight(i2, id, yReact, sat, newSatForSimulation);
 			  }
 			  else if (unidentifiedList.contains(sRight[i3].toString())){
@@ -2062,7 +2063,7 @@ public class PopupReaction{
 	
 	public boolean drawComplexLeft(int r, int id, float yReact, float sat, float newSatForSimulation) {
 		boolean result = false;
-		  ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+		  ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 		  yComplexesL[id].update();
 		  float yL2 = yComplexesL[id].value;
 		  if (processedComplexLeft.indexOf(id)<0 || sat==255){  // if not drawn yet
@@ -2115,7 +2116,7 @@ public class PopupReaction{
 			  if (sat==255 && check5.s){
 				  parent.textAlign(PApplet.CENTER);
 				  parent.textSize(12);
-				  parent.text(main.PathwayViewer_1_8.complexList.get(id).getDisplayName(),xL2,yL2-5);
+				  parent.text(main.PathwayViewer_1_9.complexList.get(id).getDisplayName(),xL2,yL2-5);
 			  }
 		  }
 		  if (check14.s && sat==200)
@@ -2143,7 +2144,7 @@ public class PopupReaction{
 	}
 	public boolean drawComplexRight(int r, int id, float yReact, float sat, float newSatForSimulation) {
 		 boolean result =false;
-		ArrayList<String> components = main.PathwayViewer_1_8.proteinsInComplex[id];
+		ArrayList<String> components = main.PathwayViewer_1_9.proteinsInComplex[id];
 		  yComplexesR[id].update();
 		  float yR2 = yComplexesR[id].value;
 		 
@@ -2229,7 +2230,7 @@ public class PopupReaction{
 			  if (sat==255 && check5.s){
 				  parent.textAlign(PApplet.CENTER);
 				  parent.textSize(12);
-				  parent.text(main.PathwayViewer_1_8.complexList.get(id).getDisplayName(),xR2,yR2-5);
+				  parent.text(main.PathwayViewer_1_9.complexList.get(id).getDisplayName(),xR2,yR2-5);
 			  }
 		  }
 		 // if (sat>200)
@@ -2256,7 +2257,7 @@ public class PopupReaction{
 			BiochemicalReaction rect = rectList.get(r);
 			Object[] sLeft = rect.getLeft().toArray();
 			for (int i3=0;i3<sLeft.length;i3++){
-				 String name = main.PathwayViewer_1_8.getProteinName(sLeft[i3].toString());
+				 String name = main.PathwayViewer_1_9.getProteinName(sLeft[i3].toString());
 				 if (name==null)
 					  name = sLeft[i3].toString();
 				 if (mapProteinRDFId_index.get(name)!=null && mapProteinRDFId_index.get(name)==protein){
@@ -2289,7 +2290,7 @@ public class PopupReaction{
 			BiochemicalReaction rect = rectList.get(r);
 			Object[] sRight = rect.getRight().toArray();
 			for (int i3=0;i3<sRight.length;i3++){
-				 String name = main.PathwayViewer_1_8.getProteinName(sRight[i3].toString());
+				 String name = main.PathwayViewer_1_9.getProteinName(sRight[i3].toString());
 				  if (name==null)
 					  name = sRight[i3].toString();
 				  if (mapProteinRDFId_index.get(name)!=null && mapProteinRDFId_index.get(name)==bProteinR){
@@ -2328,8 +2329,8 @@ public class PopupReaction{
 					BiochemicalReaction rect = rectList.get(r);
 					Object[] sLeft = rect.getLeft().toArray();
 					for (int i3=0;i3<sLeft.length;i3++){
-						  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
-							  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(sLeft[i3].toString());
+						  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+							  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(sLeft[i3].toString());
 							  if (id==c && !bRectListL.contains(r))
 								  bRectListL.add(r);
 						  }	
@@ -2350,8 +2351,8 @@ public class PopupReaction{
 					BiochemicalReaction rect = rectList.get(r);
 					Object[] sRight = rect.getRight().toArray();
 					for (int i3=0;i3<sRight.length;i3++){
-						  if (main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
-							  int id = main.PathwayViewer_1_8.mapComplexRDFId_index.get(sRight[i3].toString());
+						  if (main.PathwayViewer_1_9.mapComplexRDFId_index.get(sRight[i3].toString())!=null){
+							  int id = main.PathwayViewer_1_9.mapComplexRDFId_index.get(sRight[i3].toString());
 							  if (id==c && !bRectListR.contains(r))
 								  bRectListR.add(r);
 						  }	
