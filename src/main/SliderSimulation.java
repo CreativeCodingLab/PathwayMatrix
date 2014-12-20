@@ -12,29 +12,28 @@ public class SliderSimulation{
 	public int w; 
 	
 	
-	public int bSlider = -1;
-	public int sSlider = -1;
+	public boolean b = false;
+	public boolean s = false;
 	public float ggg =10;
-	public float u = 10;
-	public int value =0;
-		
+	public float v =0;
+	public static float transitionProcess =0;
+	public static float reactionSize =0;
 	
 	public SliderSimulation(PApplet parent_){
 		parent = parent_;
 		w= 300;
-		u=(int) (w/5);
 	}
 		
 	
 		
 	public void draw(float x_, float y_, int maxLevel_){
+		checkBrushingSlider();
 		int maxLevel2 = maxLevel_+1;
 		if (maxLevel2<=0) return;
 		x = x_;
 		y = y_;
 		
-		float reactionSize = w/maxLevel2;
-		checkBrushingSlider();
+		reactionSize = w/maxLevel2;
 		
 		
 		for (int k=0; k<maxLevel2; k++ ){
@@ -74,10 +73,14 @@ public class SliderSimulation{
 			}
 		}
 		
+		//System.out.println("s="+s+"	b="+b);
 		Color color = new Color(0,0,0);
-		if (sSlider==1){
-			color= new Color(200,100,0);
-		}	
+		if (s){
+			color= new Color(200,0,0);
+		}
+		else if (b){
+			color = new Color(200,150,0);
+		}
 		else{
 			color = new Color(0,100,255);
 		}
@@ -89,14 +92,12 @@ public class SliderSimulation{
 		int currentRect = PopupReaction.simulationRectList.get(lastIndex);
 		
 		float sumStep = PopupReaction.iS1[currentRect].value+PopupReaction.iS2[currentRect].value+
-						PopupReaction.iS3[currentRect].value+PopupReaction.iS4[currentRect].value;
-		float xx2 = x+currentLevel*reactionSize +(sumStep/1000)*reactionSize/5;
-		DecimalFormat df = new DecimalFormat("#.##");
-		parent.stroke(200);
-		parent.strokeWeight(1.0f);
-		parent.line(x, y+9, x, y+16);
-		parent.line(x+w, y+9, x+w, y+16);
-		
+						PopupReaction.iS3[currentRect].value+PopupReaction.iS4[currentRect].value+
+						transitionProcess;
+	//	DecimalFormat df = new DecimalFormat("#.##");
+		if (!parent.mousePressed)
+			v = currentLevel*reactionSize +(sumStep/1000)*reactionSize/5;;
+		float xx2 = x+ v;
 		parent.textSize(14);
 		parent.stroke(0,100);
 		parent.fill(color.getRGB());
@@ -106,7 +107,6 @@ public class SliderSimulation{
 		// Decide the text on slider
 		parent.textAlign(PApplet.CENTER);
 		parent.textSize(13);
-		value = (int) (u/w);
 		//parent.text(df.format(value), xx2,y+8);
 		parent.textAlign(PApplet.LEFT);
 	}
@@ -114,30 +114,46 @@ public class SliderSimulation{
 	
 	
 	public void checkBrushingSlider() {
-		float xx2 = x+u;
+		float x2 = x+v;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		
-		if (xx2-20<mX && mX < xx2+20 && y<mY && mY<y+25){
-			bSlider =1; 
-			return;
+		if (x2-20<mX && mX < x2+10 && y-15<mY && mY<y+15){
+			b=true; 
 		}
-		bSlider =-1;
-	}
-	
-	public void mousePressed() {
-		sSlider = bSlider;
-	}
-	public void mouseRelease() {
-		sSlider = -1;
-	}	
-	public int checkSelectedSlider() {
-		if (sSlider==1){
-			u += (parent.mouseX - parent.pmouseX);
-			if (u<0) u=0;
-			if (u>w)  u=w;
+		else{
+			b = false;
 		}
-		return sSlider;
+			
+	}
+	public void mousePresses() {
+		s =true;
+	}
+	public void mouseReleased() {
+		s = false;
 	}
 		
+	public void mouseDragged() {
+		if (s){
+			v += (parent.mouseX - parent.pmouseX);
+			int setLevel = (int) (v/reactionSize);
+			
+			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
+				int currentLevel = PopupReaction.simulationRectListLevel.get(i);
+				int currentReact = PopupReaction.simulationRectList.get(i);
+				if (currentLevel>=setLevel){
+					PopupReaction.simulationRectList.remove(i);
+					PopupReaction.simulationRectListLevel.remove(i);
+					PopupReaction.iS1[currentReact].set(0);
+					for (int g=0;g<PopupReaction.rectList.size();g++){
+						PopupReaction.iS[currentReact][g].set(0);
+						
+					}
+				}	
+			}
+			
+			if (v<0) v=0;
+			if (v>w)  v=w;
+		}
+	}
 }

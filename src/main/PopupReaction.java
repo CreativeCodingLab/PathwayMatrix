@@ -1295,10 +1295,10 @@ public class PopupReaction{
 				}
 			}
 			//if (simulationRectList.size()>0){
-			System.out.println(simulationRectList);
-			System.out.println(simulationRectListLevel);
-			System.out.println("downstreamList = "+simulationRectListAll);
-			System.out.println("levelDownstreamList = "+simulationRectListLevelAll);
+			//System.out.println(simulationRectList);
+			//System.out.println(simulationRectListLevel);
+			//System.out.println("downstreamList = "+simulationRectListAll);
+			//System.out.println("levelDownstreamList = "+simulationRectListLevelAll);
 			int maxLevel = -1;
 			for (int i=0;i<simulationRectListLevelAll.size();i++){
 				int level = simulationRectListLevelAll.get(i);
@@ -1521,6 +1521,13 @@ public class PopupReaction{
 									interElementsLevel.add(recursive+1);	
 								}
 							}	
+						}
+						int lastIndex=simulationRectList.get(simulationRectList.size()-1);
+						if (iS[r][g].value<=1000 && lastIndex==r){
+							SliderSimulation.transitionProcess = iS[r][g].value;
+						}
+						else{
+							SliderSimulation.transitionProcess =0;
 						}
 					}
 				}
@@ -2478,6 +2485,19 @@ public class PopupReaction{
 			}	
 		}
 	}
+	
+	public void mousePressed() {
+		if (slider.b)
+			slider.mousePresses();
+	}
+	public void mouseReleased() {
+		slider.mouseReleased();
+	}
+		
+	public void mouseDragged() {
+		if (slider.b)
+			slider.mouseDragged();
+	}
 		
 	public void mouseClicked1() {
 		 sPopup = !sPopup;
@@ -2624,9 +2644,6 @@ public class PopupReaction{
 			simulationRectListLevelAll = new ArrayList<Integer>();
 			simulationRectListLevelAll.add(0);
 			listReactionDownStream(bRect,0,simulationRectListAll, parentList,simulationRectListLevelAll);
-			
-			
-			
 		}
 		else if (bProteinL>=0 || bComplexL>=0){
 			deleteReactionList = new ArrayList<Integer>();

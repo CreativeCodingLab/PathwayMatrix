@@ -891,19 +891,29 @@ public class PathwayViewer_1_8 extends PApplet {
 	}
 				
 	public void mousePressed() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mousePressed();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider1();
 		}
 	}
 	public void mouseReleased() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mouseReleased();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider2();
 		}
 	}
 	public void mouseDragged() {
-		if (popupOrder.b>=0){
+		if (popupReaction.sPopup){
+			popupReaction.mouseDragged();
+		}
+		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider3();
 		}
+		
 	}
 		
 	public void mouseMoved() {
