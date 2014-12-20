@@ -127,6 +127,7 @@ public class PopupReaction{
 	public static ButtonSimulation buttonBack;
 	public static ButtonSimulation buttonForward;
 	public static SliderSimulation slider;
+	public static SliderSpeed slider2;
 	
 	
 	public PopupReaction(PApplet parent_){
@@ -157,6 +158,7 @@ public class PopupReaction{
 		PImage im6 =  parent.loadImage("img/buttonForward.png");
 		buttonForward = new ButtonSimulation(parent, im6);
 		slider = new SliderSimulation(parent);
+		slider2 = new SliderSpeed(parent);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -230,12 +232,12 @@ public class PopupReaction{
 			iY[i] = new Integrator(20, 0.5f,0.1f);
 			iH[i] = new Integrator(10, 0.5f,0.1f);
 			for (int j=0;j<rectHash.size();j++){
-				iS[i][j] = new Integrator(0, 0.5f,0.2f);
+				iS[i][j] = new Integrator(0, 0.2f,SliderSpeed.speed/2);
 			}
-			iS1[i] = new Integrator(0, 0.2f,1f);
-			iS2[i] = new Integrator(0, 0.2f,1f);
-			iS3[i] = new Integrator(0, 0.2f,1);
-			iS4[i] = new Integrator(0, 0.2f,1f);
+			iS1[i] = new Integrator(0, 0.2f,SliderSpeed.speed);
+			iS2[i] = new Integrator(0, 0.2f,SliderSpeed.speed);
+			iS3[i] = new Integrator(0, 0.2f,SliderSpeed.speed);
+			iS4[i] = new Integrator(0, 0.2f,SliderSpeed.speed);
 		}
 		
 		hightlightList =  new int[rectHash.size()];
@@ -1307,14 +1309,16 @@ public class PopupReaction{
 						maxLevel = level;
 				}
 				float y3 = 130;
-			
+				float x3 = parent.width*3/4f-20;
+				
 				//buttonPlay.draw(parent.width-400, y3);
-				buttonStop.draw(parent.width-350, y3);
-				buttonPause.draw(parent.width-300, y3);
-				buttonReset.draw(parent.width-250, y3);
-				buttonBack.draw(parent.width-200, y3);
-				buttonForward.draw(parent.width-150, y3);
-				slider.draw(parent.width-400, y3+80, maxLevel);
+				buttonPause.draw(x3, y3);
+				buttonStop.draw(x3+50, y3);
+				buttonReset.draw(x3+100, y3);
+				buttonBack.draw(x3+150, y3);
+				buttonForward.draw(x3+200, y3);
+				slider.draw(x3, y3+80, maxLevel);
+				slider2.draw(x3, y3+110);
 			}
 				
 			
@@ -2493,14 +2497,19 @@ public class PopupReaction{
 	public void mousePressed() {
 		if (slider.b)
 			slider.mousePresses();
+		else if (slider2.b)
+			slider2.mousePresses();
 	}
 	public void mouseReleased() {
 		slider.mouseReleased();
+		slider2.mouseReleased();
 	}
 		
 	public void mouseDragged() {
 		if (slider.b)
 			slider.mouseDragged();
+		else if (slider2.b)
+			slider2.mouseDragged();
 	}
 		
 	public void mouseClicked1() {
@@ -2521,7 +2530,6 @@ public class PopupReaction{
 		}
 		else if (buttonPause.b){
 			buttonPause.mouseClicked();
-			System.out.println(buttonPause.s);
 		}
 		else if (buttonBack.b){
 			int size = simulationRectList.size();

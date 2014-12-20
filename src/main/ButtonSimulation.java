@@ -38,10 +38,7 @@ public class ButtonSimulation{
 	}
 	
 	public void mouseClicked() {
-		System.out.println("	s1="+s);
 		s = !s;
-		System.out.println("	s2="+s);
-		
 	}
 		
 	 

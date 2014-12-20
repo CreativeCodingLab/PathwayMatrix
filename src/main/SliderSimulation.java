@@ -95,7 +95,7 @@ public class SliderSimulation{
 						PopupReaction.iS3[currentRect].value+PopupReaction.iS4[currentRect].value+
 						transitionProcess;
 	//	DecimalFormat df = new DecimalFormat("#.##");
-		if (!parent.mousePressed)
+		if (!(parent.mousePressed && b))
 			v = currentLevel*reactionSize +(sumStep/1000)*reactionSize/5;;
 		float xx2 = x+ v;
 		parent.textSize(14);
@@ -118,7 +118,7 @@ public class SliderSimulation{
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		
-		if (x2-50<mX && mX < x2+40 && y-25<mY && mY<y+25){
+		if (x2-60<mX && mX < x2+50 && y-25<mY && mY<y+25){
 			b=true; 
 		}
 		else{
