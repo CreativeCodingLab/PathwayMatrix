@@ -26,7 +26,7 @@ public class PopupBackground{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.PathwayViewer_1_8.popupRelation.b<0)
+		if (main.PathwayViewer_1_9.popupRelation.b<0)
 			checkBrushing();
 		parent.noStroke();
 		parent.fill(200,200,200);
@@ -38,8 +38,8 @@ public class PopupBackground{
 			parent.rect(x, y-2, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_1_8.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_1_8.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_1_9.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_1_9.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
