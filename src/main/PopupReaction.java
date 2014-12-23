@@ -117,7 +117,7 @@ public class PopupReaction{
 	ArrayList<Integer> loopReactionList = new ArrayList<Integer>();
 	ArrayList<Integer> deleteReactionList = new ArrayList<Integer>();
 	
-	Integrator iDelete =  new Integrator(0,0.1f,0.4f);
+	Integrator iDelete =  new Integrator(0,0.1f,0.6f);
 	public static PopupCausality popupCausality;
 	
 	//public static ButtonSimulation buttonPlay;
@@ -1800,8 +1800,8 @@ public class PopupReaction{
 	
 	public void drawProteinLeft(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 12);
-		parent.textSize(textSixe);
+		float textSize = PApplet.map(hProtein, 0, maxH, 2, 12);
+		parent.textSize(textSize);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
 		if (main.PathwayViewer_2_0.isSmallMolecule(proteins[p])){
@@ -1819,14 +1819,22 @@ public class PopupReaction{
 			}
 		}
 		
-		if (sat>=255 && textSixe<10)
+		if (sat==255 && textSize<10)
 			parent.textSize(10);
-		if (sat==255 && p==bProteinL)
+		
+		if (sat==255 && p==bProteinL){
 			parent.fill(c.getRed(), c.getGreen(), c.getBlue(), (parent.frameCount*22)%255);
+		}	
 		else
 			parent.fill(c.getRed(), c.getGreen(), c.getBlue(),sat);
 		parent.textAlign(PApplet.RIGHT);
 		parent.text(name, xL,y3);
+		
+		if (PopupCausality.s==1 && p==bProteinL){  // Knock out one protein
+			parent.stroke(250,0,0);
+			float ww = parent.textWidth(name);
+			parent.line(xL-ww-8, y3-textSize/3, xL+5, y3-textSize/3);
+		}
 	}
 	
 	public void drawProteinRight(int p, float sat) {
