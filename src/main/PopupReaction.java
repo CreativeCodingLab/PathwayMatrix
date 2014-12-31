@@ -1519,18 +1519,26 @@ public class PopupReaction{
 						iS[r][g].update();
 					drawArc(r,g, iS[r][g], recursive, sat);
 					if (recursive>=0){
-						if (processedList.indexOf(g)<0 && iS[r][g].value>=990){
-							processedList.add(r);
-							if (simulationRectList.indexOf(g)<0){
-								simulationRectList.add(g);
-								simulationRectListLevel.add(recursive+1);
-								
+						if (processedList.indexOf(g)<0){
+							if (iS[r][g].value>=990){
+								processedList.add(r);
+								if (simulationRectList.indexOf(g)<0){
+									simulationRectList.add(g);
+									simulationRectListLevel.add(recursive+1);
+									
+								}
+							}
+							// Add intermediate elements
+							if (iS[r][g].value>=10){
 								for (int i=0;i<commonElements.size();i++){
 									String str = commonElements.get(i);
-									interElements.add(str);
-									interElementsLevel.add(recursive+1);	
+									if (!interElements.contains(str)){
+										interElements.add(str);
+										interElementsLevel.add(recursive+1);	
+									}
 								}
 							}	
+						
 						}
 						int lastIndex=simulationRectList.get(simulationRectList.size()-1);
 						if (iS[r][g].value<=1000 && lastIndex==r){
@@ -1836,19 +1844,31 @@ public class PopupReaction{
 			float ww = parent.textWidth(name);
 			parent.line(xL-ww-8, y3-textSize/3, xL+5, y3-textSize/3);
 		}
-		// Draw connecting nodes
-		System.out.println(name + "	"+interElements);
-		if (interElements.contains(name)){
-			System.out.println(name + "	"+interElements);
-			parent.stroke(250,0,250);
-			parent.line(xL, y3-textSize/3, xL+50, y3-textSize/3);
+		// Draw connecting nodes for simulations
+		float rReaction = parent.width/4f-10;   // The width of reaction = parent.width/2
+		int numDash = 50;
+		float gap = 2.5f;
+		float w4 = rReaction/numDash-gap; // Width of a dash   
+		for (int i=0;i<interElements.size();i++){
+			String ref = interElements.get(i);
+			String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
+			if(interProteinName!=null && interProteinName.equals(name)){
+				float x4 = xL;
+				for (int k=0;k<numDash;k++){
+					parent.stroke(0,255-k*5.25f);
+					parent.strokeWeight(1.5f-k*1.5f/numDash);
+					parent.line(x4, y3-textSize/3, x4+w4, y3-textSize/3);
+					x4+=w4+gap;
+				}
+			}
+			parent.strokeWeight(1);
 		}
 	}
 	
 	public void drawProteinRight(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSixe = PApplet.map(hProtein, 0, maxH, 2, 12);
-		parent.textSize(textSixe);
+		float textSize = PApplet.map(hProtein, 0, maxH, 2, 12);
+		parent.textSize(textSize);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
 		if (main.PathwayViewer_2_1.isSmallMolecule(proteins[p])){
@@ -1866,7 +1886,7 @@ public class PopupReaction{
 			}
 		}
 		
-		if (sat>=255 && textSixe<10)
+		if (sat>=255 && textSize<10)
 			parent.textSize(10);
 		if (sat==255 && p==bProteinR)
 			parent.fill(c.getRed(), c.getGreen(), c.getBlue(), (parent.frameCount*22)%255);
@@ -1876,6 +1896,26 @@ public class PopupReaction{
 		parent.textAlign(PApplet.LEFT);
 		parent.text(name, xR,y3);
 		
+		
+		// Draw connecting nodes for simulations
+		float rReaction = parent.width/4f-10;   // The width of reaction = parent.width/2
+		int numDash = 50;
+		float gap = 2.5f;
+		float w4 = rReaction/numDash-gap; // Width of a dash   
+		for (int i=0;i<interElements.size();i++){
+			String ref = interElements.get(i);
+			String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
+			if(interProteinName!=null && interProteinName.equals(name)){
+				float x4 = xR;
+				for (int k=0;k<numDash;k++){
+					parent.stroke(0,255-k*5.25f);
+					parent.strokeWeight(1.5f-k*1.5f/numDash);
+					parent.line(x4, y3-textSize/3, x4-w4, y3-textSize/3);
+					x4-=(w4+gap);
+				}
+			}
+			parent.strokeWeight(1);
+		}
 	}
 		
 	public void drawReactionNode(Map.Entry<BiochemicalReaction, Integer> entry, int i, float sat) {
@@ -2133,6 +2173,29 @@ public class PopupReaction{
 				  parent.textSize(12);
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xL2,yL2-5);
 			  }
+			  
+			  
+				// Draw connecting nodes for simulations
+				float rReaction = parent.width/6f-10;   // The width of reaction = parent.width/2
+				int numDash = 30;
+				float gap = 2.5f;
+				float w4 = rReaction/numDash-gap; // Width of a dash   
+				for (int i=0;i<interElements.size();i++){
+					String ref = interElements.get(i);
+					if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
+						  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
+						  if(complexId==id){
+								float x4 = xL2+2;
+								for (int k=0;k<numDash;k++){
+									parent.stroke(0,255-k*8.5f);
+									parent.strokeWeight(1.5f-k*1.5f/(numDash-1));
+									parent.line(x4, yL2, x4+w4, yL2);
+									x4+=(w4+gap);
+								}
+							}
+					  }
+				}
+				parent.strokeWeight(1f);
 		  }
 		  if (check14.s && sat==200)
 			  drawGradientLine(xL2, yL2, xRect, yReact, complexRectionColor, sat);
@@ -2159,11 +2222,10 @@ public class PopupReaction{
 	}
 	public boolean drawComplexRight(int r, int id, float yReact, float sat, float newSatForSimulation) {
 		 boolean result =false;
-		ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
+		 ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
 		  yComplexesR[id].update();
 		  float yR2 = yComplexesR[id].value;
 		 
-		  
 		  if (check14.s && sat==200)
 			  drawGradientLine(xRect, yReact, xR2, yR2, complexRectionColor, sat);
 		  else{	  
@@ -2248,6 +2310,8 @@ public class PopupReaction{
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xR2,yR2-5);
 			  }
 		  }
+		
+			
 		return result;
 	}
 		
@@ -2597,7 +2661,7 @@ public class PopupReaction{
 			textbox1.searchText="";
 			
 		}	
-		else if (wordCloud.b>0){
+		else if (wordCloud.b>=0){
 			wordCloud.mouseClicked();
 		}
 		else if (PopupReaction.check11.b){
