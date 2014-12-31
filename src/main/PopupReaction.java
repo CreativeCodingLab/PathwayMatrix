@@ -1845,7 +1845,7 @@ public class PopupReaction{
 			parent.line(xL-ww-8, y3-textSize/3, xL+5, y3-textSize/3);
 		}
 		// Draw connecting nodes for simulations
-		float rReaction = parent.width/4f-10;   // The width of reaction = parent.width/2
+		float rReaction = 0.8f*(parent.width/4f);   // The width of reaction = parent.width/2
 		int numDash = 50;
 		float gap = 2.5f;
 		float w4 = rReaction/numDash-gap; // Width of a dash   
@@ -1898,7 +1898,7 @@ public class PopupReaction{
 		
 		
 		// Draw connecting nodes for simulations
-		float rReaction = parent.width/4f-10;   // The width of reaction = parent.width/2
+		float rReaction = 0.8f*(parent.width/4f);   // The width of reaction = parent.width/2
 		int numDash = 50;
 		float gap = 2.5f;
 		float w4 = rReaction/numDash-gap; // Width of a dash   
@@ -2174,23 +2174,21 @@ public class PopupReaction{
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xL2,yL2-5);
 			  }
 			  
-			  
-				// Draw connecting nodes for simulations
-				float rReaction = parent.width/6f-10;   // The width of reaction = parent.width/2
-				int numDash = 30;
-				float gap = 2.5f;
-				float w4 = rReaction/numDash-gap; // Width of a dash   
+			  // Draw connecting Complex for simulations
+				float rReaction = 0.75f*(parent.width/6f);   // The width of reaction = parent.width/2
+				float w4 = 5; // Width of a dash   
+				int numDash = (int) (rReaction/w4);
+				parent.noStroke();
 				for (int i=0;i<interElements.size();i++){
 					String ref = interElements.get(i);
 					if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
 						  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
 						  if(complexId==id){
-								float x4 = xL2+2;
+								float x4 = xL2;
 								for (int k=0;k<numDash;k++){
-									parent.stroke(0,255-k*8.5f);
-									parent.strokeWeight(1.5f-k*1.5f/(numDash-1));
-									parent.line(x4, yL2, x4+w4, yL2);
-									x4+=(w4+gap);
+									parent.fill(0,255-k*255f/numDash);
+									parent.ellipse(x4, yL2, 3, 3);
+									x4+=w4;
 								}
 							}
 					  }
@@ -2309,6 +2307,28 @@ public class PopupReaction{
 				  parent.textSize(12);
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xR2,yR2-5);
 			  }
+			  
+			  // Draw connecting Complex for simulations
+				float rReaction = 0.75f*(parent.width/6f);   // The width of reaction = parent.width/2
+				float w4 = 5; // Width of a dash   
+				int numDash = (int) (rReaction/w4);
+				parent.noStroke();
+				for (int i=0;i<interElements.size();i++){
+					String ref = interElements.get(i);
+					if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
+						  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
+						  if(complexId==id){
+								float x4 = xR2;
+								for (int k=0;k<numDash;k++){
+									parent.fill(0,255-k*255f/numDash);
+									parent.ellipse(x4, yR2, 3, 3);
+									x4-=w4;
+								}
+							}
+					  }
+				}
+				parent.strokeWeight(1f);
+			  
 		  }
 		
 			
