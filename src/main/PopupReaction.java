@@ -906,6 +906,8 @@ public class PopupReaction{
 					int level = simulationRectListLevel.get(r);
 					processedList.add(rect);
 					drawDownStreamReaction(rect, level,processedList, iS4[rect].value,255);
+					
+					
 				}
 			}
 			else if (PopupCausality.s==0){
@@ -1274,9 +1276,9 @@ public class PopupReaction{
 				check14.draw((int) x7, (int) y7+82);
 				check15.draw((int) x7, (int) y7+101);
 				// Draw word cloud
-				//wordCloud.x1=parent.width-200; 
-				//wordCloud.x2=parent.width; 
-				//wordCloud.draw(parent);
+				wordCloud.x1=parent.width-200; 
+				wordCloud.x2=parent.width; 
+				wordCloud.draw(parent);
 				
 				// Draw word relationship
 				int[][] rel =  new int[numTop][numTop];
@@ -1290,7 +1292,7 @@ public class PopupReaction{
 						}
 					}		
 				}
-			//	drawRelationship(wordCloud, rel, Color.BLACK);
+				drawRelationship(wordCloud, rel, Color.BLACK);
 			}
 			
 // ****************** Draw Button simulations ***********************************************************************************************
@@ -1498,7 +1500,6 @@ public class PopupReaction{
 					levelDownStreamList.add(recursive+1);
 					listReactionDownStream(g, recursive+1,downstreamList, parentList, levelDownStreamList);
 				}	
-				
 			}
 		}
 	}
@@ -1835,6 +1836,13 @@ public class PopupReaction{
 			float ww = parent.textWidth(name);
 			parent.line(xL-ww-8, y3-textSize/3, xL+5, y3-textSize/3);
 		}
+		// Draw connecting nodes
+		System.out.println(name + "	"+interElements);
+		if (interElements.contains(name)){
+			System.out.println(name + "	"+interElements);
+			parent.stroke(250,0,250);
+			parent.line(xL, y3-textSize/3, xL+50, y3-textSize/3);
+		}
 	}
 	
 	public void drawProteinRight(int p, float sat) {
@@ -1962,7 +1970,6 @@ public class PopupReaction{
 					  
 					  if (sat==255){ // Draw simulation lines
 						  if (iS1[i2].value>=990){
-							  
 							  iS2[i2].target(1000);
 						  }
 						  else{
@@ -2241,8 +2248,6 @@ public class PopupReaction{
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xR2,yR2-5);
 			  }
 		  }
-		 // if (sat>200)
-		//	  System.out.println("	isContainedComplexR 1 = "+isContainedComplexR);
 		return result;
 	}
 		
