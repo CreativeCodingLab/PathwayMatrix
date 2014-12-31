@@ -1857,8 +1857,15 @@ public class PopupReaction{
 				String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
 				if(interProteinName!=null && interProteinName.equals(name)){
 					float x4 = xL;
+					float max = 0;
+					int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+					if (10<=SliderSimulation.transitionProcess)
+						max = (SliderSimulation.transitionProcess/1000)*255;
+					else 
+						max = ((1000-iS2[currentReact].value)/1001)*255;
+					
 					for (int k=0;k<numDash;k++){
-						parent.stroke(0,255-k*5.25f);
+						parent.stroke(0,max-k*max/numDash);
 						parent.strokeWeight(1.5f-k*1.5f/numDash);
 						parent.line(x4, y3-textSize/3, x4+w4, y3-textSize/3);
 						x4+=w4+gap;
@@ -1914,8 +1921,16 @@ public class PopupReaction{
 				String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
 				if(interProteinName!=null && interProteinName.equals(name)){
 					float x4 = xR;
+					// Compute the max value;
+					int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+					float max = 0;
+					if (10<=SliderSimulation.transitionProcess)
+						max = (SliderSimulation.transitionProcess/1000)*255;
+					else 
+						max = ((1000-iS2[currentReact].value)/1001)*255;
+					
 					for (int k=0;k<numDash;k++){
-						parent.stroke(0,255-k*5.25f);
+						parent.stroke(0,max-k*max/numDash);
 						parent.strokeWeight(1.5f-k*1.5f/numDash);
 						parent.line(x4, y3-textSize/3, x4-w4, y3-textSize/3);
 						x4-=(w4+gap);
@@ -2196,8 +2211,13 @@ public class PopupReaction{
 							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
 							  if(complexId==id){
 									float x4 = xL2;
+									float max = 0;
+									if (10<=SliderSimulation.transitionProcess)
+										max = (SliderSimulation.transitionProcess/1000)*255;
+									else 
+										max = ((1000-iS2[r].value)/1001)*255;
 									for (int k=0;k<numDash;k++){
-										parent.fill(0,255-k*255f/numDash);
+										parent.fill(0,max-k*max/numDash);
 										parent.ellipse(x4, yL2, 3, 3);
 										x4+=w4;
 									}
@@ -2276,7 +2296,6 @@ public class PopupReaction{
 							  else{
 								  iS4[r].set(0);
 							  }
-								
 							  float percent = iS4[r].value/1000;
 							  float xDel = (xR-xR2)*percent;
 							  float yDel = (y4-yR2)*percent;
@@ -2298,7 +2317,6 @@ public class PopupReaction{
 						  parent.line(xR2, yR2, xR, yUFO);
 					  }
 				  }
-				  
 			  }
 			  // Draw complex node
 			  parent.noStroke();
@@ -2334,8 +2352,17 @@ public class PopupReaction{
 							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
 							  if(complexId==id){
 									float x4 = xR2;
+									float max = 0;
+									if (10<=SliderSimulation.transitionProcess){
+										max = (SliderSimulation.transitionProcess/1000)*255;
+									}	
+									else {//if (SliderSimulation.transitionProcess==0){
+										int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+										max = ((1000-iS2[currentReact].value)/1001)*255;
+									}
+									
 									for (int k=0;k<numDash;k++){
-										parent.fill(0,255-k*255f/numDash);
+										parent.fill(0,max-k*max/numDash);
 										parent.ellipse(x4, yR2, 3, 3);
 										x4-=w4;
 									}
