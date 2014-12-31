@@ -271,10 +271,6 @@ public class PathwayViewer_2_1 extends PApplet {
 		});
 	}	
 	
-	
-	
-		
-	
 	public void draw() {
 		background(255);
 		// Draw 

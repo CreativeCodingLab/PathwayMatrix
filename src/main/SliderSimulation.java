@@ -18,6 +18,7 @@ public class SliderSimulation{
 	public float v =0;
 	public static float transitionProcess =0;
 	public static float reactionSize =0;
+	public static float sumStep =0;
 	
 	public SliderSimulation(PApplet parent_){
 		parent = parent_;
@@ -91,7 +92,7 @@ public class SliderSimulation{
 		int currentLevel = PopupReaction.simulationRectListLevel.get(lastIndex);
 		int currentRect = PopupReaction.simulationRectList.get(lastIndex);
 		
-		float sumStep = PopupReaction.iS1[currentRect].value+PopupReaction.iS2[currentRect].value+
+		sumStep = PopupReaction.iS1[currentRect].value+PopupReaction.iS2[currentRect].value+
 						PopupReaction.iS3[currentRect].value+PopupReaction.iS4[currentRect].value+
 						transitionProcess;
 	//	DecimalFormat df = new DecimalFormat("#.##");

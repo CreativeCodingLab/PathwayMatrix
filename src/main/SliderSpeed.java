@@ -104,7 +104,6 @@ public class SliderSpeed{
 	}
 	// Set speed **********************************
 	public void setSpeed(float speed_) {
-	
 		speed = 0.2f+speed_*2.8f;     // initial value v =0.25; speed = 0.2+0.25*2.8f = 0.9f
 		for (int i=0; i< PopupReaction.rectList.size();i++){
 			PopupReaction.iS1[i].attraction = speed;
