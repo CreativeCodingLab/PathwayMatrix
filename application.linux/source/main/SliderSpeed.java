@@ -58,9 +58,8 @@ public class SliderSpeed{
 		int lastIndex = PopupReaction.simulationRectList.size()-1;
 		if (lastIndex<0) return;
 		
-		DecimalFormat df = new DecimalFormat("#.##");
+		DecimalFormat df = new DecimalFormat("#.#");
 		float xx2 = x+ v;
-		parent.textSize(14);
 		parent.stroke(0,100);
 		parent.fill(color.getRGB());
 		parent.triangle(xx2-6, y+10, xx2+6, y+10, xx2, y);
@@ -68,12 +67,9 @@ public class SliderSpeed{
 		
 		// Decide the text on slider
 		parent.textAlign(PApplet.CENTER);
-		parent.textSize(13);
+		parent.textSize(12);
 		
 		float rate = PApplet.pow(speed/0.9f,1.9125f); // to make sure the fastest speed is 10 times faster than the default
-		
-		//if (rate>1) rate *=3;
-		//else if (rate<1) rate /=3f;
 		parent.text(df.format(rate)+"x", xx2,y-2);
 		parent.textAlign(PApplet.LEFT);
 	}

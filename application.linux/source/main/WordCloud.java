@@ -89,7 +89,6 @@ public class WordCloud{
 			}	
 		}
 		else{
-			
 			s=-1;
 		}
 	}
@@ -180,7 +179,6 @@ public class WordCloud{
 		}
 
 		public int checkBrushing(PApplet p) {
-			
 			if (x-word_width/2<=parent.mouseX && parent.mouseX<=x+word_width/2 &&
 				y-font_size<=parent.mouseY && parent.mouseY<=y){
 				b=id;

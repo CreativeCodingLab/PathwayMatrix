@@ -296,7 +296,7 @@ public class PathwayViewer_2_1 extends PApplet {
 			
 			if (isAllowedDrawing){
 				if (PopupReaction.sPopup){
-					popupReaction.drawReactions(140);
+					popupReaction.drawReactions(120);
 				}	
 				else{
 					if (currentFile.equals("")){

@@ -1850,18 +1850,22 @@ public class PopupReaction{
 		float gap = 2.5f;
 		float w4 = rReaction/numDash-gap; // Width of a dash   
 		for (int i=0;i<interElements.size();i++){
-			String ref = interElements.get(i);
-			String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
-			if(interProteinName!=null && interProteinName.equals(name)){
-				float x4 = xL;
-				for (int k=0;k<numDash;k++){
-					parent.stroke(0,255-k*5.25f);
-					parent.strokeWeight(1.5f-k*1.5f/numDash);
-					parent.line(x4, y3-textSize/3, x4+w4, y3-textSize/3);
-					x4+=w4+gap;
+			int curLevel =  interElementsLevel.get(interElementsLevel.size()-1);
+			int level = interElementsLevel.get(i);
+			if (curLevel==level){
+				String ref = interElements.get(i);
+				String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
+				if(interProteinName!=null && interProteinName.equals(name)){
+					float x4 = xL;
+					for (int k=0;k<numDash;k++){
+						parent.stroke(0,255-k*5.25f);
+						parent.strokeWeight(1.5f-k*1.5f/numDash);
+						parent.line(x4, y3-textSize/3, x4+w4, y3-textSize/3);
+						x4+=w4+gap;
+					}
 				}
+				parent.strokeWeight(1);
 			}
-			parent.strokeWeight(1);
 		}
 	}
 	
@@ -1903,18 +1907,22 @@ public class PopupReaction{
 		float gap = 2.5f;
 		float w4 = rReaction/numDash-gap; // Width of a dash   
 		for (int i=0;i<interElements.size();i++){
-			String ref = interElements.get(i);
-			String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
-			if(interProteinName!=null && interProteinName.equals(name)){
-				float x4 = xR;
-				for (int k=0;k<numDash;k++){
-					parent.stroke(0,255-k*5.25f);
-					parent.strokeWeight(1.5f-k*1.5f/numDash);
-					parent.line(x4, y3-textSize/3, x4-w4, y3-textSize/3);
-					x4-=(w4+gap);
+			int curLevel =  interElementsLevel.get(interElementsLevel.size()-1);
+			int level = interElementsLevel.get(i);
+			if (curLevel==level){
+				String ref = interElements.get(i);
+				String interProteinName = main.PathwayViewer_2_1.getProteinName(ref);
+				if(interProteinName!=null && interProteinName.equals(name)){
+					float x4 = xR;
+					for (int k=0;k<numDash;k++){
+						parent.stroke(0,255-k*5.25f);
+						parent.strokeWeight(1.5f-k*1.5f/numDash);
+						parent.line(x4, y3-textSize/3, x4-w4, y3-textSize/3);
+						x4-=(w4+gap);
+					}
 				}
-			}
-			parent.strokeWeight(1);
+				parent.strokeWeight(1);
+			}	
 		}
 	}
 		
@@ -2180,18 +2188,22 @@ public class PopupReaction{
 				int numDash = (int) (rReaction/w4);
 				parent.noStroke();
 				for (int i=0;i<interElements.size();i++){
-					String ref = interElements.get(i);
-					if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
-						  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
-						  if(complexId==id){
-								float x4 = xL2;
-								for (int k=0;k<numDash;k++){
-									parent.fill(0,255-k*255f/numDash);
-									parent.ellipse(x4, yL2, 3, 3);
-									x4+=w4;
-								}
-							}
-					  }
+					int curLevel =  interElementsLevel.get(interElementsLevel.size()-1);
+					int level = interElementsLevel.get(i);
+					if (curLevel==level){
+						String ref = interElements.get(i);
+						if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
+							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
+							  if(complexId==id){
+									float x4 = xL2;
+									for (int k=0;k<numDash;k++){
+										parent.fill(0,255-k*255f/numDash);
+										parent.ellipse(x4, yL2, 3, 3);
+										x4+=w4;
+									}
+							  }
+						 }
+					}	
 				}
 				parent.strokeWeight(1f);
 		  }
@@ -2314,18 +2326,22 @@ public class PopupReaction{
 				int numDash = (int) (rReaction/w4);
 				parent.noStroke();
 				for (int i=0;i<interElements.size();i++){
-					String ref = interElements.get(i);
-					if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
-						  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
-						  if(complexId==id){
-								float x4 = xR2;
-								for (int k=0;k<numDash;k++){
-									parent.fill(0,255-k*255f/numDash);
-									parent.ellipse(x4, yR2, 3, 3);
-									x4-=w4;
-								}
-							}
-					  }
+					int curLevel =  interElementsLevel.get(interElementsLevel.size()-1);
+					int level = interElementsLevel.get(i);
+					if (curLevel==level){
+						String ref = interElements.get(i);
+						if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
+							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
+							  if(complexId==id){
+									float x4 = xR2;
+									for (int k=0;k<numDash;k++){
+										parent.fill(0,255-k*255f/numDash);
+										parent.ellipse(x4, yR2, 3, 3);
+										x4-=w4;
+									}
+							  }
+						 }
+					}
 				}
 				parent.strokeWeight(1f);
 			  
