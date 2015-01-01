@@ -517,8 +517,111 @@ public class PopupReaction{
 		return score;
 	}
 	
-		
 	public void updateReactionPositions(){
+		itemH2 = (parent.height-yBeginList)/(rectHash.size());
+		// Compute positions
+		if (itemH2>maxH)
+			itemH2 =maxH;
+		for (int i=0;i<rectHash.size();i++){
+			iH[i].target(itemH2);
+		}	
+		
+		if (check2.s){
+			int indexOfItemHash=0;
+			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
+			for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
+				BiochemicalReaction rect = entry.getKey();
+				Object[] aLeft = rect.getLeft().toArray();
+				Object[] aRight = rect.getRight().toArray();
+				
+				float score = 0;
+				float size = 0;
+				for (int i3=0;i3<aLeft.length;i3++){
+					  String name = main.PathwayViewer_2_1.getProteinName(aLeft[i3].toString());
+					  if (name==null)
+						  name = aLeft[i3].toString();
+					  if (mapProteinRDFId_index.get(name)!=null){
+						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
+							  int p =mapProteinRDFId_index.get(name);
+							  score += iP[p].target;
+							  size++;
+						  }
+					  }
+					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
+						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString());
+						  score += yComplexes[id].target;
+						  size++;
+					  }
+				}	  
+				for (int i3=0;i3<aRight.length;i3++){
+					  String name = main.PathwayViewer_2_1.getProteinName(aRight[i3].toString());
+					  if (name==null)
+						  name = aRight[i3].toString();
+					  if (mapProteinRDFId_index.get(name)!=null){
+						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
+							  int p =mapProteinRDFId_index.get(name);
+							  score += iP[p].target;
+							  size++;
+						  }
+					  }
+					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
+						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString());
+						  score += yComplexes[id].target;
+						  size++;
+					  }
+				}	  
+				
+				if (size>0)
+					score = score/size;
+				
+				if (size==0)
+					score = -1000;
+				unsortMap.put(indexOfItemHash, score);	
+				indexOfItemHash++;
+			}
+			
+			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap,false);
+			int i5 = 0;
+			for (Map.Entry<Integer, Float> entry : sortedMap.entrySet()) {
+				int rectOrder = entry.getKey();
+				iY[rectOrder].target(yBeginList+i5*itemH2);
+				i5++;
+			}
+		}
+		else{
+			ArrayList<Integer> a = new ArrayList<Integer>();
+			
+			int r = getNoneUpstream(a);
+			int count = 0;
+			while (r>=0){
+				iY[r].target(yBeginList+count*itemH2);
+				a.add(r);
+				r = getNoneUpstream(a);
+				count++;
+				System.out.println(count+"	a="+a);
+			}
+			
+			for (int i=0;i<rectHash.size();i++){
+				if (!a.contains(i))
+				iY[i].target(yBeginList+400+i*itemH2);
+			}
+		}
+	}
+	public int getNoneUpstream(ArrayList<Integer> doneList){
+		int react = -1;
+		for (int i=0;i<rectList.size();i++){
+			if (doneList.contains(i)) continue;
+			ArrayList<Integer> up = this.getDirectUpStream(i);
+			System.out.println("	"+i+"	up="+up);
+			
+			if (up.size()==0)
+				return i;
+		}
+		return react;
+	}
+		
+		
+	public void updateReactionPositions1(){
 		itemH2 = (parent.height-yBeginList)/(rectHash.size());
 		// Compute positions
 		if (itemH2>maxH)
@@ -1533,6 +1636,42 @@ public class PopupReaction{
 		}
 	}
 	
+	public ArrayList<Integer> getDirectUpstream(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sLeft = rectSelected.getLeft().toArray();
+		
+		// List current reaction
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sRight2 = rect2.getRight().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight2, sLeft);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	public ArrayList<Integer> getDirectDownstream(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight = rectSelected.getRight().toArray();
+		// List current reaction
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight, sLeft2);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	
+	
 	public void listReactionDownStream(int r, int recursive, ArrayList<Integer> downstreamList, ArrayList<Integer> parentList,ArrayList<Integer> levelDownStreamList){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
@@ -1789,7 +1928,6 @@ public class PopupReaction{
 	
 	public  void drawGradientLine(float x1, float y1, float x2, float y2, Color color, float sat) {
 		float gap = PApplet.abs(x2-x1)/4;
-		
 		parent.noStroke();
 		
 		for (float x = 0; x <= gap; x=x+1) {
