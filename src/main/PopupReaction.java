@@ -276,6 +276,8 @@ public class PopupReaction{
 		simulationRectListLevel = new ArrayList<Integer>();
 		
 		updateProteinPositions();
+		updateComplexPositions();
+		updateReactionPositions();  /// **********Update reactions when updating proteins **********
 		
 	}
 	
@@ -405,7 +407,6 @@ public class PopupReaction{
 				iP[p].target(yBeginList+hProtein*order);
 			}
 		}
-		updateReactionPositions();  /// **********Update reactions when updating proteins **********
 	}
 	
 	
@@ -533,26 +534,43 @@ public class PopupReaction{
 				BiochemicalReaction rect = entry.getKey();
 				Object[] aLeft = rect.getLeft().toArray();
 				Object[] aRight = rect.getRight().toArray();
-				ArrayList<Integer> proteinLeft = getProteinsInOneSideOfReaction(aLeft);
-				ArrayList<Integer> proteinRight = getProteinsInOneSideOfReaction(aRight);
 				
 				float score = 0;
 				float size = 0;
-				for (int i=0; i<proteinLeft.size();i++){
-					int pOrder = proteinLeft.get(i);
-					if (pOrder>=0 && !main.PathwayViewer_2_1.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
-						score -= iP[pOrder].target;
-						size++;
-					}
-				}
-				for (int i=0; i<proteinRight.size();i++){
-					int pOrder = proteinRight.get(i);
-					if (pOrder>=0 &&  !main.PathwayViewer_2_1.isSmallMolecule(proteins[pOrder])) {// DO NOT order by small molecules
-						score -= iP[pOrder].target;
-						size++;
-					}	
-					
-				}
+				for (int i3=0;i3<aLeft.length;i3++){
+					  String name = main.PathwayViewer_2_1.getProteinName(aLeft[i3].toString());
+					  if (name==null)
+						  name = aLeft[i3].toString();
+					  if (mapProteinRDFId_index.get(name)!=null){
+						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
+							  int p =mapProteinRDFId_index.get(name);
+							  score += iP[p].target;
+							  size++;
+						  }
+					  }
+					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
+						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString());
+						  score += yComplexes[id].target;
+						  size++;
+					  }
+				}	  
+				for (int i3=0;i3<aRight.length;i3++){
+					  String name = main.PathwayViewer_2_1.getProteinName(aRight[i3].toString());
+					  if (name==null)
+						  name = aRight[i3].toString();
+					  if (mapProteinRDFId_index.get(name)!=null){
+						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
+							  int p =mapProteinRDFId_index.get(name);
+							  score += iP[p].target;
+							  size++;
+						  }
+					  }
+					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
+						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString());
+						  score += yComplexes[id].target;
+						  size++;
+					  }
+				}	  
 				
 				if (size>0)
 					score = score/size;
@@ -563,7 +581,7 @@ public class PopupReaction{
 				indexOfItemHash++;
 			}
 			
-			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap,true);
+			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap,false);
 			int i5 = 0;
 			for (Map.Entry<Integer, Float> entry : sortedMap.entrySet()) {
 				int rectOrder = entry.getKey();
@@ -576,7 +594,6 @@ public class PopupReaction{
 				iY[i].target(yBeginList+i*itemH2);
 			}
 		}
-		updateComplexPositions();
 	}
 	
 	public void updateComplexPositions(){
@@ -1861,7 +1878,7 @@ public class PopupReaction{
 		if (PopupCausality.s==1 && p==bProteinL){  // Knock out one protein
 			parent.stroke(250,0,0);
 			float ww = parent.textWidth(name);
-			parent.line(xL-ww-8, y3-textSize/3, xL+5, y3-textSize/3);
+			parent.line(xL-ww-8, y3-4, xL+5, y3-4);
 		}
 		// Draw connecting nodes for simulations
 		float rReaction = 0.8f*(parent.width/4f);   // The width of reaction = parent.width/2
@@ -1886,7 +1903,7 @@ public class PopupReaction{
 					for (int k=0;k<numDash;k++){
 						parent.stroke(0,max-k*max/numDash);
 						parent.strokeWeight(1.5f-k*1.5f/numDash);
-						parent.line(x4, y3-textSize/3, x4+w4, y3-textSize/3);
+						parent.line(x4, y3-4, x4+w4, y3-4);
 						x4+=w4+gap;
 					}
 				}
@@ -2035,27 +2052,20 @@ public class PopupReaction{
 			  int levelIndex = simulationRectList.indexOf(r);
 			  levelDif = simulationRectListLevel.get(simulationRectListLevel.size()-1)-simulationRectListLevel.get(levelIndex);
 		  }
-		  int newSat = 255;
-		  int newSat2 = 255;
-		  if (levelDif>0){
-			  newSat =  level1SatSimulation-(levelDif-1)*stepSatSimulation;
-			  if (newSat<minSatSimulation)
-				  newSat = minSatSimulation;
-		  }
-		  if (levelDif>=0){
-			  newSat2 =  level1SatSimulation-(levelDif)*stepSatSimulation;
-			  if (newSat2<minSatSimulation)
-				  newSat2 = minSatSimulation;
-		  }
-		  float sss = newSat;
+		  
 		  if (levelDif==0){
-			  sss = 255*(1000-SliderSimulation.transitionProcess)/1000;
-			  if (sss<newSat2)
-				  sss = newSat2;
-		  }	  
-		
-		  return sss;
-	}
+			  float sat = 255*(1000-SliderSimulation.transitionProcess)/1000;
+			  if (sat<level1SatSimulation)
+				  sat = level1SatSimulation;
+			  return sat;  
+		  }
+		  else{
+			  float sat = level1SatSimulation-(levelDif-1)*stepSatSimulation;
+			  if (sat<minSatSimulation)
+				  sat = minSatSimulation;
+			  return sat;
+		  }
+	}	  
 		
 		 
 	// draw Reactions links
@@ -2243,36 +2253,6 @@ public class PopupReaction{
 				  parent.textSize(12);
 				  parent.text(main.PathwayViewer_2_1.complexList.get(id).getDisplayName(),xL2,yL2-5);
 			  }
-			  
-			  // Draw connecting Complex for simulations
-				float rReaction = 0.75f*(parent.width/6f);   // The width of reaction = parent.width/2
-				float w4 = 5; // Width of a dash   
-				int numDash = (int) (rReaction/w4);
-				parent.noStroke();
-				for (int i=0;i<interElements.size();i++){
-					int curLevel =  interElementsLevel.get(interElementsLevel.size()-1);
-					int level = interElementsLevel.get(i);
-					if (curLevel==level){
-						String ref = interElements.get(i);
-						if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
-							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
-							  if(complexId==id){
-									float x4 = xL2;
-									float max = 0;
-									if (10<=SliderSimulation.transitionProcess)
-										max = (SliderSimulation.transitionProcess/1000)*255;
-									else 
-										max = ((1000-iS2[r].value)/1001)*255;
-									for (int k=0;k<numDash;k++){
-										parent.fill(0,max-k*max/numDash);
-										parent.ellipse(x4, yL2, 3, 3);
-										x4+=w4;
-									}
-							  }
-						 }
-					}	
-				}
-				parent.strokeWeight(1f);
 		  }
 		  if (check14.s && sat==200)
 			  drawGradientLine(xL2, yL2, xRect, yReact, complexRectionColor, sat);
@@ -2398,7 +2378,8 @@ public class PopupReaction{
 						if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref)!=null){
 							  int complexId = main.PathwayViewer_2_1.mapComplexRDFId_index.get(ref);
 							  if(complexId==id){
-									float x4 = xR2;
+									float x1 = xL2;
+									float x2 = xR2;
 									float max = 0;
 									if (10<=SliderSimulation.transitionProcess){
 										max = (SliderSimulation.transitionProcess/1000)*255;
@@ -2410,8 +2391,10 @@ public class PopupReaction{
 									
 									for (int k=0;k<numDash;k++){
 										parent.fill(0,max-k*max/numDash);
-										parent.ellipse(x4, yR2, 3, 3);
-										x4-=w4;
+										x1+=w4;
+										x2-=w4;
+										parent.ellipse(x1, yR2, 3, 3);
+										parent.ellipse(x2, yR2, 3, 3);
 									}
 							  }
 						 }

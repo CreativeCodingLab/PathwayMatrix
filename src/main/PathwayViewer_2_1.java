@@ -924,6 +924,7 @@ public class PathwayViewer_2_1 extends PApplet {
 	}
 		
 	public void mouseClicked() {
+		SliderSimulation.transitionProcess =0;
 		if (button.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
