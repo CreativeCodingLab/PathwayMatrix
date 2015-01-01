@@ -589,35 +589,132 @@ public class PopupReaction{
 			}
 		}
 		else{
-			ArrayList<Integer> a = new ArrayList<Integer>();
+			ArrayList<Integer> doneList = new ArrayList<Integer>();
+			ArrayList<Integer> circleList = new ArrayList<Integer>();
 			
-			int r = getNoneUpstream(a);
 			int count = 0;
-			while (r>=0){
-				iY[r].target(yBeginList+count*itemH2);
-				a.add(r);
-				r = getNoneUpstream(a);
+			int r = getNoneUpstream(doneList);
+			while (count<rectList.size()){
+				System.out.println(count+"	doneList="+doneList+"	r="+r);
+				if (r>=0){
+					doneList.add(r);
+					iY[r].target(yBeginList+count*itemH2);
+					r = getNoneUpstream(doneList);
+				}
+				else{
+					int randomReaction = getReactionMaxDownstream(doneList);
+					doneList.add(randomReaction);
+					circleList.add(randomReaction);
+					iY[randomReaction].target(yBeginList+count*itemH2);
+					
+					r = getNoneUpstream(doneList);
+				}	
 				count++;
-				System.out.println(count+"	a="+a);
+				System.out.println("	circleList="+circleList);
+				
 			}
 			
-			for (int i=0;i<rectHash.size();i++){
-				if (!a.contains(i))
-				iY[i].target(yBeginList+400+i*itemH2);
+			for (int i=0;i<rectList.size();i++){
+				if (!doneList.contains(i))
+				iY[i].target(yBeginList+600+i);
 			}
 		}
 	}
-	public int getNoneUpstream(ArrayList<Integer> doneList){
-		int react = -1;
+	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
+		ArrayList<Integer> a = new ArrayList<Integer>();
 		for (int i=0;i<rectList.size();i++){
 			if (doneList.contains(i)) continue;
-			ArrayList<Integer> up = this.getDirectUpStream(i);
-			System.out.println("	"+i+"	up="+up);
-			
-			if (up.size()==0)
-				return i;
+			a.add(i);
+		}
+		return getReactionMaxDownstreamIn(a);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	public int getReactionMaxDownstreamIn(ArrayList<Integer> list){
+		int numDownstream = 0;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> down = getDirectDownstream(index);
+			if (down.size()>=numDownstream){
+				numDownstream = down.size();
+				react =index;
+			}	
 		}
 		return react;
+	}
+	
+	public int getReactionMinDownstreamIn(ArrayList<Integer> list){
+		int numDownstream = Integer.MAX_VALUE;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> down = getDirectDownstream(index);
+			if (down.size()<numDownstream){
+				numDownstream = down.size();
+				react =index;
+			}	
+		}
+		return react;
+	}
+	
+	public int getReactionMaxUpstreamIn(ArrayList<Integer> list){
+		int numUpstream = 0;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> up = getDirectUpstream(index);
+			if (up.size()>=numUpstream){
+				numUpstream = up.size();
+				react =index;
+			}	
+		}
+		return react;
+	}
+	
+	public int getNoneUpstream(ArrayList<Integer> doneList){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		for (int i=0;i<rectList.size();i++){
+			if (doneList.contains(i)) continue;
+			ArrayList<Integer> up = this.getDirectUpstream(i);
+			if (up.size()==0)  {//No upstream
+				a.add(i);
+			}	
+		}
+		if (a.size()>0){
+			return getReactionMinDownstreamIn(a);
+		}
+		else{
+			ArrayList<Integer> b = new ArrayList<Integer>();
+			for (int i=0;i<rectList.size();i++){
+				if (doneList.contains(i)) continue;
+				ArrayList<Integer> up = this.getDirectUpstream(i);
+				if (isContainedAllUpInDoneList(up,doneList)){  // Upstream are all in the doneList;
+				//	return i;
+					b.add(i);
+				}	
+			}
+			if (b.size()>0){
+				return getReactionMaxUpstreamIn(b);
+			}
+			return -1;
+		}
+		
+	}
+	
+	public boolean isContainedAllUpInDoneList(ArrayList<Integer> up, ArrayList<Integer> doneList){
+		for (int i=0;i<up.size();i++){
+			int r = up.get(i);
+			if (!doneList.contains(r))
+				return false;
+		}
+		return true;
 	}
 		
 		
@@ -2140,6 +2237,8 @@ public class PopupReaction{
 		}
 		else 
 			parent.ellipse(xRect,iY[i].value, r, r);
+		
+		parent.text(i,xRect+5,iY[i].value+5); //draw reaction ID
 		
 		// Draw brushing reaction name
 		String rectName = entry.getKey().getDisplayName();
