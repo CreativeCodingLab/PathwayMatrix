@@ -924,6 +924,7 @@ public class PathwayViewer_2_1 extends PApplet {
 	}
 		
 	public void mouseClicked() {
+		SliderSimulation.transitionProcess =0;
 		if (button.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
@@ -1280,9 +1281,11 @@ public class PathwayViewer_2_1 extends PApplet {
 			System.out.println();
 		
 			popupComplex.setItems();
-			PopupReaction.check2.s=true;
+			PopupReaction.check11.s=true;   // Fade small molecule
+			PopupReaction.check2.s=false;
 			PopupReaction.check3.s=true;
 			PopupReaction.check5.s=false;
+			PopupCausality.s =0;
 			
 			PopupReaction.sPopup =true;
 			popupReaction.setItems();

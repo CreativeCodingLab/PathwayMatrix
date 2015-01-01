@@ -631,11 +631,6 @@ public class PopupReaction{
 	
 	
 	
-	
-	
-	
-	
-	
 	public int getReactionMaxDownstreamIn(ArrayList<Integer> list){
 		int numDownstream = 0;
 		int react = -1;
@@ -726,7 +721,6 @@ public class PopupReaction{
 		for (int i=0;i<rectHash.size();i++){
 			iH[i].target(itemH2);
 		}	
-		
 		if (check2.s){
 			int indexOfItemHash=0;
 			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
