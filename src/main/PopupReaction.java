@@ -83,10 +83,8 @@ public class PopupReaction{
 	// Unidentified Elements
 	public float yUFO = 0;
 	
-	public Integrator[] yComplexesL; 
-	public float[] rComplexesL; 
-	public Integrator[] yComplexesR; 
-	public float[] rComplexesR; 
+	public Integrator[] yComplexes; 
+	public float[] rComplexes; 
 	
 	public int bProteinL =-1;
 	public int bProteinR =-1;
@@ -100,9 +98,10 @@ public class PopupReaction{
 	public static Integrator[] iS3;
 	public static Integrator[] iS4;
 	
-	public int minSatSimulation =15;
-	public int level1SatSimulation =50;
-	public int stepSatSimulation =15;
+	public int minSatSimulation =5;
+	public int level1SatSimulation =32;
+	public int stepSatSimulation =7;
+	
 	public static ArrayList<Integer> simulationRectList = new ArrayList<Integer>();
 	public static ArrayList<Integer> simulationRectListLevel = new ArrayList<Integer>();
 	public static ArrayList<Integer> simulationRectListAll = new ArrayList<Integer>();
@@ -275,7 +274,6 @@ public class PopupReaction{
 		}
 		simulationRectList = new ArrayList<Integer>();
 		simulationRectListLevel = new ArrayList<Integer>();
-			
 		
 		updateProteinPositions();
 		
@@ -307,13 +305,10 @@ public class PopupReaction{
 				  }
 			}
 		}
-		yComplexesL =  new Integrator[maxID+1];
-		rComplexesL =  new float[maxID+1];
-		yComplexesR =  new Integrator[maxID+1];
-		rComplexesR =  new float[maxID+1];
-		for (int i=0;i<yComplexesL.length;i++){
-			yComplexesL[i] = new Integrator(10, 0.5f,0.1f);
-			yComplexesR[i] = new Integrator(10, 0.5f,0.1f);
+		yComplexes =  new Integrator[maxID+1];
+		rComplexes =  new float[maxID+1];
+		for (int i=0;i<yComplexes.length;i++){
+			yComplexes[i] = new Integrator(10, 0.5f,0.1f);
 		}
 		
 	}
@@ -410,7 +405,6 @@ public class PopupReaction{
 				iP[p].target(yBeginList+hProtein*order);
 			}
 		}
-		
 		updateReactionPositions();  /// **********Update reactions when updating proteins **********
 	}
 	
@@ -569,7 +563,7 @@ public class PopupReaction{
 				indexOfItemHash++;
 			}
 			
-			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap);
+			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap,true);
 			int i5 = 0;
 			for (Map.Entry<Integer, Float> entry : sortedMap.entrySet()) {
 				int rectOrder = entry.getKey();
@@ -586,6 +580,7 @@ public class PopupReaction{
 	}
 	
 	public void updateComplexPositions(){
+		Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();// Reorganize complexes to avoid  overlapping
 		for (int r=0;r<rectList.size();r++) {
 			BiochemicalReaction rect = rectList.get(r);
 			Object[] aLeft = rect.getLeft().toArray();
@@ -609,41 +604,69 @@ public class PopupReaction{
 					  
 					  float radius = PApplet.map(PApplet.sqrt(components.size()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
 						 
-					  yComplexesL[id].target(yL2);
-					  rComplexesL[id] = radius;
-					
+					  yComplexes[id].target(yL2);
+					  rComplexes[id] = radius;
+					  unsortMap.put(id, yL2);
 				  }
 			}
+			
 			for (int i3=0;i3<aRight.length;i3++){
 				  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
 					  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString());
-					  ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
-					  float yR2 = 0;
-				      int numAvailableComponents = 0;
-					  for (int k=0;k<components.size();k++){
-						  if (mapProteinRDFId_index.get(components.get(k))!=null){
-							  yR2+= iP[mapProteinRDFId_index.get(components.get(k))].target-hProtein/4f;
-							  numAvailableComponents++;
-						  }	  
+					  if (!unsortMap.containsKey(id)){
+						  ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
+						  float yR2 = 0;
+					      int numAvailableComponents = 0;
+						  for (int k=0;k<components.size();k++){
+							  if (mapProteinRDFId_index.get(components.get(k))!=null){
+								  yR2+= iP[mapProteinRDFId_index.get(components.get(k))].target-hProtein/4f;
+								  numAvailableComponents++;
+							  }	  
+						  }
+						  if (numAvailableComponents==0)
+							  yR2 =iY[r].target-iH[r].target/2;
+						  else 	  
+							  yR2 /= numAvailableComponents;
+						  
+						  
+						  float radius = PApplet.map(PApplet.sqrt(components.size()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
+						  yComplexes[id].target(yR2);
+						  rComplexes[id] = radius;
+						  
+						   unsortMap.put(id, yR2);
 					  }
-					  if (numAvailableComponents==0)
-						  yR2 =iY[r].target-iH[r].target/2;
-					  else 	  
-						  yR2 /= numAvailableComponents;
-					  
-					  
-					  float radius = PApplet.map(PApplet.sqrt(components.size()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
-					  yComplexesR[id].target(yR2);
-					  rComplexesR[id] = radius;
 				  }
 			}	  
-			
 		}
-		 
-	
+		
+		// Compute the position of the last protein
+		float maxY = 0;
+		for (int p=0;p<iP.length;p++){
+			float yy = iP[p].target;
+			if (yy>maxY && yy<parent.height)
+				maxY=yy;
+		}   
+		
+		// Reorganize complexes to avoid  overlapping
+		Map<Integer, Float> sortMap = sortByComparator2(unsortMap,false);
+		int i=0;
+		float prevousPos = 60;
+		float gapY = (maxY-prevousPos-150)/sortMap.size();
+		
+		for (Map.Entry<Integer, Float> entry : sortMap.entrySet()) {
+			int complexId = entry.getKey();
+			float complexPos = entry.getValue();
+			if (complexPos<prevousPos+gapY){
+				complexPos = prevousPos+gapY;
+				yComplexes[complexId].target(complexPos);
+			}
+			prevousPos = complexPos;
+			i++;
+		}
+			
 	}
 		
-	// Sort decreasing order
+	// Sort decreasing order of Reaction by its size
 	public static Map<BiochemicalReaction, Integer> sortByComparator(Map<BiochemicalReaction, Integer> unsortMap) {
 		// Convert Map to List
 		List<Map.Entry<BiochemicalReaction, Integer>> list = 
@@ -667,18 +690,28 @@ public class PopupReaction{
 	}
 	
 	// Sort Reactions by score (average positions of proteins)
-	public static Map<Integer, Float> sortByComparator2(Map<Integer, Float> unsortMap) {
+	public static Map<Integer, Float> sortByComparator2(Map<Integer, Float> unsortMap, boolean decreasing) {
 		// Convert Map to List
 		List<Map.Entry<Integer, Float>> list = 
 			new LinkedList<Map.Entry<Integer, Float>>(unsortMap.entrySet());
  
 		// Sort list with comparator, to compare the Map values
-		Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
-			public int compare(Map.Entry<Integer, Float> o1,
-                                           Map.Entry<Integer, Float> o2) {
-				return -(o1.getValue()).compareTo(o2.getValue());
-			}
-		});
+		if (decreasing){
+			Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+				public int compare(Map.Entry<Integer, Float> o1,
+	                                           Map.Entry<Integer, Float> o2) {
+						return -(o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+		}
+		else{
+			Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+				public int compare(Map.Entry<Integer, Float> o1,
+	                                           Map.Entry<Integer, Float> o2) {
+						return (o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+		}
  
 		// Convert sorted map back to a Map
 		Map<Integer, Float> sortedMap = new LinkedHashMap<Integer, Float>();
@@ -1578,21 +1611,7 @@ public class PopupReaction{
 	}
 		 
 	
-	public float getReactionSaturation(int r){
-		  int levelDif = 0;
-		  if (simulationRectList.indexOf(r)>=0){
-			  int levelIndex = simulationRectList.indexOf(r);
-			  levelDif = simulationRectListLevel.get(simulationRectListLevel.size()-1)-simulationRectListLevel.get(levelIndex);
-		  }
-		  int newSat = 255;
-		  if (levelDif>0){
-			  newSat =  level1SatSimulation-(levelDif-1)*stepSatSimulation;
-			  if (newSat<minSatSimulation)
-				  newSat = minSatSimulation;
-		  }
-		  return newSat;
-	}
-		
+	
 	public void drawArc(int r, int g, Integrator inter, int level, float sat){
 		float y1 = iY[r].value;
 		float y2 = iY[g].value;
@@ -2009,6 +2028,35 @@ public class PopupReaction{
 			parent.text(rectName,xRect,y3);
 		}
 	}
+	
+	public float getReactionSaturation(int r){
+		  int levelDif = 0;
+		  if (simulationRectList.indexOf(r)>=0){
+			  int levelIndex = simulationRectList.indexOf(r);
+			  levelDif = simulationRectListLevel.get(simulationRectListLevel.size()-1)-simulationRectListLevel.get(levelIndex);
+		  }
+		  int newSat = 255;
+		  int newSat2 = 255;
+		  if (levelDif>0){
+			  newSat =  level1SatSimulation-(levelDif-1)*stepSatSimulation;
+			  if (newSat<minSatSimulation)
+				  newSat = minSatSimulation;
+		  }
+		  if (levelDif>=0){
+			  newSat2 =  level1SatSimulation-(levelDif)*stepSatSimulation;
+			  if (newSat2<minSatSimulation)
+				  newSat2 = minSatSimulation;
+		  }
+		  float sss = newSat;
+		  if (levelDif==0){
+			  sss = 255*(1000-SliderSimulation.transitionProcess)/1000;
+			  if (sss<newSat2)
+				  sss = newSat2;
+		  }	  
+		
+		  return sss;
+	}
+		
 		 
 	// draw Reactions links
 	public void drawReactionLink(BiochemicalReaction rect, int i2, float xL, float xL2, float xRect, float xR, float xR2, float sat) {
@@ -2029,8 +2077,7 @@ public class PopupReaction{
 				  else if (check15.s && !main.PathwayViewer_2_1.isSmallMolecule(name) && sat==200){
 					  drawGradientLine(xL, y5, xRect, yReact, proteinRectionColor, sat);
 				  }
-				  else  {
-					  
+				  else {
 					  if (sat==255){ // Draw simulation lines
 						  if (iS1[i2].value>=990){
 							  iS2[i2].target(1000);
@@ -2048,7 +2095,7 @@ public class PopupReaction{
 						  }
 						  parent.line(xL, y5, xL+xDel, y5+yDel);
 					  }
-					  else  {
+					  else {
 						  parent.stroke(proteinRectionColor.getRed(),proteinRectionColor.getGreen(),proteinRectionColor.getBlue(),sat);
 					  	  if (main.PathwayViewer_2_1.isSmallMolecule(name)){
 								parent.stroke(smallMoleculeColor.getRed(),smallMoleculeColor.getGreen(),smallMoleculeColor.getBlue(),sat);
@@ -2142,8 +2189,8 @@ public class PopupReaction{
 	public boolean drawComplexLeft(int r, int id, float yReact, float sat, float newSatForSimulation) {
 		boolean result = false;
 		  ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
-		  yComplexesL[id].update();
-		  float yL2 = yComplexesL[id].value;
+		  yComplexes[id].update();
+		  float yL2 = yComplexes[id].value;
 		  if (processedComplexLeft.indexOf(id)<0 || sat==255){  // if not drawn yet
 			  if (processedComplexLeft.indexOf(id)<0)
 					  processedComplexLeft.add(id);
@@ -2187,7 +2234,7 @@ public class PopupReaction{
 			  if (sat>=200){
 				  parent. pushMatrix();
 				  parent.translate(xL2, yL2);
-				  polygon(0, 0, rComplexesL[id]/2+1, 4); 
+				  polygon(0, 0, rComplexes[id]/2+1, 4); 
 				  parent.popMatrix();
 			  }
 			  
@@ -2253,8 +2300,8 @@ public class PopupReaction{
 	public boolean drawComplexRight(int r, int id, float yReact, float sat, float newSatForSimulation) {
 		 boolean result =false;
 		 ArrayList<String> components = main.PathwayViewer_2_1.proteinsInComplex[id];
-		  yComplexesR[id].update();
-		  float yR2 = yComplexesR[id].value;
+		  yComplexes[id].update();
+		  float yR2 = yComplexes[id].value;
 		 
 		  if (check14.s && sat==200)
 			  drawGradientLine(xRect, yReact, xR2, yR2, complexRectionColor, sat);
@@ -2328,7 +2375,7 @@ public class PopupReaction{
 			  if (sat>=200){
 				  parent. pushMatrix();
 				  parent.translate(xR2, yR2);
-				  polygon(0, 0, rComplexesR[id]/2+1, 4); 
+				  polygon(0, 0, rComplexes[id]/2+1, 4); 
 				  parent.popMatrix();
 			  }
 			  
@@ -2462,8 +2509,8 @@ public class PopupReaction{
 		bRectListR = new ArrayList<Integer>();
 		int bComplexLold = bComplexL;
 		bComplexL=-1;
-		for (int c=0;c<yComplexesL.length;c++){
-			if (PApplet.dist(xL2,yComplexesL[c].value, parent.mouseX, parent.mouseY)<=rComplexesL[c]){
+		for (int c=0;c<yComplexes.length;c++){
+			if (PApplet.dist(xL2,yComplexes[c].value, parent.mouseX, parent.mouseY)<=rComplexes[c]){
 				bComplexL = c;
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);
@@ -2484,8 +2531,8 @@ public class PopupReaction{
 		}
 		int bComplexRold = bComplexR;
 		bComplexR=-1;
-		for (int c=0;c<yComplexesR.length;c++){
-			if (PApplet.dist(xR2,yComplexesR[c].value, parent.mouseX, parent.mouseY)<=rComplexesR[c]){
+		for (int c=0;c<yComplexes.length;c++){
+			if (PApplet.dist(xR2,yComplexes[c].value, parent.mouseX, parent.mouseY)<=rComplexes[c]){
 				bComplexR = c;
 				for (int r=0;r<rectList.size();r++) {
 					BiochemicalReaction rect = rectList.get(r);

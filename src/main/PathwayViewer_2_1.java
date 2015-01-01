@@ -1280,6 +1280,7 @@ public class PathwayViewer_2_1 extends PApplet {
 			System.out.println();
 		
 			popupComplex.setItems();
+			PopupReaction.check11.s=true;   // Fade small molecule
 			PopupReaction.check2.s=true;
 			PopupReaction.check3.s=true;
 			PopupReaction.check5.s=false;
