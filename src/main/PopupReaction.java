@@ -118,6 +118,7 @@ public class PopupReaction{
 	
 	Integrator iDelete =  new Integrator(0,0.1f,0.6f);
 	public static PopupCausality popupCausality;
+	public static PopupReactionOrder popupReactionOrder;
 	
 	//public static ButtonSimulation buttonPlay;
 	public static ButtonSimulation buttonStop;
@@ -143,6 +144,7 @@ public class PopupReaction{
 		wordCloud = new WordCloud(parent, 10,290,250,parent.height-250);
 		
 		popupCausality = new PopupCausality(parent);
+		popupReactionOrder =  new PopupReactionOrder(parent);
 		
 		//PImage im1 =  parent.loadImage("img/buttonPlay.png");
 		//buttonPlay = new ButtonSimulation(parent, im1);
@@ -1586,6 +1588,7 @@ public class PopupReaction{
 			
 			// Draw buttons
 			popupCausality.draw(parent.width-202);
+			popupReactionOrder.draw(parent.width-304);
 	}
 
 	// Compute shortest path
@@ -2983,8 +2986,11 @@ public class PopupReaction{
 			resetIntegrators();
 			resetCausality();
 			textbox1.searchText="";
+		}
+		else if (popupReactionOrder.b>=0){
+			popupReactionOrder.mouseClicked();
 			
-		}	
+		}
 		else if (wordCloud.b>=0){
 			wordCloud.mouseClicked();
 		}
