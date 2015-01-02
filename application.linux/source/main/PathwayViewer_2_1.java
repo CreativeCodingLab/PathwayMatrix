@@ -916,6 +916,7 @@ public class PathwayViewer_2_1 extends PApplet {
 		popupReaction.checkBrushing();
 		if (!PopupReaction.bPopup){
 			PopupReaction.popupCausality.mouseMoved();
+			PopupReaction.popupReactionOrder.mouseMoved();
 			popupReaction.checkReactionBrushing();
 		}
 		if (isAllowedDrawing && PopupReaction.sPopup && PopupReaction.simulationRectList.size()==0){
@@ -924,7 +925,6 @@ public class PathwayViewer_2_1 extends PApplet {
 	}
 		
 	public void mouseClicked() {
-		SliderSimulation.transitionProcess =0;
 		if (button.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
@@ -1282,8 +1282,7 @@ public class PathwayViewer_2_1 extends PApplet {
 		
 			popupComplex.setItems();
 			PopupReaction.check11.s=true;   // Fade small molecule
-			PopupReaction.check2.s=false;
-			PopupReaction.check3.s=true;
+			PopupReaction.popupReactionOrder.s=1;
 			PopupReaction.check5.s=false;
 			PopupCausality.s =0;
 			

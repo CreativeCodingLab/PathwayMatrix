@@ -67,7 +67,7 @@ public class PopupCausality{
 			}
 		}
 		else{
-			parent.fill(150);
+			parent.fill(180);
 			parent.noStroke();
 			parent.rect(x,y,w1,25);
 		}

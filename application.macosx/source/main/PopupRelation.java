@@ -73,32 +73,6 @@ public class PopupRelation{
 					parent.rect(x+350,y+itemH*(i)-2, 9, 24);
 				}
 			}	
-			
-			/*
-			float y=600;
-			parent.fill(0);
-			parent.textSize(18);
-			parent.text("Color legend:",x+50,y);
-			y +=8;
-			for (int i=0;i<items.length;i++){
-				if (main.MainViewer.pairs[i].size()==0) continue;
-				y +=itemH+4;
-				
-				int index = edu.uic.ncdm.venn.Venn_Overview.globalToLocal(i);
-				if (s[i]){
-					parent.noStroke();
-					parent.fill(0);
-					parent.rect(x+10,y+itemH*(i)+5,w-25,itemH+1);
-				
-					parent.fill(edu.uic.ncdm.venn.Venn_Overview.getMinerColor(index).getRGB());
-				}
-				
-				parent.fill(edu.uic.ncdm.venn.Venn_Overview.getMinerColor(index).getRGB());
-				
-				parent.textAlign(PApplet.LEFT);
-				parent.text(items[i],x+50,y);
-			}
-			*/	
 		}
 		else{
 			parent.fill(150);

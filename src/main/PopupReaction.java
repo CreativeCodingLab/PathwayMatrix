@@ -940,7 +940,7 @@ public class PopupReaction{
 			}
 			
 			// Update complex with no input  yComplex = yReaction
-			for (intc=0;c<yComplexes)
+			//for (intc=0;c<yComplexes)
 			
 		}	
 		else if (popupReactionOrder.s==2){
