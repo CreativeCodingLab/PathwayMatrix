@@ -7,7 +7,7 @@ import processing.core.PFont;
 
 public class PopupReactionOrder{
 	public int b = -1;
-	public static int s=-1;
+	public int s=-1;
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
@@ -60,17 +60,10 @@ public class PopupReactionOrder{
 			}	
 		}
 		
-		if (s>=0 && s<items.length){
-			for (int i=0;i<w1;i++){
-				parent.stroke(255,255-i*2.55f,i*2.55f);
-				parent.line(x+i, y, x+i, y+24);
-			}
-		}
-		else{
-			parent.fill(150);
-			parent.noStroke();
-			parent.rect(x,y,w1,25);
-		}
+		parent.fill(180);
+		parent.noStroke();
+		parent.rect(x,y,w1,25);
+		
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
 		parent.textSize(13);

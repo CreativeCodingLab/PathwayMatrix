@@ -81,6 +81,9 @@ public class CheckBox{
 	}
 	
 	public void checkBrushing() {
+		if (PopupReaction.popupReactionOrder.b>=0
+				|| PopupReaction.popupCausality.b>=0)
+			return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
 		if (x-10<mX && mX < x+200 && y<mY && mY<y+20){

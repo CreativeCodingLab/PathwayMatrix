@@ -51,8 +51,6 @@ public class PopupReaction{
 	public ArrayList<Integer> bProteinRight = new ArrayList<Integer>();
 	public Integrator[] iP;
 	
-	public static CheckBox check2;
-	public static CheckBox check3;
 	public static CheckBox check5;
 	public static CheckBox check11;
 	public static CheckBox check12;
@@ -132,8 +130,6 @@ public class PopupReaction{
 	
 	public PopupReaction(PApplet parent_){
 		parent = parent_;
-		check2 = new CheckBox(parent, "Rearrange reactions");
-		check3 = new CheckBox(parent, "Remove non-react proteins");
 		check5 = new CheckBox(parent, "Display names");
 		check11 = new CheckBox(parent, "Fade links of Small molecules");
 		check12 = new CheckBox(parent, "Fade links of Unidentified elements");
@@ -365,7 +361,16 @@ public class PopupReaction{
 	}
 	
 	public void updateProteinPositions(){
-		if (check3.s){
+		if (popupReactionOrder.s==0){
+			hProtein = (parent.height-yBeginList-2)/(proteins.length);  // Save 20 pixels for Unidentified elements
+			if (hProtein>maxH)
+				hProtein =maxH;
+			for (int p=0; p<proteins.length;p++){
+				int order = p;
+				iP[p].target(yBeginList+hProtein*order);
+			}
+		}
+		else if (popupReactionOrder.s==1 || popupReactionOrder.s==2){
 			ArrayList<Integer> reactProteinList = new ArrayList<Integer>();
 			
 			for (int r=0;r<rectList.size();r++) {
@@ -398,15 +403,6 @@ public class PopupReaction{
 					iP[p].target(yBeginList+hProtein*index);
 				else
 					iP[p].target(parent.height+20);
-			}
-		}
-		else{
-			hProtein = (parent.height-yBeginList-2)/(proteins.length);  // Save 20 pixels for Unidentified elements
-			if (hProtein>maxH)
-				hProtein =maxH;
-			for (int p=0; p<proteins.length;p++){
-				int order = p;
-				iP[p].target(yBeginList+hProtein*order);
 			}
 		}
 	}
@@ -528,7 +524,12 @@ public class PopupReaction{
 			iH[i].target(itemH2);
 		}	
 		
-		if (check2.s){
+		if (popupReactionOrder.s==0){
+			for (int i=0;i<rectHash.size();i++){
+				iY[i].target(yBeginList+i*itemH2);
+			}
+		}
+		else if (popupReactionOrder.s==1){
 			int indexOfItemHash=0;
 			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
 			for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
@@ -590,7 +591,7 @@ public class PopupReaction{
 				i5++;
 			}
 		}
-		else{
+		else if (popupReactionOrder.s==2){
 			ArrayList<Integer> doneList = new ArrayList<Integer>();
 			ArrayList<Integer> circleList = new ArrayList<Integer>();
 			
@@ -621,6 +622,7 @@ public class PopupReaction{
 				iY[i].target(yBeginList+600+i);
 			}
 		}
+		
 	}
 	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
@@ -715,82 +717,7 @@ public class PopupReaction{
 	}
 		
 		
-	public void updateReactionPositions1(){
-		itemH2 = (parent.height-yBeginList)/(rectHash.size());
-		// Compute positions
-		if (itemH2>maxH)
-			itemH2 =maxH;
-		for (int i=0;i<rectHash.size();i++){
-			iH[i].target(itemH2);
-		}	
-		if (check2.s){
-			int indexOfItemHash=0;
-			Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();
-			for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-				BiochemicalReaction rect = entry.getKey();
-				Object[] aLeft = rect.getLeft().toArray();
-				Object[] aRight = rect.getRight().toArray();
-				
-				float score = 0;
-				float size = 0;
-				for (int i3=0;i3<aLeft.length;i3++){
-					  String name = main.PathwayViewer_2_1.getProteinName(aLeft[i3].toString());
-					  if (name==null)
-						  name = aLeft[i3].toString();
-					  if (mapProteinRDFId_index.get(name)!=null){
-						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
-							  int p =mapProteinRDFId_index.get(name);
-							  score += iP[p].target;
-							  size++;
-						  }
-					  }
-					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString())!=null){
-						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aLeft[i3].toString());
-						  score += yComplexes[id].target;
-						  size++;
-					  }
-				}	  
-				for (int i3=0;i3<aRight.length;i3++){
-					  String name = main.PathwayViewer_2_1.getProteinName(aRight[i3].toString());
-					  if (name==null)
-						  name = aRight[i3].toString();
-					  if (mapProteinRDFId_index.get(name)!=null){
-						  if (!main.PathwayViewer_2_1.isSmallMolecule(name)) {
-							  int p =mapProteinRDFId_index.get(name);
-							  score += iP[p].target;
-							  size++;
-						  }
-					  }
-					  else  if (main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString())!=null){
-						  int id = main.PathwayViewer_2_1.mapComplexRDFId_index.get(aRight[i3].toString());
-						  score += yComplexes[id].target;
-						  size++;
-					  }
-				}	  
-				
-				if (size>0)
-					score = score/size;
-				
-				if (size==0)
-					score = -1000;
-				unsortMap.put(indexOfItemHash, score);	
-				indexOfItemHash++;
-			}
-			
-			Map<Integer, Float> sortedMap = sortByComparator2(unsortMap,false);
-			int i5 = 0;
-			for (Map.Entry<Integer, Float> entry : sortedMap.entrySet()) {
-				int rectOrder = entry.getKey();
-				iY[rectOrder].target(yBeginList+i5*itemH2);
-				i5++;
-			}
-		}
-		else{
-			for (int i=0;i<rectHash.size();i++){
-				iY[i].target(yBeginList+i*itemH2);
-			}
-		}
-	}
+	
 	
 	public void updateComplexPositions(){
 		Map<Integer, Float> unsortMap  =  new HashMap<Integer, Float>();// Reorganize complexes to avoid  overlapping
@@ -1404,8 +1331,6 @@ public class PopupReaction{
 			
 			parent.strokeWeight(1);
 			check5.draw((int) x7, (int) y7-19);
-			check3.draw((int) x7, (int) y7);
-			check2.draw((int) x7, (int) y7+19);
 			
 			
 			// ****************** Draw output list ***********************************************************************
@@ -2989,7 +2914,9 @@ public class PopupReaction{
 		}
 		else if (popupReactionOrder.b>=0){
 			popupReactionOrder.mouseClicked();
-			
+			updateProteinPositions();
+			updateComplexPositions();
+			updateReactionPositions(); 
 		}
 		else if (wordCloud.b>=0){
 			wordCloud.mouseClicked();
@@ -3009,18 +2936,12 @@ public class PopupReaction{
 		else if (PopupReaction.sPopup && PopupReaction.check15.b){
 			PopupReaction.check15.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check2.b){
-			PopupReaction.check2.mouseClicked();
-			if (PopupReaction.check2.s){
+		else if (PopupReaction.sPopup && popupReactionOrder.b>=0){
+			if (popupReactionOrder.s==1){
 				PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
 				PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
-			//	PopupReaction.check13.s = true;   // Fade complex formation links if order reactions to avoid crossing
 			}	
 			updateReactionPositions();
-		}
-		else if (PopupReaction.sPopup && PopupReaction.check3.b){
-			PopupReaction.check3.mouseClicked();
-			updateProteinPositions();
 		}
 		else if (PopupReaction.sPopup && PopupReaction.check5.b){
 			PopupReaction.check5.mouseClicked();
