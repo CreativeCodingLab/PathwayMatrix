@@ -58,7 +58,7 @@ public class RelatedGenesOfInteractionsMiner extends MinerAdapter
 		throws IOException{
 		
 		System.out.println();
-		System.out.println("RelatedGenesOfInteractionsMiner="+main.PathwayViewer_2_1.processingMiner+
+		System.out.println("RelatedGenesOfInteractionsMiner="+main.PathwayViewer_2_2.processingMiner+
 				"	"+this.getName()+"	BiochemicalReaction -> NOT USED right now!");
 		
 		
