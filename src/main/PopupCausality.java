@@ -16,7 +16,7 @@ public class PopupCausality{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"All Causalities","Knockout a protein", "Shortest path", "Feedback loop"}; 
+	public static String[] items={"All Causalities","Knockout a protein", "Shortest path", "Feedback loop", "Common downstream"}; 
 	public Slider slider;
 
 	public PopupCausality(PApplet parent_){
