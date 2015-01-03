@@ -1480,16 +1480,11 @@ public class PopupReaction{
 				
 			}	
 			else if (PopupCausality.s==4){    // Common downstream
-				if (selectedReactionsForCommonDownstream.size()>0 ){
 					for(int r=0;r<rectList.size();r++){
 						ArrayList<Integer> processedList = new ArrayList<Integer>();
 						processedList.add(r);
-						if (selectedReactionsForCommonDownstream.indexOf(r)>=0){  
-							drawDownStreamReaction(r,-100, processedList, 1000,255);
-						}
-						else{
-							drawDownStreamReaction(r,-100, processedList, 1000,20);
-						}
+						drawDownStreamReaction(r,-100, processedList, 1000,20);
+						
 					}
 					
 					// Draw reaction nodes
@@ -1498,44 +1493,15 @@ public class PopupReaction{
 						if (selectedReactionsForCommonDownstream.indexOf(i)>=0){  
 							drawReactionNode(entry, i, 200);
 						}
-						i++;
-					}
-				}
-				else{
-					ArrayList<Integer> processedList = new ArrayList<Integer>();
-					for (int r=0;r<rectList.size();r++) {
-						processedList.add(r);
-						drawDownStreamReaction(r,-100, processedList, 1000,20);
-					}
-					// Draw reaction nodes
-					int i=0;
-					for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-						drawReactionNode(entry, i, 20);
-						i++;
-					}
-				}
-				
-				if (brushingReactionsForCommonDownstream.size()>0 ){
-					for(int r=0;r<rectList.size();r++){
-						ArrayList<Integer> processedList = new ArrayList<Integer>();
-						processedList.add(r);
-						if (brushingReactionsForCommonDownstream.indexOf(r)>=0){  
-							drawDownStreamReaction(r,-100, processedList, 1000,255);
-						}
 						else{
-							drawDownStreamReaction(r,-100, processedList, 1000,20);
-						}
-					}
-					
-					// Draw reaction nodes
-					int i=0;
-					for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-						if (brushingReactionsForCommonDownstream.indexOf(i)>=0){  
-							drawReactionNode(entry, i, 200);
+							drawReactionNode(entry, i, 20);
 						}
 						i++;
 					}
-				}
+				
+				
+				
+				
 				
 			}	
 			else{
@@ -2096,16 +2062,19 @@ public class PopupReaction{
 					parent.stroke(red,green,blue,sat2);
 					parent.strokeWeight(1.5f+1.5f*(1-iDelete.value));
 				}	
-				else if(brushingReactionsForCommonDownstream.indexOf(r)>=0){
-					parent.stroke(0,0,0,10+PApplet.pow(sat2/255,2)*150);
+				else if(selectedReactionsForCommonDownstream.indexOf(r)>=0){
+					parent.stroke(0,200,200,sss*255);
 					parent.strokeWeight(3);
 				}
-				else if(selectedReactionsForCommonDownstream.indexOf(r)>=0){
-					parent.stroke(0,0,255,10+PApplet.pow(sat2/255,2)*150);
+				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
+				
+				if(brushingReactionsForCommonDownstream.indexOf(r)>=0){
+					float sat3 = parent.frameCount*22%256;
+					parent.stroke(0,0,0,(sss)*sat3);
 					parent.strokeWeight(3);
+					parent.arc(xRect, yy, d,d, beginAngle, endAngle);
 				}
 				
-				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
 			}
 			beginAngle = endAngle;
 			parent.strokeWeight(1);
@@ -2312,7 +2281,7 @@ public class PopupReaction{
 			parent.line(xL-ww-8, y3-4, xL+5, y3-4);
 		}
 		else if (PopupCausality.s==4 && selectedProteinForCommonDownstream.contains(p)){  // Common downstream
-			parent.fill(150,200);
+			parent.fill(0,200,200,200);
 			parent.noStroke();
 			parent.rect(xL-parent.textWidth(name)-5, y3-textSize, parent.textWidth(name)+10, textSize+2);
 			
