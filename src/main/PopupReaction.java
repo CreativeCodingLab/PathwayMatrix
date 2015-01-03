@@ -111,6 +111,9 @@ public class PopupReaction{
 	public static ArrayList<Integer> interElementsLevel = new ArrayList<Integer>();
 
 	
+	ArrayList<Integer> brushingProteinForCommonDownstream = new ArrayList<Integer>();
+	ArrayList<Integer> brushingComplexForCommonDownstream = new ArrayList<Integer>();
+	ArrayList<Integer> brushingReactionsForCommonDownstream = new ArrayList<Integer>();
 	ArrayList<Integer> selectedProteinForCommonDownstream = new ArrayList<Integer>();
 	ArrayList<Integer> selectedComplexForCommonDownstream = new ArrayList<Integer>();
 	ArrayList<Integer> selectedReactionsForCommonDownstream = new ArrayList<Integer>();
@@ -1507,10 +1510,33 @@ public class PopupReaction{
 					// Draw reaction nodes
 					int i=0;
 					for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
-					//	drawReactionNode(entry, i, 20);
+						drawReactionNode(entry, i, 20);
 						i++;
 					}
 				}
+				
+				if (brushingReactionsForCommonDownstream.size()>0 ){
+					for(int r=0;r<rectList.size();r++){
+						ArrayList<Integer> processedList = new ArrayList<Integer>();
+						processedList.add(r);
+						if (brushingReactionsForCommonDownstream.indexOf(r)>=0){  
+							drawDownStreamReaction(r,-100, processedList, 1000,255);
+						}
+						else{
+							drawDownStreamReaction(r,-100, processedList, 1000,20);
+						}
+					}
+					
+					// Draw reaction nodes
+					int i=0;
+					for (Map.Entry<BiochemicalReaction, Integer> entry : rectHash.entrySet()) {
+						if (brushingReactionsForCommonDownstream.indexOf(i)>=0){  
+							drawReactionNode(entry, i, 200);
+						}
+						i++;
+					}
+				}
+				
 			}	
 			else{
 				for (int r=0;r<rectList.size();r++) {
@@ -2069,7 +2095,15 @@ public class PopupReaction{
 					
 					parent.stroke(red,green,blue,sat2);
 					parent.strokeWeight(1.5f+1.5f*(1-iDelete.value));
-				}		
+				}	
+				else if(brushingReactionsForCommonDownstream.indexOf(r)>=0){
+					parent.stroke(0,0,0,10+PApplet.pow(sat2/255,2)*150);
+					parent.strokeWeight(3);
+				}
+				else if(selectedReactionsForCommonDownstream.indexOf(r)>=0){
+					parent.stroke(0,0,255,10+PApplet.pow(sat2/255,2)*150);
+					parent.strokeWeight(3);
+				}
 				
 				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
 			}
@@ -3065,6 +3099,15 @@ public class PopupReaction{
 				}
 			}
 		}
+		
+		// Retrieve downstream reactions *****************************************************************************************************
+		if (bProteinL>=0 || bComplexL>=0 || bRect>=0){
+			brushingReactionsForCommonDownstream = getDownstreamOfAprotein(bProteinL);
+		}	
+		else 
+			brushingReactionsForCommonDownstream = new ArrayList<Integer>();
+			
+			
 	}
 	
 	// Check brushing reaction when there is no simulations
@@ -3217,7 +3260,6 @@ public class PopupReaction{
 			PopupReaction.check5.mouseClicked();
 		}
 		else{
-			System.out.println("simulationRectList="+simulationRectList);
 			if (PopupCausality.s==4){
 				if (bProteinL>=0 || bComplexL>=0 || bRect>=0){
 					if (bProteinL>=0){
