@@ -40,12 +40,12 @@ public class SliderSimulation{
 		for (int k=0; k<maxLevel2; k++ ){
 			float x1 = x+k*reactionSize;
 			float x2 = x1+reactionSize/5;
-			parent.stroke(PopupReaction.formComplexColor.getRGB());
+			parent.stroke(ReactionView.formComplexColor.getRGB());
 			parent.line(x1, y, x2, y);
 			
 			x1=x2;
 			x2+=reactionSize/5;
-			parent.stroke(PopupReaction.complexRectionColor.getRGB());
+			parent.stroke(ReactionView.complexRectionColor.getRGB());
 			parent.line(x1, y, x2, y);
 			
 			x1=x2;
@@ -54,12 +54,12 @@ public class SliderSimulation{
 			parent.ellipse(x1, y, 8, 8);
 			
 			x2+=reactionSize/5;
-			parent.stroke(PopupReaction.complexRectionColor.getRGB());
+			parent.stroke(ReactionView.complexRectionColor.getRGB());
 			parent.line(x1, y, x2, y);
 			
 			x1=x2;
 			x2+=reactionSize/5;
-			parent.stroke(PopupReaction.formComplexColor.getRGB());
+			parent.stroke(ReactionView.formComplexColor.getRGB());
 			parent.line(x1, y, x2, y);
 			
 			if (k<maxLevel2-1){
@@ -86,14 +86,14 @@ public class SliderSimulation{
 			color = new Color(0,100,255);
 		}
 		
-		int lastIndex = PopupReaction.simulationRectList.size()-1;
+		int lastIndex = ReactionView.simulationRectList.size()-1;
 		if (lastIndex<0) return;
 		
-		int currentLevel = PopupReaction.simulationRectListLevel.get(lastIndex);
-		int currentRect = PopupReaction.simulationRectList.get(lastIndex);
+		int currentLevel = ReactionView.simulationRectListLevel.get(lastIndex);
+		int currentRect = ReactionView.simulationRectList.get(lastIndex);
 		
-		sumStep = PopupReaction.iS1[currentRect].value+PopupReaction.iS2[currentRect].value+
-						PopupReaction.iS3[currentRect].value+PopupReaction.iS4[currentRect].value+
+		sumStep = ReactionView.iS1[currentRect].value+ReactionView.iS2[currentRect].value+
+						ReactionView.iS3[currentRect].value+ReactionView.iS4[currentRect].value+
 						transitionProcess;
 	//	DecimalFormat df = new DecimalFormat("#.##");
 		if (!(parent.mousePressed && b))
@@ -140,13 +140,13 @@ public class SliderSimulation{
 			float setLevel =  (v/reactionSize);
 			
 			// Remove simulation List
-			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
-				int currentLevel = PopupReaction.simulationRectListLevel.get(i);
-				int currentReact = PopupReaction.simulationRectList.get(i);
+			for (int i = ReactionView.simulationRectList.size()-1;i>=0;i--){
+				int currentLevel = ReactionView.simulationRectListLevel.get(i);
+				int currentReact = ReactionView.simulationRectList.get(i);
 				if (currentLevel>setLevel){
 					if (currentLevel>0){
-						PopupReaction.simulationRectList.remove(i);
-						PopupReaction.simulationRectListLevel.remove(i);
+						ReactionView.simulationRectList.remove(i);
+						ReactionView.simulationRectListLevel.remove(i);
 					}
 					resetLevel(currentReact);
 				}
@@ -159,11 +159,11 @@ public class SliderSimulation{
 				}
 			}
 			// Remove interElements
-			for (int i = PopupReaction.interElements.size()-1;i>=0;i--){
-				int currentLevel = PopupReaction.interElementsLevel.get(i);
+			for (int i = ReactionView.interElements.size()-1;i>=0;i--){
+				int currentLevel = ReactionView.interElementsLevel.get(i);
 				if (currentLevel>setLevel){
-					PopupReaction.interElements.remove(i);
-					PopupReaction.interElementsLevel.remove(i);
+					ReactionView.interElements.remove(i);
+					ReactionView.interElementsLevel.remove(i);
 				}	
 			}
 			
@@ -172,103 +172,103 @@ public class SliderSimulation{
 		}
 	}
 	public static void foward(int currentReact){
-		PopupReaction.iS1[currentReact].set(1000);
-		PopupReaction.iS1[currentReact].target(1000);
-		PopupReaction.iS2[currentReact].set(1000);
-		PopupReaction.iS2[currentReact].target(1000);
-		PopupReaction.iS3[currentReact].set(1000);
-		PopupReaction.iS3[currentReact].target(1000);
-		PopupReaction.iS4[currentReact].set(1000);
-		PopupReaction.iS4[currentReact].target(1000);
-		for (int g=0;g<PopupReaction.rectList.size();g++){
-			PopupReaction.iS[currentReact][g].set(1000);
-			PopupReaction.iS[currentReact][g].target(1000);
+		ReactionView.iS1[currentReact].set(1000);
+		ReactionView.iS1[currentReact].target(1000);
+		ReactionView.iS2[currentReact].set(1000);
+		ReactionView.iS2[currentReact].target(1000);
+		ReactionView.iS3[currentReact].set(1000);
+		ReactionView.iS3[currentReact].target(1000);
+		ReactionView.iS4[currentReact].set(1000);
+		ReactionView.iS4[currentReact].target(1000);
+		for (int g=0;g<ReactionView.rectList.size();g++){
+			ReactionView.iS[currentReact][g].set(1000);
+			ReactionView.iS[currentReact][g].target(1000);
 		}
 	}
 	public static void resetLevel(int currentReact){
-		PopupReaction.iS1[currentReact].set(0);
-		PopupReaction.iS1[currentReact].target(0);
-		PopupReaction.iS2[currentReact].set(0);
-		PopupReaction.iS2[currentReact].target(0);
-		PopupReaction.iS3[currentReact].set(0);
-		PopupReaction.iS3[currentReact].target(0);
-		PopupReaction.iS4[currentReact].set(0);
-		PopupReaction.iS4[currentReact].target(0);
-		for (int g=0;g<PopupReaction.rectList.size();g++){
-			PopupReaction.iS[currentReact][g].set(0);
-			PopupReaction.iS[currentReact][g].target(0);
+		ReactionView.iS1[currentReact].set(0);
+		ReactionView.iS1[currentReact].target(0);
+		ReactionView.iS2[currentReact].set(0);
+		ReactionView.iS2[currentReact].target(0);
+		ReactionView.iS3[currentReact].set(0);
+		ReactionView.iS3[currentReact].target(0);
+		ReactionView.iS4[currentReact].set(0);
+		ReactionView.iS4[currentReact].target(0);
+		for (int g=0;g<ReactionView.rectList.size();g++){
+			ReactionView.iS[currentReact][g].set(0);
+			ReactionView.iS[currentReact][g].target(0);
 		}
 	}
 	public static void resetLevelCurrent(int currentReact, float sec){
 		transitionProcess = 0;
 		if (0<=sec && sec<1){
-			PopupReaction.iS1[currentReact].set(sec*1000);
-			PopupReaction.iS1[currentReact].target(sec*1000);
-			PopupReaction.iS2[currentReact].set(0);
-			PopupReaction.iS2[currentReact].target(0);
-			PopupReaction.iS3[currentReact].set(0);
-			PopupReaction.iS3[currentReact].target(0);
-			PopupReaction.iS4[currentReact].set(0);
-			PopupReaction.iS4[currentReact].target(0);
-			for (int g=0;g<PopupReaction.rectList.size();g++){
-				PopupReaction.iS[currentReact][g].set(0);
-				PopupReaction.iS[currentReact][g].target(0);
+			ReactionView.iS1[currentReact].set(sec*1000);
+			ReactionView.iS1[currentReact].target(sec*1000);
+			ReactionView.iS2[currentReact].set(0);
+			ReactionView.iS2[currentReact].target(0);
+			ReactionView.iS3[currentReact].set(0);
+			ReactionView.iS3[currentReact].target(0);
+			ReactionView.iS4[currentReact].set(0);
+			ReactionView.iS4[currentReact].target(0);
+			for (int g=0;g<ReactionView.rectList.size();g++){
+				ReactionView.iS[currentReact][g].set(0);
+				ReactionView.iS[currentReact][g].target(0);
 			}
 		}
 		else if (1<=sec && sec<2)	{
-			PopupReaction.iS1[currentReact].set(1000);
-			PopupReaction.iS1[currentReact].target(1000);
-			PopupReaction.iS2[currentReact].set((sec-1)*1000);
-			PopupReaction.iS2[currentReact].target((sec-1)*1000);
-			PopupReaction.iS3[currentReact].set(0);
-			PopupReaction.iS3[currentReact].target(0);
-			PopupReaction.iS4[currentReact].set(0);
-			PopupReaction.iS4[currentReact].target(0);
-			for (int g=0;g<PopupReaction.rectList.size();g++){
-				PopupReaction.iS[currentReact][g].set(0);
-				PopupReaction.iS[currentReact][g].target(0);
+			ReactionView.iS1[currentReact].set(1000);
+			ReactionView.iS1[currentReact].target(1000);
+			ReactionView.iS2[currentReact].set((sec-1)*1000);
+			ReactionView.iS2[currentReact].target((sec-1)*1000);
+			ReactionView.iS3[currentReact].set(0);
+			ReactionView.iS3[currentReact].target(0);
+			ReactionView.iS4[currentReact].set(0);
+			ReactionView.iS4[currentReact].target(0);
+			for (int g=0;g<ReactionView.rectList.size();g++){
+				ReactionView.iS[currentReact][g].set(0);
+				ReactionView.iS[currentReact][g].target(0);
 			}
 		}	
 		else if (2<=sec && sec<3)	{
-			PopupReaction.iS1[currentReact].set(1000);
-			PopupReaction.iS1[currentReact].target(1000);
-			PopupReaction.iS2[currentReact].set(1000);
-			PopupReaction.iS2[currentReact].target(1000);
-			PopupReaction.iS3[currentReact].set((sec-2)*1000);
-			PopupReaction.iS3[currentReact].target((sec-2)*1000);
-			PopupReaction.iS4[currentReact].set(0);
-			PopupReaction.iS4[currentReact].target(0);
-			for (int g=0;g<PopupReaction.rectList.size();g++){
-				PopupReaction.iS[currentReact][g].set(0);
-				PopupReaction.iS[currentReact][g].target(0);
+			ReactionView.iS1[currentReact].set(1000);
+			ReactionView.iS1[currentReact].target(1000);
+			ReactionView.iS2[currentReact].set(1000);
+			ReactionView.iS2[currentReact].target(1000);
+			ReactionView.iS3[currentReact].set((sec-2)*1000);
+			ReactionView.iS3[currentReact].target((sec-2)*1000);
+			ReactionView.iS4[currentReact].set(0);
+			ReactionView.iS4[currentReact].target(0);
+			for (int g=0;g<ReactionView.rectList.size();g++){
+				ReactionView.iS[currentReact][g].set(0);
+				ReactionView.iS[currentReact][g].target(0);
 			}
 		}	
 		else if (3<=sec && sec<4)	{
-			PopupReaction.iS1[currentReact].set(1000);
-			PopupReaction.iS1[currentReact].target(1000);
-			PopupReaction.iS2[currentReact].set(1000);
-			PopupReaction.iS2[currentReact].target(1000);
-			PopupReaction.iS3[currentReact].set(1000);
-			PopupReaction.iS3[currentReact].target(1000);
-			PopupReaction.iS4[currentReact].set((sec-3)*1000);
-			PopupReaction.iS4[currentReact].target((sec-3)*1000);
-			for (int g=0;g<PopupReaction.rectList.size();g++){
-				PopupReaction.iS[currentReact][g].set(0);
-				PopupReaction.iS[currentReact][g].target(0);
+			ReactionView.iS1[currentReact].set(1000);
+			ReactionView.iS1[currentReact].target(1000);
+			ReactionView.iS2[currentReact].set(1000);
+			ReactionView.iS2[currentReact].target(1000);
+			ReactionView.iS3[currentReact].set(1000);
+			ReactionView.iS3[currentReact].target(1000);
+			ReactionView.iS4[currentReact].set((sec-3)*1000);
+			ReactionView.iS4[currentReact].target((sec-3)*1000);
+			for (int g=0;g<ReactionView.rectList.size();g++){
+				ReactionView.iS[currentReact][g].set(0);
+				ReactionView.iS[currentReact][g].target(0);
 			}
 		}	
 		else if (4<=sec && sec<=5)	{
-			PopupReaction.iS1[currentReact].set(1000);
-			PopupReaction.iS1[currentReact].target(1000);
-			PopupReaction.iS2[currentReact].set(1000);
-			PopupReaction.iS2[currentReact].target(1000);
-			PopupReaction.iS3[currentReact].set(1000);
-			PopupReaction.iS3[currentReact].target(1000);
-			PopupReaction.iS4[currentReact].set(1000);
-			PopupReaction.iS4[currentReact].target(1000);
-			for (int g=0;g<PopupReaction.rectList.size();g++){
-				PopupReaction.iS[currentReact][g].set((sec-4)*1000);
-				PopupReaction.iS[currentReact][g].target((sec-4)*1000);
+			ReactionView.iS1[currentReact].set(1000);
+			ReactionView.iS1[currentReact].target(1000);
+			ReactionView.iS2[currentReact].set(1000);
+			ReactionView.iS2[currentReact].target(1000);
+			ReactionView.iS3[currentReact].set(1000);
+			ReactionView.iS3[currentReact].target(1000);
+			ReactionView.iS4[currentReact].set(1000);
+			ReactionView.iS4[currentReact].target(1000);
+			for (int g=0;g<ReactionView.rectList.size();g++){
+				ReactionView.iS[currentReact][g].set((sec-4)*1000);
+				ReactionView.iS[currentReact][g].target((sec-4)*1000);
 			}
 		}	
 	}

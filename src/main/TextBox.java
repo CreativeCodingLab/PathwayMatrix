@@ -93,16 +93,16 @@ public class TextBox {
 				
 			}
 			else if (searchText.equals(""))
-				main.PopupReaction.sRectListByText =  new ArrayList<Integer>();
+				main.ReactionView.sRectListByText =  new ArrayList<Integer>();
 		}
 	}
 	public void updateReactions() {
 		int indexOfItemHash=0;
-		main.PopupReaction.sRectListByText =  new ArrayList<Integer>();
-		for (Map.Entry<BiochemicalReaction, Integer> entry : main.PopupReaction.rectHash.entrySet()) {
+		main.ReactionView.sRectListByText =  new ArrayList<Integer>();
+		for (Map.Entry<BiochemicalReaction, Integer> entry : main.ReactionView.rectHash.entrySet()) {
 			String rectName = entry.getKey().getDisplayName();
 			if (rectName.toLowerCase().contains(searchText)){
-				main.PopupReaction.sRectListByText.add(indexOfItemHash);
+				main.ReactionView.sRectListByText.add(indexOfItemHash);
 			}
 			indexOfItemHash++;
 		}

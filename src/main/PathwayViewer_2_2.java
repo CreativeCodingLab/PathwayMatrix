@@ -135,7 +135,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	
 	// Order genes
 	public static PopupComplex popupComplex;
-	public static PopupReaction popupReaction;
+	public static ReactionView popupReaction;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
 	public static CheckBox check1;
@@ -250,7 +250,7 @@ public class PathwayViewer_2_2 extends PApplet {
 		button = new ButtonBrowse(this);
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
-		popupReaction = new PopupReaction(this);
+		popupReaction = new ReactionView(this);
 		popupOrder  = new PopupOrder(this);
 		check1 = new CheckBox(this, "Lensing");
 		check2 = new CheckBox(this, "Grouping by Similarity");
@@ -291,7 +291,7 @@ public class PathwayViewer_2_2 extends PApplet {
 			}
 			
 			if (isAllowedDrawing){
-				if (PopupReaction.sPopup){
+				if (ReactionView.sPopup){
 					popupReaction.drawReactions(120);
 				}	
 				else{
@@ -914,12 +914,12 @@ public class PathwayViewer_2_2 extends PApplet {
 		
 	public void mouseMoved() {
 		popupReaction.checkBrushing();
-		if (!PopupReaction.bPopup){
-			PopupReaction.popupCausality.mouseMoved();
-			PopupReaction.popupReactionOrder.mouseMoved();
+		if (!ReactionView.bPopup){
+			ReactionView.popupCausality.mouseMoved();
+			ReactionView.popupReactionOrder.mouseMoved();
 			popupReaction.checkReactionBrushing();
 		}
-		if (isAllowedDrawing && PopupReaction.sPopup && PopupReaction.simulationRectList.size()==0){
+		if (isAllowedDrawing && ReactionView.sPopup && ReactionView.simulationRectList.size()==0){
 			popupReaction.mouseMoved();
 		}
 	}
@@ -929,10 +929,10 @@ public class PathwayViewer_2_2 extends PApplet {
 			thread4=new Thread(loader4);
 			thread4.start();
 		}
-		else if (PopupReaction.bPopup){
+		else if (ReactionView.bPopup){
 			popupReaction.mouseClicked1();
 		}
-		else if (PopupReaction.sPopup){
+		else if (ReactionView.sPopup){
 			// Click on word cloud
 			popupReaction.mouseClicked2();
 		}
@@ -985,8 +985,8 @@ public class PathwayViewer_2_2 extends PApplet {
 	
 	
 	public void keyPressed() {
-		if (PopupReaction.sPopup &&  PopupReaction.textbox1.b){
-			PopupReaction.textbox1.keyPressed();
+		if (ReactionView.sPopup &&  ReactionView.textbox1.b){
+			ReactionView.textbox1.keyPressed();
 			return;
 		}
 		
@@ -1052,7 +1052,7 @@ public class PathwayViewer_2_2 extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
-			PopupReaction.textbox1.searchText="";
+			ReactionView.textbox1.searchText="";
 		
 			
 			File modFile = new File(currentFile);
@@ -1281,12 +1281,12 @@ public class PathwayViewer_2_2 extends PApplet {
 			System.out.println();
 		
 			popupComplex.setItems();
-			PopupReaction.check11.s=true;   // Fade small molecule
-			PopupReaction.popupReactionOrder.s=2;
-			PopupReaction.check5.s=false;
+			ReactionView.check11.s=true;   // Fade small molecule
+			ReactionView.popupReactionOrder.s=2;
+			ReactionView.check5.s=false;
 			PopupCausality.s =4;
 			
-			PopupReaction.sPopup =true;
+			ReactionView.sPopup =true;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			
