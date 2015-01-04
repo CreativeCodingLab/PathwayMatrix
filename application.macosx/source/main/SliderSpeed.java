@@ -55,7 +55,7 @@ public class SliderSpeed{
 			color = new Color(0,0,0,100);
 		}
 		
-		int lastIndex = PopupReaction.simulationRectList.size()-1;
+		int lastIndex = ReactionView.simulationRectList.size()-1;
 		if (lastIndex<0) return;
 		
 		DecimalFormat df = new DecimalFormat("#.#");
@@ -105,13 +105,13 @@ public class SliderSpeed{
 	// Set speed **********************************
 	public void setSpeed(float speed_) {
 		speed = 0.2f+speed_*2.8f;     // initial value v =0.25; speed = 0.2+0.25*2.8f = 0.9f
-		for (int i=0; i< PopupReaction.rectList.size();i++){
-			PopupReaction.iS1[i].attraction = speed;
-			PopupReaction.iS2[i].attraction = speed;
-			PopupReaction.iS3[i].attraction = speed;
-			PopupReaction.iS4[i].attraction = speed;
-			for (int j=0;j<PopupReaction.rectList.size();j++){
-				PopupReaction.iS[i][j].attraction = speed/2;
+		for (int i=0; i< ReactionView.rectList.size();i++){
+			ReactionView.iS1[i].attraction = speed;
+			ReactionView.iS2[i].attraction = speed;
+			ReactionView.iS3[i].attraction = speed;
+			ReactionView.iS4[i].attraction = speed;
+			for (int j=0;j<ReactionView.rectList.size();j++){
+				ReactionView.iS[i][j].attraction = speed/2;
 			}
 		}
 		

@@ -18,7 +18,7 @@ import org.biopax.paxtools.model.level3.SmallMolecule;
 import processing.core.PApplet;
 import processing.core.PImage;
 
-public class PopupReaction{
+public class ReactionView{
 	public static boolean sPopup = true;
 	public static boolean bPopup = false;
 	public static int bRect = -1000;
@@ -136,7 +136,7 @@ public class PopupReaction{
 	public static SliderSpeed slider2;
 	
 	
-	public PopupReaction(PApplet parent_){
+	public ReactionView(PApplet parent_){
 		parent = parent_;
 		check5 = new CheckBox(parent, "Display names");
 		check11 = new CheckBox(parent, "Fade links of Small molecules");
@@ -2346,7 +2346,7 @@ public class PopupReaction{
 				if(interProteinName!=null && interProteinName.equals(name)){
 					float x4 = xL;
 					float max = 0;
-					int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+					int currentReact = ReactionView.simulationRectList.get(ReactionView.simulationRectList.size()-1);
 					if (10<=SliderSimulation.transitionProcess)
 						max = (SliderSimulation.transitionProcess/1000)*255;
 					else 
@@ -2410,7 +2410,7 @@ public class PopupReaction{
 				if(interProteinName!=null && interProteinName.equals(name)){
 					float x4 = xR;
 					// Compute the max value;
-					int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+					int currentReact = ReactionView.simulationRectList.get(ReactionView.simulationRectList.size()-1);
 					float max = 0;
 					if (10<=SliderSimulation.transitionProcess)
 						max = (SliderSimulation.transitionProcess/1000)*255;
@@ -2875,7 +2875,7 @@ public class PopupReaction{
 										max = (SliderSimulation.transitionProcess/1000)*255;
 									}	
 									else {//if (SliderSimulation.transitionProcess==0){
-										int currentReact = PopupReaction.simulationRectList.get(PopupReaction.simulationRectList.size()-1);
+										int currentReact = ReactionView.simulationRectList.get(ReactionView.simulationRectList.size()-1);
 										max = ((1000-iS2[currentReact].value)/1001)*255;
 									}
 									
@@ -3004,7 +3004,7 @@ public class PopupReaction{
 				break; // Only allow to brushing 1 complex
 			 }
 		}
-		if (bComplexLold!=bComplexL && PopupReaction.simulationRectList.size()==0){
+		if (bComplexLold!=bComplexL && ReactionView.simulationRectList.size()==0){
 			resetIntegrators();
 		}
 		int bComplexRold = bComplexR;
@@ -3027,7 +3027,7 @@ public class PopupReaction{
 				break; // Only allow to brushing 1 complex
 			 }
 		}
-		if (bComplexRold!=bComplexR && PopupReaction.simulationRectList.size()==0){
+		if (bComplexRold!=bComplexR && ReactionView.simulationRectList.size()==0){
 			resetIntegrators();
 		}
 		
@@ -3044,7 +3044,7 @@ public class PopupReaction{
 			}
 			bRectListL = getDirectReactionsOfProteinLeft(bProteinL);
 			
-			if (bProteinLold!=bProteinL && PopupReaction.simulationRectList.size()==0){
+			if (bProteinLold!=bProteinL && ReactionView.simulationRectList.size()==0){
 				resetIntegrators();
 			}
 		}
@@ -3060,7 +3060,7 @@ public class PopupReaction{
 			}
 			bRectListR = getDirectReactionsOfProteinRight(bProteinR);
 			
-			if (bProteinRold!=bProteinR && PopupReaction.simulationRectList.size()==0){
+			if (bProteinRold!=bProteinR && ReactionView.simulationRectList.size()==0){
 				resetIntegrators();
 			}
 		}
@@ -3210,33 +3210,33 @@ public class PopupReaction{
 		else if (buttonBack.b){
 			int size = simulationRectList.size();
 			int currentLevel = simulationRectListLevel.get(size-1);
-			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
-				int level = PopupReaction.simulationRectListLevel.get(i);
+			for (int i = ReactionView.simulationRectList.size()-1;i>=0;i--){
+				int level = ReactionView.simulationRectListLevel.get(i);
 				if (level==currentLevel || level==currentLevel-1){
-					int currentReact = PopupReaction.simulationRectList.get(i);
+					int currentReact = ReactionView.simulationRectList.get(i);
 					SliderSimulation.resetLevel(currentReact);       // User the function in Slider Simulation
 					if (level>0){
-						PopupReaction.simulationRectList.remove(i);
-						PopupReaction.simulationRectListLevel.remove(i);
+						ReactionView.simulationRectList.remove(i);
+						ReactionView.simulationRectListLevel.remove(i);
 					}
 				}
 			}
 			// Remove interElements
-			for (int i = PopupReaction.interElements.size()-1;i>=0;i--){
-				int level = PopupReaction.interElementsLevel.get(i);
+			for (int i = ReactionView.interElements.size()-1;i>=0;i--){
+				int level = ReactionView.interElementsLevel.get(i);
 				if ((level==currentLevel || level==currentLevel-1) && level>0){
-					PopupReaction.interElements.remove(i);
-					PopupReaction.interElementsLevel.remove(i);
+					ReactionView.interElements.remove(i);
+					ReactionView.interElementsLevel.remove(i);
 				}	
 			}
 		}
 		else if (buttonForward.b){
 			int size = simulationRectList.size();
 			int currentLevel = simulationRectListLevel.get(size-1);
-			for (int i = PopupReaction.simulationRectList.size()-1;i>=0;i--){
-				int level = PopupReaction.simulationRectListLevel.get(i);
+			for (int i = ReactionView.simulationRectList.size()-1;i>=0;i--){
+				int level = ReactionView.simulationRectListLevel.get(i);
 				if (level==currentLevel){
-					int currentReact = PopupReaction.simulationRectList.get(i);
+					int currentReact = ReactionView.simulationRectList.get(i);
 					SliderSimulation.foward(currentReact);        // User the function in Slider Simulation
 				}
 			}
@@ -3279,30 +3279,30 @@ public class PopupReaction{
 		else if (wordCloud.b>=0){
 			wordCloud.mouseClicked();
 		}
-		else if (PopupReaction.check11.b){
-			PopupReaction.check11.mouseClicked();
+		else if (ReactionView.check11.b){
+			ReactionView.check11.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check12.b){
-			PopupReaction.check12.mouseClicked();
+		else if (ReactionView.sPopup && ReactionView.check12.b){
+			ReactionView.check12.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check13.b){
-			PopupReaction.check13.mouseClicked();
+		else if (ReactionView.sPopup && ReactionView.check13.b){
+			ReactionView.check13.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check14.b){
-			PopupReaction.check14.mouseClicked();
+		else if (ReactionView.sPopup && ReactionView.check14.b){
+			ReactionView.check14.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check15.b){
-			PopupReaction.check15.mouseClicked();
+		else if (ReactionView.sPopup && ReactionView.check15.b){
+			ReactionView.check15.mouseClicked();
 		}
-		else if (PopupReaction.sPopup && popupReactionOrder.b>=0){
+		else if (ReactionView.sPopup && popupReactionOrder.b>=0){
 			if (popupReactionOrder.s==1){
-				PopupReaction.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
-				PopupReaction.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
+				ReactionView.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
+				ReactionView.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
 			}	
 			updateReactionPositions();
 		}
-		else if (PopupReaction.sPopup && PopupReaction.check5.b){
-			PopupReaction.check5.mouseClicked();
+		else if (ReactionView.sPopup && ReactionView.check5.b){
+			ReactionView.check5.mouseClicked();
 		}
 		else{
 			if (PopupCausality.s==4){

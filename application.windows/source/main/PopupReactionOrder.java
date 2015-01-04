@@ -72,13 +72,9 @@ public class PopupReactionOrder{
 	}
 	
 	 public void mouseClicked() {
-		if(s!=b){
+		if(s!=b && b<99){
 			s = b;
 		}
-		else{
-			s = -100;
-		}
-		
 	}
 	 
 	public void mouseMoved() {

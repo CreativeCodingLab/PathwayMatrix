@@ -42,29 +42,29 @@ public class CheckBox{
 			parent.fill(100);
 		if (text.contains("Small molecules")){
 			parent.text(text.replace("Small molecules", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.smallMoleculeColor.getRed(),main.PopupReaction.smallMoleculeColor.getGreen(),main.PopupReaction.smallMoleculeColor.getBlue());
+			parent.fill(main.ReactionView.smallMoleculeColor.getRed(),main.ReactionView.smallMoleculeColor.getGreen(),main.ReactionView.smallMoleculeColor.getBlue());
 			parent.text("Small molecules",x+95,y+13);
 		}
 		else if (text.contains("Unidentified elements")){
 		}
 		else if (text.contains("Complex formation")){
 			parent.text(text.replace("Complex formation", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.formComplexColor.getRed(),main.PopupReaction.formComplexColor.getGreen(),main.PopupReaction.formComplexColor.getBlue());
+			parent.fill(main.ReactionView.formComplexColor.getRed(),main.ReactionView.formComplexColor.getGreen(),main.ReactionView.formComplexColor.getBlue());
 			parent.text("Complex formation",x+95,y+13);
 		}
 		else if (text.contains("Complex formation")){
 			parent.text(text.replace("Complex formation", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.formComplexColor.getRed(),main.PopupReaction.formComplexColor.getGreen(),main.PopupReaction.formComplexColor.getBlue());
+			parent.fill(main.ReactionView.formComplexColor.getRed(),main.ReactionView.formComplexColor.getGreen(),main.ReactionView.formComplexColor.getBlue());
 			parent.text("Complex formation",x+95,y+13);
 		}
 		else if (text.contains("Complex reaction")){
 			parent.text(text.replace("Complex reaction", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.complexRectionColor.getRed(),main.PopupReaction.complexRectionColor.getGreen(),main.PopupReaction.complexRectionColor.getBlue());
+			parent.fill(main.ReactionView.complexRectionColor.getRed(),main.ReactionView.complexRectionColor.getGreen(),main.ReactionView.complexRectionColor.getBlue());
 			parent.text("Complex reaction",x+95,y+13);
 		}
 		else if (text.contains("Protein reaction")){
 			parent.text(text.replace("Protein reaction", ""),x+20,y+13);
-			parent.fill(main.PopupReaction.proteinRectionColor.getRed(),main.PopupReaction.proteinRectionColor.getGreen(),main.PopupReaction.proteinRectionColor.getBlue());
+			parent.fill(main.ReactionView.proteinRectionColor.getRed(),main.ReactionView.proteinRectionColor.getGreen(),main.ReactionView.proteinRectionColor.getBlue());
 			parent.text("Protein reaction",x+95,y+13);
 			
 		//	parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
@@ -81,8 +81,8 @@ public class CheckBox{
 	}
 	
 	public void checkBrushing() {
-		if (PopupReaction.popupReactionOrder.b>=0
-				|| PopupReaction.popupCausality.b>=0)
+		if (ReactionView.popupReactionOrder.b>=0
+				|| ReactionView.popupCausality.b>=0)
 			return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;

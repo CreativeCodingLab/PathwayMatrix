@@ -5,7 +5,7 @@ import java.text.DecimalFormat;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-public class PopupReactionOrder{
+public class PopupView{
 	public int b = -1;
 	public int s=-1;
 	public PApplet parent;
@@ -19,7 +19,7 @@ public class PopupReactionOrder{
 	public static String[] items={"None","Protein Similarity","Topological Ordering"}; 
 	public Slider slider;
 
-	public PopupReactionOrder(PApplet parent_){
+	public PopupView(PApplet parent_){
 		parent = parent_;
 		slider =  new Slider(parent_,5);
 	}
@@ -72,8 +72,8 @@ public class PopupReactionOrder{
 	}
 	
 	 public void mouseClicked() {
-		if(s!=b && b<99){
-			s = b;
+		 if(s!=b && b<99){
+				s = b;
 		}
 	}
 	 
