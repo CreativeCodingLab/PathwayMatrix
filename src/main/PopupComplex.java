@@ -20,9 +20,9 @@ public class PopupComplex{
 	public static int b = -1000;
 	public PApplet parent;
 	public float x = 800;
-	public static float yBegin = 25;
+	public static float yBegin = 23;
 	public static float yBeginList = 70;
-	public int w1 = 100;
+	public int w1 = 98;
 	public int w = 600;
 	public int h = 28;
 	public static int s=-100;
@@ -91,12 +91,12 @@ public class PopupComplex{
 	public void draw(float x_){
 		x = x_;
 		checkBrushing();
-		parent.textSize(13);
-		parent.fill(150);
-		parent.rect(x,0,w1,25);
+		parent.textSize(12);
+		parent.fill(180);
+		parent.rect(x,0,w1,23);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
-		parent.text("Complex",x+w1/2,18);
+		parent.text("Complex",x+w1/2,17);
 		
 		
 		x = x_-150;
@@ -140,7 +140,7 @@ public class PopupComplex{
 				parent.noStroke();
 				parent.fill(0);
 				parent.rect(x+10,30,200,19);
-				parent.fill(150);
+				parent.fill(180);
 			}
 			else if (b==-1){
 				parent.fill(0);
@@ -148,7 +148,7 @@ public class PopupComplex{
 			else{
 				parent.fill(50);
 			}
-			parent.textSize(13);
+			parent.textSize(12);
 			parent.textAlign(PApplet.LEFT);
 			parent.text("All complexes",x+50,45);
 			

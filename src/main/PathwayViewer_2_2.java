@@ -94,7 +94,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	//public String currentFile = "";
 	
 	
-	public static ButtonBrowse button;
+	public static ButtonBrowse buttonBrowse;
 	
 	// Store the genes results
 	public static ArrayList<String>[] pairs;
@@ -250,7 +250,7 @@ public class PathwayViewer_2_2 extends PApplet {
 		}
 		
 		
-		button = new ButtonBrowse(this);
+		buttonBrowse = new ButtonBrowse(this);
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
 		popupReaction = new ReactionView(this);
@@ -294,10 +294,7 @@ public class PathwayViewer_2_2 extends PApplet {
 			}
 			
 			if (isAllowedDrawing){
-				if (ReactionView.sPopup){
-					popupReaction.drawReactions(120);
-				}	
-				else{
+				if (popupView.s==0){
 					if (currentFile.equals("")){
 						int ccc = this.frameCount*6%255;
 						this.fill(ccc, 255-ccc,(ccc*3)%255);
@@ -319,23 +316,21 @@ public class PathwayViewer_2_2 extends PApplet {
 						drawMatrix();
 						this.textSize(13);
 						
-						popupOrder.draw(this.width-304);
-						popupComplex.draw(this.width-202);
+						popupOrder.draw(this.width-298);
+						popupComplex.draw(this.width-198);
 					
 						if (check2.s)
 						check3.draw(this.width-500, 100);
 					}
 				}	
+				else if (popupView.s==1){
+					popupReaction.drawReactions(120);
+				}	
+				
 			}
-			
-			popupView.draw(this.width-400);
-			this.textSize(13);
-			button.draw();
-			
+			popupView.draw(this.width-98);
+			buttonBrowse.draw();
 			//popupRelation.draw(this.width-304);
-			
-			
-			popupReaction.drawButton(this.width-100);
 		}
 		catch (Exception e){
 			System.out.println();
@@ -891,7 +886,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	}
 				
 	public void mousePressed() {
-		if (popupReaction.sPopup){
+		if (popupView.s==1){
 			popupReaction.mousePressed();
 		}
 		else if (popupOrder.b>=0){
@@ -899,15 +894,15 @@ public class PathwayViewer_2_2 extends PApplet {
 		}
 	}
 	public void mouseReleased() {
-		if (popupReaction.sPopup){
-			popupReaction.mouseReleased();
+		if (popupView.s==1){
+				popupReaction.mouseReleased();
 		}
 		else if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider2();
 		}
 	}
 	public void mouseDragged() {
-		if (popupReaction.sPopup){
+		if (popupView.s==1){
 			popupReaction.mouseDragged();
 		}
 		else if (popupOrder.b>=0){
@@ -917,28 +912,26 @@ public class PathwayViewer_2_2 extends PApplet {
 	}
 		
 	public void mouseMoved() {
-		popupReaction.checkBrushing();
-		if (!ReactionView.bPopup){
+		popupView.mouseMoved();
+		if (popupView.s==1){
 			ReactionView.popupCausality.mouseMoved();
 			ReactionView.popupReactionOrder.mouseMoved();
 			popupReaction.checkReactionBrushing();
+			if (isAllowedDrawing && ReactionView.simulationRectList.size()==0){
+				popupReaction.mouseMoved();
+			}
 		}
-		if (isAllowedDrawing && ReactionView.sPopup && ReactionView.simulationRectList.size()==0){
-			popupReaction.mouseMoved();
-		}
+		
 	}
 		
 	public void mouseClicked() {
-		if (button.b>=0){
+		popupView.mouseClicked();
+		if (buttonBrowse.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
 		}
-		else if (ReactionView.bPopup){
-			popupReaction.mouseClicked1();
-		}
-		else if (ReactionView.sPopup){
-			// Click on word cloud
-			popupReaction.mouseClicked2();
+		if (popupView.s==1){
+			popupReaction.mouseClicked();
 		}
 		else {
 			if (check1.b){
@@ -989,7 +982,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	
 	
 	public void keyPressed() {
-		if (ReactionView.sPopup &&  ReactionView.textbox1.b){
+		if (popupView.s==1 &&  ReactionView.textbox1.b){
 			ReactionView.textbox1.keyPressed();
 			return;
 		}
@@ -1290,7 +1283,6 @@ public class PathwayViewer_2_2 extends PApplet {
 			ReactionView.check5.s=false;
 			PopupCausality.s =4;
 			
-			ReactionView.sPopup =true;
 			popupReaction.setItems();
 			vennOverview.initialize();
 			

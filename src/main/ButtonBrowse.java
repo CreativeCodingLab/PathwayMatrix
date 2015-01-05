@@ -22,7 +22,7 @@ public class ButtonBrowse{
 	
 	public void draw(){
 		checkBrushing();
-		parent.textSize(13);
+		parent.textSize(12);
 		if (b>0){
 			parent.fill(0,0,0);
 			parent.stroke(155,155,155);
@@ -33,7 +33,7 @@ public class ButtonBrowse{
 			parent.text("Browse...",x2+8,y+16);
 		}	
 		else{
-			parent.fill(150);
+			parent.fill(180);
 			parent.noStroke();
 			parent.rect(x2, y, w, h);
 			

@@ -11,10 +11,10 @@ public class PopupOrder{
 	public PApplet parent;
 	public float x = 800;
 	public int y = 0;
-	public int w1 = 100;
-	public int w = 300;
+	public int w1 = 98;
+	public int w = 200;
 	public int h;
-	public int itemH = 20;
+	public int itemH = 19;
 	public Color cGray  = new Color(240,240,240);
 	public static String[] items={"Random","Reading order", "Name", "Similarity"}; 
 	public Slider slider;
@@ -31,11 +31,11 @@ public class PopupOrder{
 		if (b>=0){
 			parent.fill(100);
 			parent.stroke(0);
-			parent.textSize(13);
-			h=items.length*itemH+40;
+			parent.textSize(12);
+			h=items.length*itemH+20;
 			parent.fill(200);
 			parent.stroke(0,150);
-			parent.rect(x, y+25, w,h);
+			parent.rect(x, y+23, w,h);
 			// Max number of relations
 			float max =-1;
 			for (int j=0;j<main.PathwayViewer_2_2.pairs.length;j++){
@@ -57,20 +57,20 @@ public class PopupOrder{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(items[i],x+30,y+itemH*(i+1)+25);  // 
+				parent.text(items[i],x+20,y+itemH*(i+1)+25);  // 
 			}	
 			
 			if (s>=0 && items[s].equals("Similarity")) 
 				slider.draw(x+110, y+itemH*4-14+25);
 			
 		}
-		parent.fill(150);
+		parent.fill(180);
 		parent.noStroke();
-		parent.rect(x,y,w1,25);
+		parent.rect(x,y,w1,23);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
-		parent.textSize(13);
-		parent.text("Order by",x+w1/2,y+18);
+		parent.textSize(12);
+		parent.text("Order by",x+w1/2,y+17);
 		
 	}
 	

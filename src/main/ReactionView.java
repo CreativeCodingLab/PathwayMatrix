@@ -12,22 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
-import org.biopax.paxtools.model.level3.Complex;
-import org.biopax.paxtools.model.level3.SmallMolecule;
 
 import processing.core.PApplet;
 import processing.core.PImage;
 
 public class ReactionView{
-	public static boolean sPopup = true;
-	public static boolean bPopup = false;
 	public static int bRect = -1000;
 	public static ArrayList<Integer> sRectListByText = new ArrayList<Integer>();
 	public static ArrayList<Integer> bRectListL = new ArrayList<Integer>();
 	public static ArrayList<Integer> bRectListR = new ArrayList<Integer>();
 	public PApplet parent;
 	public float x = 0;
-	public float xButton = 0;
 	public static float yBegin = 25;
 	public static float yBeginList = 70;
 	public int w1 = 100;
@@ -35,7 +30,6 @@ public class ReactionView{
 	public int h = 28;
 	public static float maxSize = 0;
 	public Integrator[] iX, iY, iH;
-	public int[] hightlightList;
 	public float maxH = 22;
 	float hProtein = 0;
 	
@@ -246,11 +240,7 @@ public class ReactionView{
 			iS4[i] = new Integrator(0, 0.2f,SliderSpeed.speed);
 		}
 		
-		hightlightList =  new int[rectHash.size()];
-		for (i=0;i<rectHash.size();i++){
-			hightlightList[i] = -1;
-		}
-			
+		
 		int numValid = main.PathwayViewer_2_2.mapElementRDFId.size();
 		mapProteinRDFId_index = new HashMap<String,Integer>();
 		int p1=0;
@@ -1104,31 +1094,7 @@ public class ReactionView{
 	
 	
 	
-	public void drawButton(float x_){
-		xButton = x_;
-		
-		parent.textSize(12);
-		parent.fill(150);
-		if (bPopup)
-			parent.stroke(255,0,0);
-		if (sPopup)
-			parent.fill(0);
-		parent.rect(xButton,0,w1,25);
-		parent.fill(0);
-		if (sPopup)
-			parent.fill(255);
-		parent.textAlign(PApplet.CENTER);
-		parent.text("Reaction",xButton+w1/2,18);
 	
-		if (hightlightList==null) return;
-	
-		int countLitems = 0;
-		for (int i=0;i<hightlightList.length;i++){
-			if (hightlightList[i]>=1){
-				countLitems++;
-			}
-		}
-	}
 	
 	
 	public void drawReactions(float x_){
@@ -1206,13 +1172,9 @@ public class ReactionView{
 				}
 			}
 			
-			
-			
-			
 			// ******************************** Reaction Links ******************************************************************************************************************************
 			processedComplexLeft =  new ArrayList<Integer>();
 			processedComplexRight =  new ArrayList<Integer>();
-			
 			
 			if (PopupCausality.s==2 )  // Shortest path
 				computeShortestPath();
@@ -1786,8 +1748,8 @@ public class ReactionView{
 			parent.text("Output Proteins", xR, 45);
 			
 			// Draw buttons
-			popupReactionOrder.draw(parent.width-202);
-			popupCausality.draw(parent.width-304);
+			popupReactionOrder.draw(parent.width-198);
+			popupCausality.draw(parent.width-298);
 	}
 
 	// Compute shortest path
@@ -3161,7 +3123,6 @@ public class ReactionView{
 					if (oldRect!=bRect){
 						resetIntegrators();
 					}	
-					hightlightList[i] = 1; 
 					return;
 				}
 			}	
@@ -3186,11 +3147,9 @@ public class ReactionView{
 			slider2.mouseDragged();
 	}
 		
-	public void mouseClicked1() {
-		 sPopup = !sPopup;
-	}
+	
 		
-	public void mouseClicked2() {
+	public void mouseClicked() {
 		SliderSimulation.transitionProcess =0;
 		wordCloud.s = -99;
 		if (buttonStop.b){
@@ -3282,28 +3241,29 @@ public class ReactionView{
 		else if (ReactionView.check11.b){
 			ReactionView.check11.mouseClicked();
 		}
-		else if (ReactionView.sPopup && ReactionView.check12.b){
+		else if (ReactionView.check12.b){
 			ReactionView.check12.mouseClicked();
 		}
-		else if (ReactionView.sPopup && ReactionView.check13.b){
+		else if (ReactionView.check13.b){
 			ReactionView.check13.mouseClicked();
 		}
-		else if (ReactionView.sPopup && ReactionView.check14.b){
+		else if (ReactionView.check14.b){
 			ReactionView.check14.mouseClicked();
 		}
-		else if (ReactionView.sPopup && ReactionView.check15.b){
+		else if (ReactionView.check15.b){
 			ReactionView.check15.mouseClicked();
 		}
-		else if (ReactionView.sPopup && popupReactionOrder.b>=0){
+		else if (ReactionView.check5.b){
+			ReactionView.check5.mouseClicked();
+		}
+		else if (popupReactionOrder.b>=0){
 			if (popupReactionOrder.s==1){
 				ReactionView.check11.s = true;   // Fade small molecule links if order reactions to avoid crossing
 				ReactionView.check12.s = true;   // Fade unidentified elements links if order reactions to avoid crossing
 			}	
 			updateReactionPositions();
 		}
-		else if (ReactionView.sPopup && ReactionView.check5.b){
-			ReactionView.check5.mouseClicked();
-		}
+		
 		else{
 			if (PopupCausality.s==4){
 				if (bProteinL>=0 || bComplexL>=0){
@@ -3507,20 +3467,5 @@ public class ReactionView{
 			resetIntegrators();
 			resetCausality();
 		}
-	}
-		
-	
-	 
-	public void checkBrushing() {
-		if (rectHash==null || iH==null || iH.length==0) return;
-		int mX = parent.mouseX;
-		int mY = parent.mouseY;
-		if (xButton<mX && mX<xButton+w1 && 0<=mY && mY<=yBegin){
-			bPopup=true;
-		}	
-		else 
-			bPopup=false;		
-	
-		
 	}
 }
