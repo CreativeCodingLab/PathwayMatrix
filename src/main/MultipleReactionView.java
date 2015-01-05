@@ -33,11 +33,12 @@ public class MultipleReactionView{
 	public Set<BiochemicalReaction>[] reactionSet; 
 	public Set<SmallMolecule> smallMoleculeSet;
 	public ArrayList<String>[] proteinsInComplex; 
-	public static Map<BiochemicalReaction, Integer>[] rectHash;
 	public static ArrayList<BiochemicalReaction>[] rectList;
+	public static ArrayList<Integer>[] rectSizeList;
 	
 	
 	public int maxSize = 0;
+	public int totalReactions = 0; // Total reactions in all pathways
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
@@ -47,10 +48,12 @@ public class MultipleReactionView{
 	public void setItems(){
 		int i=0;
 		maxSize =0;
-		rectHash =  new HashMap[nFiles];
+		totalReactions =0;
 		rectList =  new ArrayList[nFiles];
+		rectSizeList =  new ArrayList[nFiles]; 
 		for (int f=0; f<nFiles;f++){
-			Map<BiochemicalReaction, Integer> unsortMap  =  new HashMap<BiochemicalReaction, Integer>();
+			rectList[f] = new ArrayList<BiochemicalReaction>();
+			rectSizeList[f] = new ArrayList<Integer>();
 			for (BiochemicalReaction current : reactionSet[f]){
 				Object[] s = current.getLeft().toArray();
 				
@@ -69,11 +72,12 @@ public class MultipleReactionView{
 					  else 
 						  size++;
 				}
-				 
-				unsortMap.put(current, size);
+				rectList[f].add(current);
+				rectSizeList[f].add(size);   
 				if (size>maxSize)
 					maxSize = size;
 				i++;
+				totalReactions++;
 			}
 		}
 		
@@ -113,6 +117,25 @@ public class MultipleReactionView{
 	
 	
 	public void draw(){
+		if (rectList==null) return;
+		float yCircular = parent.height/2;
+		float rCircular = parent.height*3/7;
+		float xCircular = rCircular+100;
+		int count = 0;
+		//System.out.println("nFiles="+nFiles);
+		for (int f=0; f<nFiles;f++){
+			for (int r=0; r<rectList[f].size();r++){
+			//	System.out.println("		r="+r+"	"+totalReactions);
+				BiochemicalReaction react = rectList[f].get(r);
+				float al = ((float)count/totalReactions)*2*PApplet.PI-PApplet.PI/2;
+				float xR =  xCircular+rCircular*PApplet.sin(al);
+				float yR =  yCircular+rCircular*PApplet.cos(al);
+ 				parent.fill(0);
+ 				parent.noStroke();
+ 				parent.ellipse(xR, yR, 10, 10);
+ 				count++;
+			}
+		}
 		
 	}
 	

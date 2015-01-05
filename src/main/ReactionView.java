@@ -760,7 +760,6 @@ public class ReactionView{
 						iY[index].target(circleGapSum+yBeginList+count2*itemH2);
 					}
 					count2++;
-					
 				}
 			}
 			// Put non-causality reaction to the end of the list
@@ -769,11 +768,10 @@ public class ReactionView{
 				iY[index].target(yBeginList+(count2+circleList.size()+1)*itemH2);
 				count2++;
 			}	
-		
-			
 		}
-		
 	}
+	
+	
 	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
 		for (int i=0;i<rectList.size();i++){
@@ -782,8 +780,6 @@ public class ReactionView{
 		}
 		return getReactionMaxDownstreamIn(a);
 	}
-	
-	
 	
 	public int getReactionMaxDownstreamIn(ArrayList<Integer> list){
 		int numDownstream = 0;
@@ -2070,7 +2066,6 @@ public class ReactionView{
 				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
 				
 				if(brushingReactionsForCommonDownstream.indexOf(r)>=0){
-					System.out.println("brushingReactionsForCommonDownstream="+brushingReactionsForCommonDownstream);
 					float sat3 = parent.frameCount*22%256;
 					parent.stroke(0,0,0,(sss)*sat3);
 					parent.strokeWeight(3);

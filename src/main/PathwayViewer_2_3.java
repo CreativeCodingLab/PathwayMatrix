@@ -255,8 +255,8 @@ public class PathwayViewer_2_3 extends PApplet {
 		check2 = new CheckBox(this, "Grouping by Similarity");
 		check3 = new CheckBox(this, "Highlighting groups");
 		
-		
 		multipleReaction = new MultipleReactionView(this);
+		
 		
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
@@ -1190,8 +1190,6 @@ public class PathwayViewer_2_3 extends PApplet {
 							System.out.println();
 							System.out.println("	NULLLLLLLLL");
 							System.out.println(match);
-							System.out.println(minerList.get(processingMiner)+"	First="+ match.getFirst()+"	"+s1);
-							System.out.println(minerList.get(processingMiner)+"	Last ="+ match.getLast()+"	"+s2);
 						}
 					}	
 				}
@@ -1247,11 +1245,12 @@ public class PathwayViewer_2_3 extends PApplet {
 				multipleReaction.mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				multipleReaction.mapComplexRDFId_index =  new HashMap<String,Integer>();
 				multipleReaction.reactionSet = new Set[multipleReaction.nFiles];
-				
-				 for (int f=0;f<multipleReaction.files.size();f++){
-				 File modFile = new File(multipleReaction.files.get(f));
-				 SimpleIOHandler io = new SimpleIOHandler();
-				 Model model = io.convertFromOWL(new FileInputStream(modFile));
+				multipleReaction.complexList = new ArrayList<Complex>();
+				 
+				for (int f=0;f<multipleReaction.files.size();f++){
+					 File modFile = new File(multipleReaction.files.get(f));
+					 SimpleIOHandler io = new SimpleIOHandler();
+					 Model model = io.convertFromOWL(new FileInputStream(modFile));
 					
 					System.out.println();
 					System.out.println("***************** Load data: "+modFile+" ***************************");
@@ -1272,7 +1271,6 @@ public class PathwayViewer_2_3 extends PApplet {
 					 
 					 
 					 Set<Complex> complexSet = model.getObjects(Complex.class);
-					 multipleReaction.complexList = new ArrayList<Complex>();
 					 int i2=0;
 					 for (Complex current : complexSet){
 						 if (!multipleReaction.mapComplexRDFId_index.containsKey(current.getRDFId().toString()))
@@ -1284,13 +1282,17 @@ public class PathwayViewer_2_3 extends PApplet {
 					 i2=0;
 					 
 					 
-					 // Compute proteins in complexes
-					multipleReaction.proteinsInComplex = new ArrayList[multipleReaction.complexList.size()];
-					for (int i=0; i<multipleReaction.complexList.size();i++){
-						multipleReaction.proteinsInComplex[i] = multipleReaction.getProteinsInComplexById(i);
-					 }
 					 multipleReaction.reactionSet[f] = model.getObjects(BiochemicalReaction.class);
+							
 				 }
+				 // Compute proteins in complexes
+				multipleReaction.proteinsInComplex = new ArrayList[multipleReaction.complexList.size()];
+				for (int i=0; i<multipleReaction.complexList.size();i++){
+					multipleReaction.proteinsInComplex[i] = multipleReaction.getProteinsInComplexById(i);
+				}
+				
+					
+				
 				 multipleReaction.setItems();
 			 }
 			 
