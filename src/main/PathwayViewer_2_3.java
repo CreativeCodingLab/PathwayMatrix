@@ -1245,63 +1245,67 @@ public class PathwayViewer_2_3 extends PApplet {
 			 println("Number of Pathway: "+multipleReaction.nFiles);
 			
 			 // Initialize best plots
-			File modFile = new File(multipleReaction.files.get(1));
-			SimpleIOHandler io = new SimpleIOHandler();
-			Model model;
-			try{
-				System.out.println();
-				System.out.println("***************** Load data: "+modFile+" ***************************");
-				model = io.convertFromOWL(new FileInputStream(modFile));
+			 try{
 				multipleReaction.mapElementRDFId = new HashMap<String,String>();
 				multipleReaction.mapElementRef = new HashMap<String,String>();
 				multipleReaction.mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				multipleReaction.mapComplexRDFId_index =  new HashMap<String,Integer>();
-				
-				 Set<Protein> proteinSet = model.getObjects(Protein.class);
-				 for (Protein currentProtein : proteinSet){
-					 multipleReaction.mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-					 if (currentProtein.getEntityReference()==null) continue;
-					 	multipleReaction.mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
-				 }
 					
-				 multipleReaction.smallMoleculeSet = model.getObjects(SmallMolecule.class);
-				 for (SmallMolecule currentMolecule : smallMoleculeSet){
-					 multipleReaction.mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 multipleReaction.mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+				 for (int f=0;f<multipleReaction.files.size();f++){
+				 File modFile = new File(multipleReaction.files.get(f));
+				 SimpleIOHandler io = new SimpleIOHandler();
+				 Model model = io.convertFromOWL(new FileInputStream(modFile));
+					
+					System.out.println();
+					System.out.println("***************** Load data: "+modFile+" ***************************");
+					
+					 Set<Protein> proteinSet = model.getObjects(Protein.class);
+					 for (Protein currentProtein : proteinSet){
+						 multipleReaction.mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+						 if (currentProtein.getEntityReference()==null) continue;
+						 	multipleReaction.mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+					 }
+						
+					 multipleReaction.smallMoleculeSet = model.getObjects(SmallMolecule.class);
+					 for (SmallMolecule currentMolecule : smallMoleculeSet){
+						 multipleReaction.mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+						 multipleReaction.mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 }
+					 
+					 
+					 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
+					 for (PhysicalEntity current : physicalEntitySet){
+						 if (current.getRDFId().contains("PhysicalEntity")){
+							 multipleReaction.mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+						 }	 
+					 }
+					 
+					 Set<Complex> complexSet = model.getObjects(Complex.class);
+					 multipleReaction.complexList = new ArrayList<Complex>();
+					 int i2=0;
+					 for (Complex current : complexSet){
+						 multipleReaction.mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
+						 multipleReaction.complexList.add(current);
+						 i2++;
+					 }
+					 i2=0;
+					 
+					 
+					 // Compute proteins in complexes
+					// multipleReaction.proteinsInComplex = new ArrayList[complexSet.size()];
+					 //for (int i=0; i<multipleReaction.complexList.size();i++){
+					//	 multipleReaction.proteinsInComplex[i] = getProteinsInComplexById(i);
+					 //}
+					 multipleReaction.reactionSet = model.getObjects(BiochemicalReaction.class);
 				 }
-				 
-				 
-				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
-				 for (PhysicalEntity current : physicalEntitySet){
-					 if (current.getRDFId().contains("PhysicalEntity")){
-						 multipleReaction.mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
-					 }	 
-				 }
-				 
-				 Set<Complex> complexSet = model.getObjects(Complex.class);
-				 multipleReaction.complexList = new ArrayList<Complex>();
-				 int i2=0;
-				 for (Complex current : complexSet){
-					 multipleReaction.mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
-					 multipleReaction.complexList.add(current);
-					 i2++;
-				 }
-				 i2=0;
-				 
-				 
-				 // Compute proteins in complexes
-				 multipleReaction.proteinsInComplex = new ArrayList[complexSet.size()];
-				 for (int i=0; i<complexList.size();i++){
-					 multipleReaction.proteinsInComplex[i] = getProteinsInComplexById(i);
-				 }
-				 multipleReaction.reactionSet = model.getObjects(BiochemicalReaction.class);
-			}
-			catch (FileNotFoundException e){
-				e.printStackTrace();
-				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
-				return;
-			}
-		}
+			 }
+			 
+			 catch (FileNotFoundException e){
+					e.printStackTrace();
+					javax.swing.JOptionPane.showMessageDialog(p, "Exception in multi pathways reading");
+					return;
+				}
+		}	 
 	}
 	
 	// This function returns all the files in a directory as an array of Strings

@@ -9,7 +9,7 @@ public class ButtonBrowse{
 	public PApplet parent;
 	public int y = 0;
 	public int w = 73;
-	public int h = 23;
+	public int h = 22;
 	public float x2 = 0;
 	public int w2 = 200;
 	public int itemNum = 9;
@@ -22,7 +22,7 @@ public class ButtonBrowse{
 	
 	public void draw(){
 		checkBrushing();
-		parent.textSize(13);
+		parent.textSize(12);
 		if (b>0){
 			parent.fill(0,0,0);
 			parent.stroke(155,155,155);
@@ -30,10 +30,10 @@ public class ButtonBrowse{
 			
 			parent.textAlign(PApplet.LEFT);
 			parent.fill(255);
-			parent.text("Browse...",x2+8,y+16);
+			parent.text("Browse...",x2+8,y+15);
 		}	
 		else{
-			parent.fill(150);
+			parent.fill(180);
 			parent.noStroke();
 			parent.rect(x2, y, w, h);
 			

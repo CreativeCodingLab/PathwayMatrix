@@ -19,8 +19,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import edu.uic.ncdm.venn.data.VennData;
-import static main.PathwayViewer_2_2.minerList;
-import static main.PathwayViewer_2_2.minerNames;
+import static main.PathwayViewer_2_3.minerList;
+import static main.PathwayViewer_2_3.minerNames;
 
 public class Venn_Overview{
 	int count = 0;
@@ -55,7 +55,7 @@ public class Venn_Overview{
 		// Select the list of miner
 		numMinerContainData = 0;
 		for (int i=0;i<minerList.size();i++){
-			if (main.PathwayViewer_2_2.pairs[i].size()>0)
+			if (main.PathwayViewer_2_3.pairs[i].size()>0)
 				numMinerContainData++;
 		}	
 		if (numMinerContainData==0) return;
@@ -67,9 +67,9 @@ public class Venn_Overview{
 		minerNames = new String[numMinerContainData];
 		int count =0;
 		for (int i=0;i<minerList.size();i++){
-			if (main.PathwayViewer_2_2.pairs[i].size()>0){
+			if (main.PathwayViewer_2_3.pairs[i].size()>0){
 				minerGlobalIDof[count] = i;
-				pair2[count] = main.PathwayViewer_2_2.pairs[i];
+				pair2[count] = main.PathwayViewer_2_3.pairs[i];
 				minerNames[count] = ""+minerList.get(i);
 				count++;
 			}	           
@@ -218,12 +218,12 @@ public class Venn_Overview{
             int radius = (int) (pi * size);
             float x = xPanelRight+10+(int) (xi * size);
             float y = yy4 + (int) (yi * size);
-            Color color = new Color(main.PathwayViewer_2_2.colorRelations[minerGlobalIDof[i]]);  
+            Color color = new Color(main.PathwayViewer_2_3.colorRelations[minerGlobalIDof[i]]);  
             
              // if (deactive[i])
            // 	color = new Color(255,255,255,10);
             
-            if (minerGlobalIDof[i]==main.PathwayViewer_2_2.currentRelation){
+            if (minerGlobalIDof[i]==main.PathwayViewer_2_3.currentRelation){
             	currentSize = radius;
             }
             
@@ -256,9 +256,9 @@ public class Venn_Overview{
            }
         }
         if (minerGlobalIDof!=null && brushing>=0)
-        	main.PathwayViewer_2_2.currentRelation = minerGlobalIDof[brushing];
+        	main.PathwayViewer_2_3.currentRelation = minerGlobalIDof[brushing];
         else
-        	main.PathwayViewer_2_2.currentRelation = -1;
+        	main.PathwayViewer_2_3.currentRelation = -1;
         
         parent.fill(Color.GRAY.getRGB());
 		parent.textSize(14);
@@ -285,12 +285,12 @@ public class Venn_Overview{
 	 
 	public boolean mouseClicked() {
 		if (brushing>=0){
-			main.PathwayViewer_2_2.currentRelation = minerGlobalIDof[brushing];
+			main.PathwayViewer_2_3.currentRelation = minerGlobalIDof[brushing];
 			deactive[brushing] =! deactive[brushing];
 			return true;
 		}
 		else{
-			main.PathwayViewer_2_2.currentRelation = -2;
+			main.PathwayViewer_2_3.currentRelation = -2;
 			return false;
 		}	
 	}

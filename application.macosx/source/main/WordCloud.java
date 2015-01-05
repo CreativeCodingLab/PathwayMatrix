@@ -19,7 +19,7 @@ public class WordCloud{
 	public int height;
 	public PFont font2;
 	float baseline_ratio = (float)0.28;
-	int large_font = 15;
+	int large_font = 14;
 	int small_font = 10;
 	float spring = (float)0.02;
 	int numWords;
@@ -79,13 +79,13 @@ public class WordCloud{
 				s=-100;
 				main.ReactionView.textbox1.searchText = "";
 				ReactionView.textbox1.updateReactions();
-				main.PathwayViewer_2_2.popupReaction.mouseMoved();  // to update protein names in current reactions
+				main.PathwayViewer_2_3.popupReaction.mouseMoved();  // to update protein names in current reactions
 			}
 			else{
 				s=b;
 				main.ReactionView.textbox1.searchText = words[b].word.toLowerCase();
 				ReactionView.textbox1.updateReactions();
-				main.PathwayViewer_2_2.popupReaction.mouseMoved();	// to update protein names in current reactions
+				main.PathwayViewer_2_3.popupReaction.mouseMoved();	// to update protein names in current reactions
 			}	
 		}
 		else{

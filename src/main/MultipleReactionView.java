@@ -32,7 +32,7 @@ public class MultipleReactionView{
 	public Map<String,Integer> mapComplexRDFId_index;
 	public Set<BiochemicalReaction> reactionSet; 
 	public Set<SmallMolecule> smallMoleculeSet;
-	public ArrayList<String>[] proteinsInComplex; 
+	//public ArrayList<String>[] proteinsInComplex; 
 	
 	
 	public MultipleReactionView(PApplet p){

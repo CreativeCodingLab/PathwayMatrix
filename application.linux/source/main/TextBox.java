@@ -15,8 +15,8 @@ public class TextBox {
 	public PApplet parent;
 	public float x = 0;
 	public int y = 0;
-	public int h = 24;
-	public int w = 150;
+	public int h = 20;
+	public int w = 130;
 	public char pKey = ' ';
 	public String text = "";
 	public String searchText = "";
@@ -26,7 +26,6 @@ public class TextBox {
 	public int sIndex = -1;
 	public int w2 = 370; 
 	public int hBox = 640;
-	public int h3 = 24;  // TextBox result high
 	public int mouseOnTextList = -1;
 	
 	public TextBox(PApplet parent_, String text_) {
@@ -41,11 +40,11 @@ public class TextBox {
 		parent.strokeWeight(1f);
 		parent.textAlign(PApplet.LEFT);
 		if (b){
-			parent.fill(255);
+			parent.fill(255,255,0);
 			parent.stroke(0);
 		}
 		else{
-			parent.fill(200);
+			parent.fill(0,30);
 			parent.stroke(50,100);
 			if (!searchText.equals("")){
 				parent.stroke(0);
@@ -58,9 +57,9 @@ public class TextBox {
 		// Main Text
 		//parent.textFont(font, 12);
 		parent.textAlign(PApplet.LEFT);
-		parent.textSize(13);
+		parent.textSize(12);
 		parent.fill(0);
-		parent.text(searchText, x -w/2+6, y + h - 5);
+		parent.text(searchText, x -w/2+6, y + h - 4);
 
 		// Explaining Text
 		//parent.textSize(14);
