@@ -16,7 +16,7 @@ public class PopupView{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"None","Protein Similarity","Topological Ordering"}; 
+	public static String[] items={"Binary relations","Reaction View","Multiple pathways"}; 
 	public Slider slider;
 
 	public PopupView(PApplet parent_){
@@ -67,7 +67,7 @@ public class PopupView{
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
 		parent.textSize(13);
-		parent.text("Order",x+w1/2,y+18);
+		parent.text("View",x+w1/2,y+18);
 		
 	}
 	

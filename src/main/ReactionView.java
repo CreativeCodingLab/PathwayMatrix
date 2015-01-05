@@ -222,7 +222,7 @@ public class ReactionView{
 		}
 			
 		wc1.countNames(a); 
-		wordCloud.updateTags(wc1.wordArray, wc1.counts);
+		wordCloud.updateTags(wc1.wordArray, wc1.counts); 
 		
 		// positions of items
 		iX = new Integrator[rectHash.size()];

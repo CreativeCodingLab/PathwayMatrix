@@ -169,6 +169,9 @@ public class PathwayViewer_2_2 extends PApplet {
 	public static Set<SmallMolecule> smallMoleculeSet;
 	public static ArrayList<String>[] proteinsInComplex; 
 	
+	// Multiple pathways 
+	public PopupView popupView = new PopupView(this);
+	
 	
 	
 	public static void main(String args[]){
@@ -325,6 +328,7 @@ public class PathwayViewer_2_2 extends PApplet {
 				}	
 			}
 			
+			popupView.draw(this.width-400);
 			this.textSize(13);
 			button.draw();
 			
