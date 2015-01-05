@@ -741,12 +741,10 @@ public class ReactionView{
 			float totalH = itemH2*rectList.size();
 			
 			
-			System.out.println("1  itemH2="+itemH2);
 			itemH2 = totalH/(rectList.size()+circleList.size()+1);
 			float circleGap = itemH2;
 			float circleGapSum = 0;
 			
-			System.out.println("2  itemH2="+itemH2);
 			ArrayList<Integer> nonCausalityList = new ArrayList<Integer>();
 			int count2 = 0;
 			for (int i=0;i<doneList.size();i++){
