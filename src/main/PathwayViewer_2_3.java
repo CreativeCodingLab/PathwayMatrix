@@ -81,7 +81,7 @@ import edu.uic.ncdm.venn.Venn_Overview;
 
 import processing.core.*;
 
-public class PathwayViewer_2_2 extends PApplet {
+public class PathwayViewer_2_3 extends PApplet {
 	private static final long serialVersionUID = 1L;
 	public int count = 0;
 	
@@ -119,7 +119,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
 	public Thread thread1=new Thread(loader1);
 	
-	public ThreadLoader2 loader2=new ThreadLoader2();
+	public ThreadLoader2 loader2=new ThreadLoader2(this);
 	public Thread thread2=new Thread(loader2);
 	
 	public ThreadLoader3 loader3=new ThreadLoader3();
@@ -171,15 +171,11 @@ public class PathwayViewer_2_2 extends PApplet {
 	
 	// Multiple pathways 
 	public PopupView popupView = new PopupView(this);
-	
-	
+	public MultipleReactionView multipleReaction;
 	
 	public static void main(String args[]){
-	  PApplet.main(new String[] { PathwayViewer_2_2.class.getName() });
+	  PApplet.main(new String[] { PathwayViewer_2_3.class.getName() });
     }
-
-	
-	
 
 	public void setup() {
 		textFont(metaBold,14);
@@ -259,12 +255,20 @@ public class PathwayViewer_2_2 extends PApplet {
 		check2 = new CheckBox(this, "Grouping by Similarity");
 		check3 = new CheckBox(this, "Highlighting groups");
 		
+		
+		multipleReaction = new MultipleReactionView(this);
+		
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
 		if (!currentFile.equals("")){
 			thread1=new Thread(loader1);
 			thread1.start();
 		}
+		
+		// Loading multiple pathways
+		thread2=new Thread(loader2);
+		thread2.start();
+		
 		
 		// enable the mouse wheel, for zooming
 		addMouseWheelListener(new java.awt.event.MouseWheelListener() {
@@ -324,8 +328,21 @@ public class PathwayViewer_2_2 extends PApplet {
 					}
 				}	
 				else if (popupView.s==1){
+					// Draw file name
+					this.fill(128);
+					this.textAlign(PApplet.LEFT);
+					this.textSize(12);
+					String[] str = currentFile.split("/");
+			        String nameFile = str[str.length-1];
+			  	    this.text("File: "+nameFile, 80, 16);
+					
 					popupReaction.drawReactions(120);
-				}	
+				}
+				else if (popupView.s==2){
+					multipleReaction.draw();
+					
+				}
+					
 				
 			}
 			popupView.draw(this.width-98);
@@ -373,12 +390,12 @@ public class PathwayViewer_2_2 extends PApplet {
 		else{
 			drawGenes();
 		}
-		
+
 		float x2 = this.width-500;
 		float y2 = 180;
 		this.fill(0);
 		this.textAlign(PApplet.LEFT);
-		this.textSize(13);
+		this.textSize(12);
 		String[] str = currentFile.split("/");
         String nameFile = str[str.length-1];
   	    this.text("File: "+nameFile, x2, y2);
@@ -940,12 +957,12 @@ public class PathwayViewer_2_2 extends PApplet {
 			else if (check2.b){
 			check2.mouseClicked();
 			if (check2.s){  
-				main.PathwayViewer_2_2.stateAnimation=0;
+				main.PathwayViewer_2_3.stateAnimation=0;
 				Gene.orderBySimilarity();
 				Gene.groupBySimilarity();
 			}	
 				else {
-					main.PathwayViewer_2_2.stateAnimation=0;
+					main.PathwayViewer_2_3.stateAnimation=0;
 					Gene.orderBySimilarity();
 				}	
 			}
@@ -1051,7 +1068,6 @@ public class PathwayViewer_2_2 extends PApplet {
 			
 			ReactionView.textbox1.searchText="";
 		
-			
 			File modFile = new File(currentFile);
 			//File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
@@ -1064,7 +1080,6 @@ public class PathwayViewer_2_2 extends PApplet {
 				mapElementRef = new HashMap<String,String>();
 				mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
-					
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
 				 for (Protein currentProtein : proteinSet){
@@ -1122,75 +1137,9 @@ public class PathwayViewer_2_2 extends PApplet {
 				 for (int i=0; i<complexList.size();i++){
 						proteinsInComplex[i] = getProteinsInComplexById(i);
 				 }
-				 
-				 
-				 
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
-						
-				 /*i2=0;
-				 for (BiochemicalReaction current : reactionSet){
-					  System.out.println("BiochemicalReaction "+(i2+1)+": "+current.getDisplayName());
-					  Object[] s = current.getLeft().toArray();
-					  for (int i=0;i<s.length;i++){
-						  String name = getProteinName(s[i].toString());
-						  if (name!=null)
-							  System.out.println("	Left "+(i+1)+" = "+name);
-						  else{
-							  if (mapComplexRDFId_index.get(s[i].toString())!=null){
-								  System.out.println("	Left "+(i+1)+" = "+s[i]);
-								  int id = mapComplexRDFId_index.get(s[i].toString());
-								  ArrayList<String> components = proteinsInComplex[id];
-									 for (int k=0;k<components.size();k++){
-										 System.out.println("		 contains "+components.get(k));
-								  }
-							  }
-							  else
-								  System.out.println("	Left "+(i+1)+" = "+s[i]);
-						  }
-					  }
-
-					  Object[] s2 = current.getRight().toArray();
-					  for (int i=0;i<s2.length;i++){
-						  String name = getProteinName(s2[i].toString());
-						  if (name!=null)
-							  System.out.println("	Right "+(i+1)+" = "+name);
-						  else{
-							 if (mapComplexRDFId_index.get(s2[i].toString())!=null){
-								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
-								  int id = mapComplexRDFId_index.get(s2[i].toString());
-								  ArrayList<String> components = proteinsInComplex[id];
-									 for (int k=0;k<components.size();k++){
-										 System.out.println("		 contains "+components.get(k));
-								  }
-							  }
-							  else		
-								  System.out.println("	Right "+(i+1)+" = "+s2[i]);
-						  }
-					  }
-					  
-					// System.out.println("  		getLeft() = "+current.getLeft());
-					// System.out.println("  		getRight() ="+ current.getRight());
-					 i2++;
-				 	}*/
-				 
-				 
-				 Set<Stoichiometry> set = 	 model.getObjects(Stoichiometry.class);
-				 i2=0;
-				 System.out.println("SET ******:"+set);
-				 for (Stoichiometry current : set){
-					// System.out.println("Stoichiometry"+i2+"	"+current.getPhysicalEntity()+"	="+current.getStoichiometricCoefficient());
-					 i2++;
-				 }
-				 
-
-				 Set<Catalysis> set2 = 	 model.getObjects(Catalysis.class);
-				 i2=0;
-				 System.out.println("SET2 ******:"+set2);
-				 for (Catalysis current : set2){
-					// System.out.println("Catalysis"+i2+"	"+current.getDisplayName()+"	"+current.getParticipant());
-					 i2++;
-				 }
-				 
+				
+				 /*
 				 Set<PathwayStep> set3 = 	 model.getObjects(PathwayStep.class);
 				 i2=0;
 				 System.out.println("SET2 ******:"+set2);
@@ -1207,31 +1156,7 @@ public class PathwayViewer_2_2 extends PApplet {
 					 System.out.println();
 					  System.out.println("aPathway ******:"+aPathway.getDisplayName());
 					  extractProteinUrefsFromPathway(aPathway);
-						
-				 }
-				 
-				/* SIF
-				// Iterate through all BioPAX Elements and print basic info
-				 SimpleInteractionConverter converter =
-					 new SimpleInteractionConverter(new ControlRule());
-					 try {
-						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				String[] lines = p.loadStrings("A.txt");
-				for (int i=0;i<lines.length;i++){
-					String[] p  = lines[i].split("\t");
- 					BioPAXElement element1 = model.getByID(p[0]);
- 					BioPAXElement element2 = model.getByID(p[2]);
- 					if (lines[i].contains("http://www.pantherdb.or")){
- 						System.out.println();
- 						System.out.println(i+"	"+lines[i]);
- 					String id1 = fetchID(element1);
- 					String id2 = fetchID(element2);
- 					
- 					}
+				}
 				*/
 			}
 			catch (FileNotFoundException e){
@@ -1302,49 +1227,100 @@ public class PathwayViewer_2_2 extends PApplet {
 		}
 	}
 	
-	public void extractProteinUrefsFromPathway(Pathway aPathway)
-	{
-	 for(Process aProcess: aPathway.getPathwayComponent())
-	 {
-	  if(aProcess instanceof Pathway)
-	  { //Dig into the nested structure recursively
-		  //extractProteinUrefsFromPathway((Pathway)aProcess);
-		  System.out.println("------Sub-pathway:"+aProcess.getDisplayName());
-			
-	  }  else
-	  { //It must be an Interaction
-	   extractAndPrintProteinUrefs((Interaction)aProcess);
-	  }
-	  }
-	 }
 	
-	public void extractAndPrintProteinUrefs(Interaction anInteraction) {
-		// System.out.println();
-		System.out.println("extract Interaction =  "
-				+ anInteraction.getDisplayName());
-
-		for (Entity participant : anInteraction.getParticipant()) {
+	// Thread for Venn Diagram
+	class ThreadLoader2 implements Runnable {
+		PApplet p;
+		public ThreadLoader2(PApplet parent_) {
+			p = parent_;
+		}
+		@SuppressWarnings("unchecked")
+		public void run() {
+			multipleReaction.isAllowedDrawing =  false;
 			
-			if (participant instanceof Protein) {
-				System.out.println("	 Protein=   " + participant.getDisplayName());
-
-				EntityReference entityReference = ((Protein) participant)
-						.getEntityReference();
-				if (entityReference != null) {
-					Set<Xref> xrefSet = entityReference.getXref();
-					for (Xref currentRef : xrefSet) {
-						// if (currentRef instanceof UnificationXref)
-						// System.out.println("Unification XRef: " +
-						// currentRef.getDb() + ": " +
-						// currentRef.getId()+"	"+currentRef.toString());
-					}
-				}
+			 String path = "./level3RAS/";
+			 String imgType = ".owl";
+			 multipleReaction.files = listFileNames(path, imgType); 
+			 multipleReaction.nFiles = multipleReaction.files.size();
+			 println("Number of Pathway: "+multipleReaction.nFiles);
+			
+			 // Initialize best plots
+			File modFile = new File(multipleReaction.files.get(1));
+			SimpleIOHandler io = new SimpleIOHandler();
+			Model model;
+			try{
+				System.out.println();
+				System.out.println("***************** Load data: "+modFile+" ***************************");
+				model = io.convertFromOWL(new FileInputStream(modFile));
+				multipleReaction.mapElementRDFId = new HashMap<String,String>();
+				multipleReaction.mapElementRef = new HashMap<String,String>();
+				multipleReaction.mapSmallMoleculeRDFId =  new HashMap<String,String>();
+				multipleReaction.mapComplexRDFId_index =  new HashMap<String,Integer>();
+				
+				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 for (Protein currentProtein : proteinSet){
+					 multipleReaction.mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					 if (currentProtein.getEntityReference()==null) continue;
+					 	multipleReaction.mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+				 }
+					
+				 multipleReaction.smallMoleculeSet = model.getObjects(SmallMolecule.class);
+				 for (SmallMolecule currentMolecule : smallMoleculeSet){
+					 multipleReaction.mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 multipleReaction.mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+				 }
+				 
+				 
+				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
+				 for (PhysicalEntity current : physicalEntitySet){
+					 if (current.getRDFId().contains("PhysicalEntity")){
+						 multipleReaction.mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+					 }	 
+				 }
+				 
+				 Set<Complex> complexSet = model.getObjects(Complex.class);
+				 multipleReaction.complexList = new ArrayList<Complex>();
+				 int i2=0;
+				 for (Complex current : complexSet){
+					 multipleReaction.mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
+					 multipleReaction.complexList.add(current);
+					 i2++;
+				 }
+				 i2=0;
+				 
+				 
+				 // Compute proteins in complexes
+				 multipleReaction.proteinsInComplex = new ArrayList[complexSet.size()];
+				 for (int i=0; i<complexList.size();i++){
+					 multipleReaction.proteinsInComplex[i] = getProteinsInComplexById(i);
+				 }
+				 multipleReaction.reactionSet = model.getObjects(BiochemicalReaction.class);
 			}
-			else{
-				System.out.println("	 " + participant.getDisplayName());
-
+			catch (FileNotFoundException e){
+				e.printStackTrace();
+				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
+				return;
 			}
 		}
+	}
+	
+	// This function returns all the files in a directory as an array of Strings
+	public  ArrayList<String> listFileNames(String dir, String imgType) {
+		File file = new File(dir);
+		ArrayList<String> a = new ArrayList<String>();
+		if (file.isDirectory()) { // Do
+			String names[] = file.list();
+			for (int i = 0; i < names.length; i++) {
+				ArrayList<String> b = listFileNames(dir + "/" + names[i], imgType);
+				for (int j = 0; j < b.size(); j++) {
+					a.add(b.get(j));	
+				}
+				
+			}
+		} else if (dir.endsWith(imgType)) {
+			a.add(dir);
+		}
+		return a;
 	}
 	
 	
@@ -1423,13 +1399,7 @@ public class PathwayViewer_2_2 extends PApplet {
 	
 		
 	
-	// Thread for ordering
-	class ThreadLoader2 implements Runnable {
-		public ThreadLoader2() {}
-		public void run() {
-			Gene.orderBySimilarity();
-		}
-	}	
+	
 	// Thread for grouping
 	class ThreadLoader3 implements Runnable {
 		public ThreadLoader3() {}
