@@ -1298,6 +1298,8 @@ public class PathwayViewer_2_3 extends PApplet {
 						
 				}
 				multipleReaction.setItems();
+				multipleReaction.updateNodes();
+				multipleReaction.updateEdges();
 			 }
 			 
 			 catch (FileNotFoundException e){

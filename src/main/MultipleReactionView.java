@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,7 +11,7 @@ import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.SmallMolecule;
 
 import processing.core.PApplet;
-
+import GraphLayout.*;
 
 
 public class MultipleReactionView{
@@ -32,8 +33,8 @@ public class MultipleReactionView{
 	public ArrayList<BiochemicalReaction> rectList;
 	public ArrayList<Integer> rectSizeList;
 	public ArrayList<Integer> rectFileList;
-	public int[] pathwaySize;
 	public ArrayList<Integer> rectOrderList;
+	public int[] pathwaySize;
 	
 	
 	public int maxSize = 0;
@@ -43,7 +44,7 @@ public class MultipleReactionView{
 	public float xCircular, yCircular, rCircular; 
 	
 	
-	
+	public Graph g;
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
@@ -122,6 +123,43 @@ public class MultipleReactionView{
 		isAllowedDrawing = true;
 	}
 	
+	public void updateNodes() {
+		g = new Graph();
+		for (int i = 0; i < rectList.size(); i++) {
+			int pathwayId = rectFileList.get(i);
+			int reactId = rectOrderList.get(i);
+			Node node = new Node(new Vector3D( 250+parent.random(parent.width-270), 20 + parent.random(parent.height-40), 0), parent) ;
+			node.setMass(rectSizeList.get(i));
+			node.wordWidth = 30;//rectList.get(i).getDisplayName().toString();
+			node.wordId = i;
+			node.name = rectList.get(i).getDisplayName();
+			node.color = gradient.getGradient(colorScale*(pathwayId+(float)reactId/(pathwaySize[pathwayId]*2)));
+			g.addNode(node);
+		}	
+	}
+	
+	public void updateEdges() {
+		g.edges = new ArrayList<Edge>();
+		g.edgesFrom = new HashMap<Node, ArrayList<Edge>>();
+		g.edgesTo = new HashMap<Node, ArrayList<Edge>>();
+		
+		// Update slider value to synchronize the processes
+		System.out.println();
+		for (int r = 0; r < rectList.size(); r++) {
+			Node node1 = g.nodes.get(r);
+			int degree = 0;
+			ArrayList<Integer> a = getDirectDownStream(r);
+			for (int j = 0; j < a.size(); j++) {
+				int r2 = a.get(j);
+				Node node2 = g.nodes.get(r2);
+				Edge e = new Edge(node1, node2, parent);
+				e.setStrokeWeight(2);
+				g.addEdge(e);
+				degree++;
+			}
+			node1.degree = degree;
+		}	
+	}
 	
 	public ArrayList<Integer> getProteinsInOneSideOfReaction(Object[] s) {
 		ArrayList<Integer> a = new ArrayList<Integer>();
@@ -176,7 +214,7 @@ public class MultipleReactionView{
 		int count = 0;
 		// Draw causality
 		
-		
+		/*
 		//System.out.println("nFiles="+nFiles+"	"+rectList.size());
 		for (int r=0; r<rectSizeList.size();r++){
 			int f = rectFileList.get(r);
@@ -199,14 +237,107 @@ public class MultipleReactionView{
 		for (int r1=0; r1<rectList.size();r1++){
 			ArrayList<Integer> processedList =  new ArrayList<Integer>();
 			drawDownStreamReaction(r1, processedList, 255);
+		}*/
+		
+		if (g==null) return;
+		doLayout();
+		g.draw();
+	}
+	
+	public void doLayout() {
+		// calculate forces on each node
+		// calculate spring forces on each node
+		for (int i = 0; i < g.getNodes().size(); i++) {
+			Node n = (Node) g.getNodes().get(i);
+			ArrayList edges = (ArrayList) g.getEdgesFrom(n);
+			n.setForce(new Vector3D(0, 0, 0));
+			for (int j = 0; edges != null && j < edges.size(); j++) {
+				Edge e = (Edge) edges.get(j);
+				Vector3D f = e.getForceFrom();
+				n.applyForce(f);
+			}
+
+			edges = (ArrayList) g.getEdgesTo(n);
+			for (int j = 0; edges != null && j < edges.size(); j++) {
+				Edge e = (Edge) edges.get(j);
+				Vector3D f = e.getForceTo();
+				n.applyForce(f);
+			}
+
+		}
+
+		// calculate the anti-gravitational forces on each node
+		// this is the N^2 shittiness that needs to be optimized
+		// TODO: at least make it N^2/2 since forces are symmetrical
+		for (int i = 0; i < g.getNodes().size(); i++) {
+			Node a = (Node) g.getNodes().get(i);
+			for (int j = 0; j < g.getNodes().size(); j++) {
+				Node b = (Node) g.getNodes().get(j);
+				if (b != a) {
+					float dx = b.getX() - a.getX();
+					float dy = b.getY() - a.getY();
+					float r = PApplet.sqrt(dx * dx + dy * dy);
+					// F = G*m1*m2/r^2
+
+					float f = 10 * (a.getMass() * b.getMass() / (r * r));
+					if (a.degree>0){
+						f = 0.5f*PApplet.sqrt(a.degree)*f;
+					}
+					if (f>1000)
+					    	f=1000;
+					if (r > 1) { // don't divide by zero.
+						Vector3D vf = new Vector3D(-dx * f, -dy * f, 0);
+						a.applyForce(vf);
+					}
+				}
+			}
+		}
+		
+		for (int i = 0; i < g.getNodes().size(); i++) {
+			Node a = (Node) g.getNodes().get(i);
+			float dx = parent.width/2 - a.getX();
+			float dy = parent.height/2 - a.getY();
+			float r2 = dx * dx + dy * dy;
+			
+			float f =  r2/2000000;
+			if (f>100)
+				f=100;
+			if (a.degree>0){
+				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
+				a.applyForce(vf);
+			}
+			
+		}
+
+		// move nodes according to forces
+		for (int i = 0; i < g.getNodes().size(); i++) {
+			Node n = (Node) g.getNodes().get(i);
+			if (n != g.getDragNode()) {
+				n.setPosition(n.getPosition().add(n.getForce()));
+			}
 		}
 	}
+	
 	
 	public float computeAlpha(int r){
 		return PApplet.PI -((float)r)/(rectList.size())*2*PApplet.PI;
 	}
 		
-	
+	public ArrayList<Integer> getDirectDownStream(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
 	public void drawDownStreamReaction(int r, ArrayList<Integer> processedList, float sat){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
@@ -338,11 +469,40 @@ public class MultipleReactionView{
 		parent.stroke(color.getRed(),color.getGreen(),color.getBlue(),wei);
 		parent.strokeWeight(strokeWeight);
 		if (al1<al2)		
-			parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+			drawArc(x3, y3, newR*2,  al1, al2, 255);
 		else
-			parent.arc(x3, y3, newR*2, newR*2, al2, al1);
+			drawArc(x3, y3, newR*2,  al2, al1, 255);
 		parent.strokeWeight(1);
-			
 	}
+	public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
+		parent.smooth();
+		int numSec = (int) 15;
+		if (numSec==0) return;
+			
+		float beginAngle = al1;
+		for (int k=0;k<=numSec;k++){
+			float endAngle = al1+k*(al2-al1)/numSec;
+			parent.noFill();
+			float sss = (float) k/numSec;
+			sss = PApplet.pow(sss,0.75f);
+			
+			float sat2 = 255-220*sss;
+			if (sat<255)
+				sat2=sat;
+				
+			float red = 255;
+			float green = sss*255;
+			float blue = 255-255*sss;
+			
+			parent.stroke(red,green,blue,sat2);
+			parent.strokeWeight(2);
+			parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
+			beginAngle = endAngle;
+			parent.strokeWeight(1);
+		}
+	}
+	
+	
+	
 }
 	

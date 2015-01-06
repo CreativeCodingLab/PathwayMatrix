@@ -4,8 +4,8 @@ public class Integrator {
 	 final float DAMPING = .5f;
 	  final float ATTRACTION = 0.2f;
 
-	  float value;
-	  float vel;
+	  public float value;
+	  public float vel;
 	  float accel;
 	  float force;
 	  float mass = 1;
@@ -36,7 +36,7 @@ public class Integrator {
 	  }
 
 
-	  void update() {
+	  public void update() {
 	    if (targeting) {
 	      force += attraction * (target - value);      
 	    }
@@ -49,7 +49,7 @@ public class Integrator {
 	  }
 
 
-	  void target(float t) {
+	  public void target(float t) {
 	    targeting = true;
 	    target = t;
 	  }
