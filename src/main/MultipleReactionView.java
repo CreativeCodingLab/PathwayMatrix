@@ -47,7 +47,7 @@ public class MultipleReactionView{
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
-		float v=0.7f;
+		float v=0.5f;
 		gradient.addColor(new Color(0,0,v));
 		gradient.addColor(new Color(0,v,v));
 		gradient.addColor(new Color(0,v,0));
@@ -218,8 +218,8 @@ public class MultipleReactionView{
 			if (commonElements.size()>0){
 				if (r<g)
 					drawCircularRelationship(r,g,Color.MAGENTA,4);
-			//	else
-			//		drawCircularRelationship(g,r,Color.GREEN,4);
+				else
+					drawCircularRelationship(g,r,Color.GREEN,4);
 			}
 		}
 	}
@@ -341,6 +341,7 @@ public class MultipleReactionView{
 			parent.arc(x3, y3, newR*2, newR*2, al1, al2);
 		else
 			parent.arc(x3, y3, newR*2, newR*2, al2, al1);
+		parent.strokeWeight(1);
 			
 	}
 }
