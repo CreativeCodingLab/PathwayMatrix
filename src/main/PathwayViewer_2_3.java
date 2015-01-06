@@ -1228,7 +1228,6 @@ public class PathwayViewer_2_3 extends PApplet {
 		public ThreadLoader2(PApplet parent_) {
 			p = parent_;
 		}
-		@SuppressWarnings("unchecked")
 		public void run() {
 			multipleReaction.isAllowedDrawing =  false;
 			
@@ -1240,10 +1239,10 @@ public class PathwayViewer_2_3 extends PApplet {
 			
 			 // Initialize best plots
 			 try{
-				multipleReaction.mapElementRDFId = new HashMap<String,String>();
+				multipleReaction.mapProteinRDFId = new HashMap<String,String>();
 				multipleReaction.mapSmallMoleculeRDFId =  new HashMap<String,String>();
-				multipleReaction.mapComplexRDFId_index =  new HashMap<String,Integer>();
-				multipleReaction.complexList = new ArrayList<Complex>();
+				multipleReaction.mapComplexRDFId =  new HashMap<String,String>();
+				multipleReaction.mapComplexRDFId_Complex = new HashMap<String,Complex>();
 				multipleReaction.rectList = new ArrayList<BiochemicalReaction>();
 				multipleReaction.rectSizeList = new ArrayList<Integer>();
 				multipleReaction.rectFileList = new ArrayList<Integer>();
@@ -1261,16 +1260,15 @@ public class PathwayViewer_2_3 extends PApplet {
 					
 					 Set<Protein> proteinSet = model.getObjects(Protein.class);
 					 for (Protein currentProtein : proteinSet){
-						 System.out.println(currentProtein.getDisplayName()+"	"+currentProtein.getRDFId().toString());
-						 if (!multipleReaction.mapElementRDFId.containsKey(currentProtein.getRDFId().toString()))
-							 multipleReaction.mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+						 if (!multipleReaction.mapProteinRDFId.containsKey(currentProtein.getRDFId().toString()))
+							 multipleReaction.mapProteinRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
 						 
 					 }
 						
 					 multipleReaction.smallMoleculeSet = model.getObjects(SmallMolecule.class);
 					 for (SmallMolecule currentMolecule : multipleReaction.smallMoleculeSet){
-						 if (!multipleReaction.mapElementRDFId.containsKey(currentMolecule.getRDFId().toString()))
-							 multipleReaction.mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+						 if (!multipleReaction.mapProteinRDFId.containsKey(currentMolecule.getRDFId().toString()))
+							 multipleReaction.mapProteinRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 						 if (!multipleReaction.mapSmallMoleculeRDFId.containsKey(currentMolecule.getRDFId().toString()))
 							 multipleReaction.mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 					 }
@@ -1279,10 +1277,10 @@ public class PathwayViewer_2_3 extends PApplet {
 					 Set<Complex> complexSet = model.getObjects(Complex.class);
 					 int i2=0;
 					 for (Complex current : complexSet){
-						 if (!multipleReaction.mapComplexRDFId_index.containsKey(current.getRDFId().toString()))
-								multipleReaction.mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
-						 if (!multipleReaction.complexList.contains(current))
-								multipleReaction.complexList.add(current);
+						 if (!multipleReaction.mapComplexRDFId.containsKey(current.getRDFId().toString())){
+							 multipleReaction.mapComplexRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+						 	 multipleReaction.mapComplexRDFId_Complex.put(current.getRDFId().toString(),current);
+						 }	 
 						 i2++;
 					 }
 					 i2=0;
@@ -1299,13 +1297,6 @@ public class PathwayViewer_2_3 extends PApplet {
 					multipleReaction.pathwaySize[f] = r;   // number of reaction in pathway f
 						
 				}
-				
-				 // Compute proteins in complexes
-				multipleReaction.proteinsInComplex = new ArrayList[multipleReaction.complexList.size()];
-				for (int i=0; i<multipleReaction.complexList.size();i++){
-					multipleReaction.proteinsInComplex[i] = multipleReaction.getProteinsInComplexById(i);
-				}
-			
 				multipleReaction.setItems();
 			 }
 			 
@@ -1348,9 +1339,6 @@ public class PathwayViewer_2_3 extends PApplet {
 	
 	public static String getProteinName(String ref){	
 		String s1 = mapElementRDFId.get(ref);
-		if (s1==null){
-			s1 = mapElementRef.get(ref);
-		}
 		return s1;
 	}
 	

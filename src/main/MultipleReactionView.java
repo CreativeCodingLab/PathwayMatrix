@@ -20,12 +20,14 @@ public class MultipleReactionView{
 	public boolean isAllowedDrawing = false;
 	
 	// Read data 
-	public Map<String,String> mapElementRDFId;
+	public Map<String,String> mapProteinRDFId;
 	public Map<String,String> mapSmallMoleculeRDFId;
-	public ArrayList<Complex> complexList; 
-	public Map<String,Integer> mapComplexRDFId_index;
+	public Map<String,String> mapComplexRDFId;
+	public Map<String,Complex> mapComplexRDFId_Complex;
 	public Set<SmallMolecule> smallMoleculeSet;
-	public ArrayList<String>[] proteinsInComplex; 
+	
+	public ArrayList<String> complexList = new ArrayList<String>(); 
+	public ArrayList<String> proteinList = new ArrayList<String>();
 	
 	public ArrayList<BiochemicalReaction> rectList;
 	public ArrayList<Integer> rectSizeList;
@@ -33,7 +35,6 @@ public class MultipleReactionView{
 	public int[] pathwaySize;
 	public ArrayList<Integer> rectOrderList;
 	
-	public ArrayList<String> proteins = new ArrayList<String>();
 	
 	public int maxSize = 0;
 	public Gradient gradient = new Gradient();
@@ -64,72 +65,100 @@ public class MultipleReactionView{
 				iS[i][j] = new Integrator(0, 0.2f,SliderSpeed.speed/2);
 			}
 		}	
-		System.out.println("rectList.size()="+rectList.size());
+		
+		
+	
+		// Compute proteinList and complexList
+		complexList = new ArrayList<String>(); 
+		proteinList = new ArrayList<String>();
+		for (int r=0; r<rectList.size();r++){
+			BiochemicalReaction react = rectList.get(r);
+			Object[] left = react.getLeft().toArray();
+			Object[] right = react.getRight().toArray();
+			for (int i=0;i<left.length;i++){
+				String ref = left[i].toString();
+				  if ( mapProteinRDFId.get(ref)!=null){
+					  String proteinName = mapProteinRDFId.get(ref);
+					  if (!proteinList.contains(proteinName))
+							proteinList.add(proteinName);
+				  }	  
+				  else if (mapComplexRDFId.get(ref)!=null){
+					  String complexName = mapComplexRDFId.get(ref);
+					  if (!complexList.contains(complexName))
+						  complexList.add(complexName);
+				  }
+			}
+			for (int i=0;i<right.length;i++){
+				String ref = right[i].toString();
+				  if ( mapProteinRDFId.get(ref)!=null){
+					  String proteinName = mapProteinRDFId.get(ref);
+					  if (!proteinList.contains(proteinName))
+							proteinList.add(proteinName);
+				  }	  
+				  else if (mapComplexRDFId.get(ref)!=null){
+					  String complexName = mapComplexRDFId.get(ref);
+					  if (!complexList.contains(complexName))
+						  complexList.add(complexName);
+				  }
+			}
+		}
 		
 		// Compute size of reaction
 		maxSize =0;
 		for (int r=0; r<rectList.size();r++){
 			BiochemicalReaction react = rectList.get(r);
-			Object[] s = react.getLeft().toArray();
+			Object[] left = react.getLeft().toArray();
+			Object[] right = react.getRight().toArray();
 			
-			int size = 0;
-			for (int i3=0;i3<s.length;i3++){
-				  String name = getProteinName(s[i3].toString());
-				  if (name!=null){
-					  size++;
-				  }	  
-				  else if (mapComplexRDFId_index.get(s[i3].toString())!=null){
-					  int id = mapComplexRDFId_index.get(s[i3].toString());
-					  ArrayList<String> components = proteinsInComplex[id];
-					  size += components.size();
-				  }
-				  else 
-					  size++;
-			}
+			ArrayList<Integer> proteinsL = getProteinsInOneSideOfReaction(left);
+			ArrayList<Integer> proteinsR = getProteinsInOneSideOfReaction(right);
+			int size = proteinsL.size()+ proteinsR.size();
 			rectSizeList.add(size);   
 			if (size>maxSize)
 				maxSize = size;
-			
-		}
-		proteins = new ArrayList<String>();
-		for (Map.Entry<String, String> entry : mapElementRDFId.entrySet()) {
-			String displayName = entry.getValue();
-			if (!proteins.contains(displayName))
-				proteins.add(displayName);
-		}
-		
-		System.out.println("proteins"+proteins);
-		for (int i=0;i<proteins.size();i++){
-			System.out.println(i+"	proteins="+proteins.get(i));
 		}
 			
-		
 		colorScale = (float) gradient.colors.size()/ (nFiles+1) ;
 		isAllowedDrawing = true;
 	}
 	
-	public String getProteinName(String ref){	
-		return mapElementRDFId.get(ref);
+	
+	public ArrayList<Integer> getProteinsInOneSideOfReaction(Object[] s) {
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		for (int i3=0;i3<s.length;i3++){
+			  String ref = s[i3].toString();
+			  if (mapProteinRDFId.get(ref)!=null){
+				  String proteinName = mapProteinRDFId.get(ref);
+				  int index = proteinList.indexOf(proteinName);
+				  a.add(index);
+			  }
+			  else  if (mapComplexRDFId.get(ref)!=null){
+				  ArrayList<String> components = getProteinsInComplexRDFId(ref);
+				  for (int k=0;k<components.size();k++){
+					  String proteinName = mapComplexRDFId.get(components.get(k));
+					  int index = proteinList.indexOf(proteinName);
+					  a.add(index);
+				  }
+			  }
+			  else{
+				  System.out.println("getProteinsInOneSideOfReaction: CAN NOT FIND ="+s[i3]+"-----SOMETHING WRONG");
+			 } 
+		  }
+		return a;
 	}
 	
-	public ArrayList<String> getProteinsInComplexById(int id){	
+	public ArrayList<String> getProteinsInComplexRDFId(String ref){	
 		ArrayList<String> components = new ArrayList<String>(); 
-		Complex com = complexList.get(id);
+		Complex com = mapComplexRDFId_Complex.get(ref);
 		Object[] s2 = com.getComponent().toArray();
 		for (int i=0;i<s2.length;i++){
-			 if (getProteinName(s2[i].toString())!=null)
-				  components.add(getProteinName(s2[i].toString()));
-			 else {
-				  if (mapComplexRDFId_index.get(s2[i].toString())==null){
-					  String name = s2[i].toString();
-					  components.add(name);
-				  }
-				  else{
-					  int id4 = mapComplexRDFId_index.get(s2[i].toString());
-					  ArrayList<String> s4 = getProteinsInComplexById(id4);
-					  for (int k=0;k<s4.size();k++){
-						  components.add(s4.get(k));
-					  }
+			String ref2 = s2[i].toString();
+			 if (mapProteinRDFId.get(ref2)!=null)
+				  components.add(mapProteinRDFId.get(ref2));
+			 else if (mapComplexRDFId.get(ref2)!=null){
+				  ArrayList<String> s4 = getProteinsInComplexRDFId(ref2);
+				  for (int k=0;k<s4.size();k++){
+					  components.add(s4.get(k));
 				  }
 			  }
 		 }
@@ -189,8 +218,8 @@ public class MultipleReactionView{
 			if (commonElements.size()>0){
 				if (r<g)
 					drawCircularRelationship(r,g,Color.MAGENTA,4);
-				else
-					drawCircularRelationship(g,r,Color.GREEN,4);
+			//	else
+			//		drawCircularRelationship(g,r,Color.GREEN,4);
 			}
 		}
 	}
@@ -198,16 +227,29 @@ public class MultipleReactionView{
 	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
 		ArrayList<String> results = new ArrayList<String>();
 		for (int i=0; i<a.length;i++){
-			String proteinName1 = mapElementRDFId.get(a[i].toString());
-			for (int j=0; j<b.length;j++){
-				String proteinName2 = mapElementRDFId.get(b[j].toString());
-				if (proteinName1!=null && proteinName2!=null
-						&& proteinName1.equals(proteinName2)){
-					 if (!main.PathwayViewer_2_3.isSmallMolecule(proteinName1)){
-						 results.add(proteinName1);
-					 }	 
-				}	
+			String ref1 = a[i].toString();
+			if (mapProteinRDFId.get(ref1)!=null){
+				String proteinName1 = mapProteinRDFId.get(ref1);
+				for (int j=0; j<b.length;j++){
+					String ref2 = b[j].toString();
+					String proteinName2 = mapProteinRDFId.get(ref2);
+					if (proteinName2!=null && proteinName1.equals(proteinName2) 
+							&& !mapSmallMoleculeRDFId.containsValue(proteinName1)){
+							 results.add(proteinName1);
+					}	
+				}
 			}
+			else if (mapComplexRDFId.get(ref1)!=null){
+				String complexName1 = mapComplexRDFId.get(ref1);
+				for (int j=0; j<b.length;j++){
+					String ref2 = b[j].toString();
+					String complexName2 = mapComplexRDFId.get(ref2);
+					if (complexName2!=null && complexName1.equals(complexName2)){
+						 results.add(complexName1);
+					}	
+				}
+			}
+			
 		}
 		return results;
 	}
@@ -221,6 +263,7 @@ public class MultipleReactionView{
 		float x2 =  xCircular+rCircular*PApplet.sin(a2);
 		float y2 =  yCircular+rCircular*PApplet.cos(a2);
 		
+		
 		float alpha = (y2-y1)/(x2-x1);
 		alpha = PApplet.atan(alpha);
 		float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
@@ -229,11 +272,11 @@ public class MultipleReactionView{
 		if (wei>191){
 			return;
 		}
-		float strokeWeight = wei/60; 
+		float strokeWeight = wei/100; 
 		
 		float alCircular =0;
 		float d3, x3, y3, newR;
-		if (r2-r1<=rectList.size()*2){
+		if (r2-r1<=rectList.size()/2){
 			 alCircular = PApplet.PI-((float) (r2-r1)*2/rectList.size())*PApplet.PI;
 			 if (alCircular==0)       // Straight line
 				 alCircular = 0.01f; 
@@ -243,11 +286,16 @@ public class MultipleReactionView{
 			 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 		}
 		else{ // relationship of 2 wordcloud away
-			 alCircular = ((float) (r2-r1)/rectList.size())*PApplet.PI/2-PApplet.PI;
+			 alCircular = ((float) (r2-r1)*2/rectList.size())*PApplet.PI-PApplet.PI;
 			 newR = (dd/2)/PApplet.sin(alCircular/2);
 			 d3 = PApplet.dist(x1,y1,x2,y2);
 			 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+			 
+			 //parent.strokeWeight(1);
+			 //	parent.stroke(0,50);
+			 //	parent.line(x1,y1,x2,y2);
+				
 		}
 		
 		float delX1 = (x1-x3);

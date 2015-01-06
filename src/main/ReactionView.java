@@ -1548,8 +1548,6 @@ public class ReactionView{
 						drawReactionNode(entry, i, 25);
 					else
 						drawReactionNode(entry, i, 200);
-					
-					
 					i++;
 				}
 			}
@@ -3196,7 +3194,6 @@ public class ReactionView{
 			resetSelectionSimulation();
 		}
 		else if (popupCausality.b>=0){
-			System.out.println("popupCausality.b="+popupCausality.b);
 			popupCausality.mouseClicked();
 			// reset simulation
 			deleteReactionList = new ArrayList<Integer>();
@@ -3308,9 +3305,6 @@ public class ReactionView{
 					}
 					else if (selectedProteinForCommonDownstream.size()>0){
 						selectedReactionsForCommonDownstream = listDown1;
-						System.out.println("listDown1="+listDown1+"	listDown2"+listDown2);
-						
-						
 					}
 					else if (selectedComplexForCommonDownstream.size()>0){
 						selectedReactionsForCommonDownstream = listDown2;
