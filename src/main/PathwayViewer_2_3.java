@@ -1232,7 +1232,7 @@ public class PathwayViewer_2_3 extends PApplet {
 		public void run() {
 			multipleReaction.isAllowedDrawing =  false;
 			
-			 String path = "./level3RAS/";
+			 String path = "./level3_2015/";
 			 String imgType = ".owl";
 			 multipleReaction.files = listFileNames(path, imgType); 
 			 multipleReaction.nFiles = multipleReaction.files.size();
@@ -1241,12 +1241,16 @@ public class PathwayViewer_2_3 extends PApplet {
 			 // Initialize best plots
 			 try{
 				multipleReaction.mapElementRDFId = new HashMap<String,String>();
-				multipleReaction.mapElementRef = new HashMap<String,String>();
 				multipleReaction.mapSmallMoleculeRDFId =  new HashMap<String,String>();
 				multipleReaction.mapComplexRDFId_index =  new HashMap<String,Integer>();
-				multipleReaction.reactionSet = new Set[multipleReaction.nFiles];
 				multipleReaction.complexList = new ArrayList<Complex>();
-				 
+				multipleReaction.rectList = new ArrayList<BiochemicalReaction>();
+				multipleReaction.rectSizeList = new ArrayList<Integer>();
+				multipleReaction.rectFileList = new ArrayList<Integer>();
+				multipleReaction.rectOrderList = new ArrayList<Integer>();
+				multipleReaction.maxSize=0;
+				multipleReaction.pathwaySize = new int[multipleReaction.nFiles];
+				
 				for (int f=0;f<multipleReaction.files.size();f++){
 					 File modFile = new File(multipleReaction.files.get(f));
 					 SimpleIOHandler io = new SimpleIOHandler();
@@ -1257,8 +1261,10 @@ public class PathwayViewer_2_3 extends PApplet {
 					
 					 Set<Protein> proteinSet = model.getObjects(Protein.class);
 					 for (Protein currentProtein : proteinSet){
+						 System.out.println(currentProtein.getDisplayName()+"	"+currentProtein.getRDFId().toString());
 						 if (!multipleReaction.mapElementRDFId.containsKey(currentProtein.getRDFId().toString()))
 							 multipleReaction.mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+						 
 					 }
 						
 					 multipleReaction.smallMoleculeSet = model.getObjects(SmallMolecule.class);
@@ -1282,18 +1288,25 @@ public class PathwayViewer_2_3 extends PApplet {
 					 i2=0;
 					 
 					 
-					 multipleReaction.reactionSet[f] = model.getObjects(BiochemicalReaction.class);
-							
-				 }
+					 Set<BiochemicalReaction> reactionSet = model.getObjects(BiochemicalReaction.class);
+					 int r=0;
+					 for (BiochemicalReaction current : reactionSet){
+						 multipleReaction.rectList.add(current);
+						 multipleReaction.rectFileList.add(f);
+						 multipleReaction.rectOrderList.add(r);
+						r++;
+					}
+					multipleReaction.pathwaySize[f] = r;   // number of reaction in pathway f
+						
+				}
+				
 				 // Compute proteins in complexes
 				multipleReaction.proteinsInComplex = new ArrayList[multipleReaction.complexList.size()];
 				for (int i=0; i<multipleReaction.complexList.size();i++){
 					multipleReaction.proteinsInComplex[i] = multipleReaction.getProteinsInComplexById(i);
 				}
-				
-					
-				
-				 multipleReaction.setItems();
+			
+				multipleReaction.setItems();
 			 }
 			 
 			 catch (FileNotFoundException e){
