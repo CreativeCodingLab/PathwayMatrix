@@ -44,10 +44,17 @@ public class MultipleReactionView{
 	public float xCircular, yCircular, rCircular; 
 	
 	
-	public Graph g;
+	public static Graph g;
+	public static float xRight =0;
+	public Slider2 slider2;
+	public PopupLayout popupLayout;
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
+		slider2 = new Slider2(parent);
+		popupLayout = new PopupLayout(parent);
+		
+		xRight = parent.width*7.5f/10;
 		float v=0.5f;
 		gradient.addColor(new Color(0,0,v));
 		gradient.addColor(new Color(0,v,v));
@@ -128,11 +135,13 @@ public class MultipleReactionView{
 		for (int i = 0; i < rectList.size(); i++) {
 			int pathwayId = rectFileList.get(i);
 			int reactId = rectOrderList.get(i);
-			Node node = new Node(new Vector3D( 250+parent.random(parent.width-270), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(rectSizeList.get(i));
+			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
+			node.setMass(8+PApplet.sqrt(rectSizeList.get(i)));
 			node.wordWidth = 30;//rectList.get(i).getDisplayName().toString();
 			node.wordId = i;
 			node.name = rectList.get(i).getDisplayName();
+			if (node.name==null)
+				node.name = "NULL";
 			node.color = gradient.getGradient(colorScale*(pathwayId+(float)reactId/(pathwaySize[pathwayId]*2)));
 			g.addNode(node);
 		}	
@@ -207,9 +216,10 @@ public class MultipleReactionView{
 	
 	public void draw(){
 		if (!isAllowedDrawing) return;
+		xRight = parent.width*7.5f/10;
+		xCircular = xRight/2;
 		yCircular = parent.height/2;
 		rCircular = parent.height*3/7;
-		xCircular = rCircular+100;
 		
 		int count = 0;
 		// Draw causality
@@ -242,6 +252,14 @@ public class MultipleReactionView{
 		if (g==null) return;
 		doLayout();
 		g.draw();
+		
+		// Right PANEL
+		float wRight = parent.width-xRight;
+		parent.fill(0,50);
+		parent.noStroke();
+		parent.rect(xRight, 25, wRight, parent.height-25);
+		slider2.draw("Edge length",xRight+100, 50);
+		popupLayout.draw(parent.width-198);
 	}
 	
 	public void doLayout() {
@@ -279,29 +297,26 @@ public class MultipleReactionView{
 					float r = PApplet.sqrt(dx * dx + dy * dy);
 					// F = G*m1*m2/r^2
 
-					float f = 10 * (a.getMass() * b.getMass() / (r * r));
+					float f = 5*(a.getMass() * b.getMass() / (r * r));
 					if (a.degree>0){
-						f = 0.5f*PApplet.sqrt(a.degree)*f;
+						f = PApplet.sqrt(a.degree)*f;
 					}
-					if (f>1000)
-					    	f=1000;
-					if (r > 1) { // don't divide by zero.
+					if (r > 0) { // don't divide by zero.
 						Vector3D vf = new Vector3D(-dx * f, -dy * f, 0);
 						a.applyForce(vf);
 					}
+					
 				}
 			}
 		}
 		
 		for (int i = 0; i < g.getNodes().size(); i++) {
 			Node a = (Node) g.getNodes().get(i);
-			float dx = parent.width/2 - a.getX();
-			float dy = parent.height/2 - a.getY();
+			float dx = xCircular - a.getX();
+			float dy = yCircular - a.getY();
 			float r2 = dx * dx + dy * dy;
 			
-			float f =  r2/2000000;
-			if (f>100)
-				f=100;
+			float f =  r2/5000000;
 			if (a.degree>0){
 				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
 				a.applyForce(vf);
@@ -503,6 +518,79 @@ public class MultipleReactionView{
 	}
 	
 	
+	
+	public void keyPressed() {
+		if (g!=null){
+			ArrayList<Node> nodes= g.getNodes();
+			if (parent.key == '+') {
+				//g.removeNode(g.getNodes().get(1));
+				return;
+			} else if (parent.key == '-') {
+				g.removeNode(nodes.get(4));
+				return;
+			}
+		}
+	}
+
+	public void mousePressed() {
+		if (g==null) return;
+		g.setDragNode(null);
+		slider2.checkSelectedSlider1();
+		for (int i = 0; i < g.getNodes().size(); i++) {
+			Node n = (Node) g.getNodes().get(i);
+			if (n.containsWord(parent.mouseX, parent.mouseY)) {
+				g.setDragNode(n);
+			}
+		}
+	}
+	
+	public void mouseReleased() {
+		if (g==null) return;
+		g.setDragNode(null);
+		slider2.checkSelectedSlider2();
+	}
+
+	public void mouseMoved() {
+		if (g!=null && g.getDragNode() == null) {
+			g.setHoverNode(null);
+			for (int i = 0; i < g.getNodes().size(); i++) {
+				Node n = (Node) g.getNodes().get(i);
+				if (n.containsWord(parent.mouseX, parent.mouseY)) {
+					g.setHoverNode(n);
+				}
+			}
+		}
+		popupLayout.mouseMoved();
+	}
+	
+	public void mouseClicked() {
+		if (g==null) return;
+		
+		if (popupLayout.b>=0){
+			popupLayout.mouseClicked();
+		}
+		else{
+			g.setSelectedNode(null);
+			for (int i = 0; i < g.getNodes().size(); i++) {
+				Node n = (Node) g.getNodes().get(i);
+				if (n.containsWord(parent.mouseX, parent.mouseY)) {
+					g.setSelectedNode(n);
+				}
+			}
+		}
+	}
+
+	
+
+	public void mouseDragged() {
+		slider2.checkSelectedSlider3();
+		if (g==null) return;
+		if (g.getDragNode() != null) {
+			g.getDragNode()
+					.setPosition(
+							new Vector3D(parent.mouseX, parent.mouseY, 0));
+		}
+	}
 	
 }
 	

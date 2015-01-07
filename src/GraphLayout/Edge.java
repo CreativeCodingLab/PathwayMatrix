@@ -1,14 +1,15 @@
 package GraphLayout;
 
+import main.Slider2;
 import processing.core.PApplet;
 
 //Copyright 2005 Sean McCullough
 //banksean at yahoo
 
 public class Edge {
-	float k=0.01f; //stiffness
+	float k=0.12f; //stiffness
 	float strokeWeight=0; 
-	float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
+	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;
 	Graph g;
@@ -21,7 +22,7 @@ public class Edge {
 	}
 	public void setStrokeWeight(float wei) {
 		strokeWeight = wei;
-	    naturalLength = 100;
+	    naturalLength = Slider2.val;
 	 }
 	public float getNaturalLength() {
 	    return naturalLength;
@@ -60,9 +61,6 @@ public class Edge {
 	    float dy = dY();
 	    float l = PApplet.sqrt(dx*dx + dy*dy);
 	    float f = k*(l-naturalLength);
-	    
-	    if (f>50)
-	    	f=50;
 	    return new Vector3D(-f*dx/l, -f*dy/l, 0);
 	  }
 	    
@@ -72,8 +70,6 @@ public class Edge {
 	    float l = PApplet.sqrt(dx*dx + dy*dy);
 	    float f = k*(l-naturalLength);
 	    
-	    if (f>50)
-	    	f=50;
 	    return new Vector3D(f*dx/l, f*dy/l, 0);
 	  }
 
@@ -95,24 +91,7 @@ public class Edge {
 	 	}
 	  }
 	  public void drawLine(float sat) {
-		parent.stroke(200,sat);
-  		/*int cloudId1 = this.from.wordId/main.MainBlog_Version_7_2.numWords;
-  		int cloudId2 = this.to.wordId/main.MainBlog_Version_7_2.numWords;
-  		if (cloudId1==cloudId2){
-  			if (cloudId1==0){
-  				parent.stroke(0,255,0,sat);
-  		  	}
-  			else if (cloudId1==1){
-  				parent.stroke(255,0,0,sat);
-  		  	}
-  			else if (cloudId1==2){
-  				parent.stroke(0,125,255,sat);
-  		  	}
-  			else if (cloudId1==3){
-  				parent.stroke(255,255,0,sat);
-  		  	}
-  		}*/	
-  	//	if (strokeWeight>11) return;
+		parent.stroke(0,sat);
 		parent.strokeWeight(strokeWeight);
   		parent.line(from.getX(), from.getY(), to.getX(), to.getY());
  	  }

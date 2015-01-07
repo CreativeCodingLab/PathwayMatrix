@@ -5,20 +5,20 @@ import java.text.DecimalFormat;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-public class PopupReactionOrder{
+public class PopupLayout{
 	public int b = -1;
-	public int s=-1;
+	public int s=0;
 	public PApplet parent;
-	public float x = 800;
+	public float x = 0;
 	public int y = 0;
 	public int w1 = 98;
 	public int w = 300;
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"None","Protein Similarity","Topological Ordering"}; 
+	public static String[] items={"Tree","Circular","Forced-Directed"}; 
 	
-	public PopupReactionOrder(PApplet parent_){
+	public PopupLayout(PApplet parent_){
 		parent = parent_;
 	}
 	
@@ -65,7 +65,7 @@ public class PopupReactionOrder{
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
 		parent.textSize(12);
-		parent.text("Order",x+w1/2,y+17);
+		parent.text("Layout",x+w1/2,y+17);
 		
 	}
 	

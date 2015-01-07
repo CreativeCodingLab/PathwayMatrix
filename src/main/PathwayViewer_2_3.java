@@ -299,6 +299,7 @@ public class PathwayViewer_2_3 extends PApplet {
 			
 			if (isAllowedDrawing){
 				if (popupView.s==0){
+					
 					if (currentFile.equals("")){
 						int ccc = this.frameCount*6%255;
 						this.fill(ccc, 255-ccc,(ccc*3)%255);
@@ -903,7 +904,10 @@ public class PathwayViewer_2_3 extends PApplet {
 	}
 				
 	public void mousePressed() {
-		if (popupView.s==1){
+		if (popupView.s==2){
+			multipleReaction.mousePressed();
+		}
+		else if (popupView.s==1){
 			popupReaction.mousePressed();
 		}
 		else if (popupOrder.b>=0){
@@ -911,7 +915,10 @@ public class PathwayViewer_2_3 extends PApplet {
 		}
 	}
 	public void mouseReleased() {
-		if (popupView.s==1){
+		if (popupView.s==2){
+			multipleReaction.mouseReleased();
+		}
+		else if (popupView.s==1){
 				popupReaction.mouseReleased();
 		}
 		else if (popupOrder.b>=0){
@@ -919,7 +926,10 @@ public class PathwayViewer_2_3 extends PApplet {
 		}
 	}
 	public void mouseDragged() {
-		if (popupView.s==1){
+		if (popupView.s==2){
+			multipleReaction.mouseDragged();
+		}
+		else if (popupView.s==1){
 			popupReaction.mouseDragged();
 		}
 		else if (popupOrder.b>=0){
@@ -930,7 +940,10 @@ public class PathwayViewer_2_3 extends PApplet {
 		
 	public void mouseMoved() {
 		popupView.mouseMoved();
-		if (popupView.s==1){
+		if (popupView.s==2){
+			multipleReaction.mouseMoved();
+		}
+		else if (popupView.s==1){
 			ReactionView.popupCausality.mouseMoved();
 			ReactionView.popupReactionOrder.mouseMoved();
 			popupReaction.checkReactionBrushing();
@@ -947,7 +960,10 @@ public class PathwayViewer_2_3 extends PApplet {
 			thread4=new Thread(loader4);
 			thread4.start();
 		}
-		if (popupView.s==1){
+		if (popupView.s==2){
+			multipleReaction.mouseClicked();
+		}
+		else if (popupView.s==1){
 			popupReaction.mouseClicked();
 		}
 		else {
@@ -1189,13 +1205,11 @@ public class PathwayViewer_2_3 extends PApplet {
 						else{
 							System.out.println();
 							System.out.println("	NULLLLLLLLL");
-							System.out.println(match);
 						}
 					}	
 				}
 			}
 			System.out.println();
-		
 			popupComplex.setItems();
 			ReactionView.check11.s=true;   // Fade small molecule
 			ReactionView.popupReactionOrder.s=2;
@@ -1341,6 +1355,9 @@ public class PathwayViewer_2_3 extends PApplet {
 	
 	public static String getProteinName(String ref){	
 		String s1 = mapElementRDFId.get(ref);
+		if (s1==null){
+			s1 = mapElementRef.get(ref);
+		}
 		return s1;
 	}
 	
