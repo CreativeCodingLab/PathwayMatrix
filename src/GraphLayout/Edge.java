@@ -80,23 +80,23 @@ public class Edge {
 	    if (parent!=null && g!=null){
 	    	parent.strokeWeight(strokeWeight);
     	    if (g.getHoverNode() ==null){
-    	    	drawLine(40);
+    	    	drawLine(200);
 	    	}
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
-	    		drawLine(150);
+	    		drawLine(255);
 			    from.isConnected =true;
 			    to.isConnected = true;
 	    	}
 	    	else{
-	    		drawLine(12);
+	    		drawLine(20);
 	     	}
 	 	}
 	  }
 	  public void drawLine(float sat) {
 		 parent.strokeWeight(1);
 		if (MultipleReactionView.popupLayout.s==1){   // Forced-directed Layout
-			drawCircularRelationship();
+			drawCircularRelationship(sat);
 		}
 		else if (MultipleReactionView.popupLayout.s==2) { // Circular layout
 			// parent.line(from.iX.value, from.iY.value, to.iX.value, to.iY.value);
@@ -108,8 +108,10 @@ public class Edge {
 				float sss = (float) i/numSec;
 				float x2 = from.iX.value+(to.iX.value-from.iX.value)*sss;
 				float y2 = from.iY.value+(to.iY.value-from.iY.value)*sss;
-				float sat2 = 200*sss;
-				parent.stroke(0,sat2);
+				float sat2 = sat*sss;
+				float r = (255-sat*sss)*0.7f;
+				
+				parent.stroke(r,r,0,sat2);
 				parent.line(x1,y1,x2,y2);
 				x1=x2;
 				y1=y2;
@@ -117,7 +119,7 @@ public class Edge {
 		}	
  	  }
 	  
-	  public void drawCircularRelationship(){
+	  public void drawCircularRelationship(float sat){
 		 // float a1 = from.iAlpha.value;
 		  	int r1 = from.nodeId;
 			float x1 = from.iX.value;
@@ -200,13 +202,13 @@ public class Edge {
 			if (r2<r1)
 				down = false;
 			
-			drawArc(x3, y3, newR*2,  al1, al2, down);
+			drawArc(x3, y3, newR*2,  al1, al2, down, sat);
 			parent.strokeWeight(1);
 			
 	  }
 
 	  
-	  public void drawArc(float x3, float y3, float d3, float al1, float al2, boolean down){
+	  public void drawArc(float x3, float y3, float d3, float al1, float al2, boolean down, float sat){
 			int numSec = 15;
 			float beginAngle = al1;
 			if (al1>al2)
@@ -217,11 +219,17 @@ public class Edge {
 					endAngle = al2+k*(al1-al2)/numSec;
 				parent.noFill();
 				float sss = (float) k/numSec;
-				float sat2 = 165-150*sss;
+				float sat2 = sat-sat*sss;
+				float r = sat*sss;
 				if (!down){
-					sat2 = 15+150*sss;
+					sat2 = sat*sss;
+					r=sat-sat*sss;
 				}
-				parent.stroke(0,sat2);
+				if (sat>100){
+					if (sat2<100)
+						sat2=100;
+				}
+				parent.stroke(r,r,0,sat2);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
 				beginAngle = endAngle;
 			}

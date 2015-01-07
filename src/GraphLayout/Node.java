@@ -40,7 +40,7 @@ public class Node {
 	}
 
 	public boolean containsNode(float x, float y) {
-		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<fontSize)
+		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<=fontSize/2+1)
 			return true;
 		else
 			return false;
