@@ -23,7 +23,7 @@ public class Node {
 	Vector3D position;
 	Graph g;
 	public boolean isConnected = false;
-	public int wordId = -99;
+	public int nodeId = -99;
 	public static int bWord = -99;
 	public int degree = -1;
 	public Integrator iAlpha = new Integrator(0,0.1f,0.4f);
@@ -39,8 +39,8 @@ public class Node {
 		g = h;
 	}
 
-	public boolean containsWord(float x, float y) {
-		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<=fontSize/2+1)
+	public boolean containsNode(float x, float y) {
+		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<fontSize)
 			return true;
 		else
 			return false;
@@ -96,16 +96,11 @@ public class Node {
 	}
 
 	
-	public void checkBrushing() {
-		if (getX()<=parent.mouseX && parent.mouseX<=getX()+wordWidth &&
-				getY()-fontSize<=parent.mouseY && parent.mouseY<=getY()+fontSize/2){
-			bWord=wordId;
-		}	
-	}
+	
 	
 	public void draw() {
 		if (MultipleReactionView.popupLayout.s==1){ //circular Layout
-			float al = MultipleReactionView.computeAlpha(wordId);
+			float al = MultipleReactionView.computeAlpha(nodeId);
 			float xR = MultipleReactionView.xCircular + MultipleReactionView.rCircular*PApplet.sin(al);
 			float yR = MultipleReactionView.yCircular + MultipleReactionView.rCircular*PApplet.cos(al);
 			iAlpha.target(al);
@@ -134,10 +129,18 @@ public class Node {
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);
+			parent.noStroke();
 			parent.ellipse(xx, yy, fontSize, fontSize);
 		}
 		else{
-			parent.textAlign(PApplet.CENTER);
+			if (0<=iAlpha.value && iAlpha.value<= PApplet.PI/2)
+				parent.textAlign(PApplet.LEFT);
+			else if (-PApplet.PI/2<=iAlpha.value && iAlpha.value<= 0)
+				parent.textAlign(PApplet.LEFT);
+			else if (PApplet.PI/2<=iAlpha.value )
+				parent.textAlign(PApplet.LEFT);
+			else
+				parent.textAlign(PApplet.LEFT);
 			parent.textSize(fontSize);
 			wordWidth = parent.textWidth(name);
 			parent.noStroke();
@@ -145,10 +148,10 @@ public class Node {
 			if (MultipleReactionView.checkName.s){
 				// Draw node names
 				parent.translate(xx,yy);
-				parent.rotate(iAlpha.value);
+				parent.rotate(PApplet.PI/2-iAlpha.value);
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue());
 				parent.text(name, 0, 0);
-				parent.rotate(-iAlpha.value);
+				parent.rotate(-(PApplet.PI/2-iAlpha.value));
 				parent.translate(-xx,-yy);
 			}
 			else{
@@ -156,8 +159,5 @@ public class Node {
 				parent.ellipse(xx, yy, fontSize, fontSize);
 			}
 		}
-		iX.update();
-		iY.update();
-		iAlpha.update();
 	}
 }

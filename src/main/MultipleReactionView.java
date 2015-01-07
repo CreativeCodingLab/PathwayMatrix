@@ -140,7 +140,7 @@ public class MultipleReactionView{
 			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
 			node.setMass(8+PApplet.sqrt(rectSizeList.get(i)));
 			node.wordWidth = 30;//rectList.get(i).getDisplayName().toString();
-			node.wordId = i;
+			node.nodeId = i;
 			node.name = rectList.get(i).getDisplayName();
 			if (node.name==null)
 				node.name = "NULL";
@@ -221,12 +221,20 @@ public class MultipleReactionView{
 		yCircular = parent.height/2;
 		rCircular = parent.height*3/7;
 		
+		for (int i=0;i<g.nodes.size();i++){
+			Node node = g.nodes.get(i);
+			node.iX.update();
+			node.iY.update();
+			node.iAlpha.update();
+		}
+		
 		if (popupLayout.s==1){
 			g.drawNodes();
-			for (int r1=0; r1<rectList.size();r1++){
+			g.drawEdges();
+			/*for (int r1=0; r1<rectList.size();r1++){
 				ArrayList<Integer> processedList =  new ArrayList<Integer>();
 				drawDownStreamReaction(r1, processedList, 255);
-			}
+			}*/
 		}
 		else if (popupLayout.s==2){
 			if (g==null) return;
@@ -332,23 +340,6 @@ public class MultipleReactionView{
 		return a;
 	}
 	
-	public void drawDownStreamReaction(int r, ArrayList<Integer> processedList, float sat){
-		BiochemicalReaction rectSelected = rectList.get(r);
-		Object[] sRight1 = rectSelected.getRight().toArray();
-		for (int g=0;g<rectList.size();g++) {
-			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
-			Object[] sLeft2 = rect2.getLeft().toArray();
-			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
-			if (commonElements.size()>0){
-				if (r<g)
-					drawCircularRelationship(r,g,Color.MAGENTA,4);
-				else
-					drawCircularRelationship(g,r,Color.GREEN,4);
-			}
-		}
-	}
-	
 	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
 		ArrayList<String> results = new ArrayList<String>();
 		for (int i=0; i<a.length;i++){
@@ -378,8 +369,30 @@ public class MultipleReactionView{
 		}
 		return results;
 	}
-		
-	public void drawCircularRelationship(int r1, int r2, Color color, float maxWeight){
+	
+	/*
+	public void drawDownStreamReaction(int r, ArrayList<Integer> processedList, float sat){
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				if (r<g)
+					drawCircularRelationship(r,g,Color.MAGENTA);
+				else
+					drawCircularRelationship(g,r,Color.GREEN);
+			}
+		}
+	}*/
+	
+	
+	
+	
+	/*
+	public void drawCircularRelationship(int r1, int r2, Color color){
 		float a1 = computeAlpha(r1);
 		float x1 =  xCircular+rCircular*PApplet.sin(a1);
 		float y1 =  yCircular+rCircular*PApplet.cos(a1);
@@ -393,11 +406,6 @@ public class MultipleReactionView{
 		alpha = PApplet.atan(alpha);
 		float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
 		float dd = PApplet.sqrt(dis);
-		float wei = PApplet.map(maxWeight, 0, maxWeight, 0, 191);
-		if (wei>191){
-			return;
-		}
-		float strokeWeight = wei/100; 
 		
 		float alCircular =0;
 		float d3, x3, y3, newR;
@@ -459,15 +467,18 @@ public class MultipleReactionView{
 			bStrokeWeight=strokeWeight;
 			bColor = color;
 		}*/
+	/*
 		parent.noFill();
-		parent.stroke(color.getRed(),color.getGreen(),color.getBlue(),wei);
-		parent.strokeWeight(strokeWeight);
+		parent.stroke(color.getRed(),color.getGreen(),color.getBlue());
+		parent.strokeWeight(1);
 		if (al1<al2)		
 			drawArc(x3, y3, newR*2,  al1, al2, 255);
 		else
 			drawArc(x3, y3, newR*2,  al2, al1, 255);
 		parent.strokeWeight(1);
-	}
+	}*/
+	
+	/*
 	public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
 		parent.smooth();
 		int numSec = (int) 15;
@@ -489,13 +500,11 @@ public class MultipleReactionView{
 			float blue = 255-255*sss;
 			
 			parent.stroke(red,green,blue,sat2);
-			parent.strokeWeight(1);
 			parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
 			beginAngle = endAngle;
-			parent.strokeWeight(1);
 		}
 	}
-	
+	*/
 	
 	
 	public void keyPressed() {
@@ -517,7 +526,7 @@ public class MultipleReactionView{
 		slider2.checkSelectedSlider1();
 		for (int i = 0; i < g.getNodes().size(); i++) {
 			Node n = (Node) g.getNodes().get(i);
-			if (n.containsWord(parent.mouseX, parent.mouseY)) {
+			if (n.containsNode(parent.mouseX, parent.mouseY)) {
 				g.setDragNode(n);
 			}
 		}
@@ -534,7 +543,7 @@ public class MultipleReactionView{
 			g.setHoverNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {
 				Node n = (Node) g.getNodes().get(i);
-				if (n.containsWord(parent.mouseX, parent.mouseY)) {
+				if (n.containsNode(parent.mouseX, parent.mouseY)) {
 					g.setHoverNode(n);
 				}
 			}
@@ -553,7 +562,7 @@ public class MultipleReactionView{
 			g.setSelectedNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {
 				Node n = (Node) g.getNodes().get(i);
-				if (n.containsWord(parent.mouseX, parent.mouseY)) {
+				if (n.containsNode(parent.mouseX, parent.mouseY)) {
 					g.setSelectedNode(n);
 				}
 			}
