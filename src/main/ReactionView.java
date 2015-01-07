@@ -740,17 +740,28 @@ public class ReactionView{
 			
 			float totalH = itemH2*rectList.size();
 			
-			
-			itemH2 = totalH/(rectList.size()+circleList.size()+1);
-			float circleGap = itemH2;
-			float circleGapSum = 0;
-			
+			// Compute nonCausality reaction
 			ArrayList<Integer> nonCausalityList = new ArrayList<Integer>();
-			int count2 = 0;
 			for (int i=0;i<doneList.size();i++){
 				int index = doneList.get(i);
 				if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0)
 					nonCausalityList.add(index);
+			}
+			
+			itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()/2+1);
+			float circleGap = itemH2;
+			float circleGapSum = 0;
+			
+			int count2 = 0;
+			int count3 = 0;
+			float yStartCausality = yBeginList+(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
+			for (int i=0;i<doneList.size();i++){
+				int index = doneList.get(i);
+				// Compute nonCausality reaction
+				if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0){
+					iY[index].target(yStartCausality +count3*itemH2/2);
+					count3++;
+				}	
 				else{
 					if(circleList.contains(index)){
 						iY[index].target(circleGapSum+ yBeginList+count2*itemH2+circleGap);
@@ -762,12 +773,13 @@ public class ReactionView{
 					count2++;
 				}
 			}
+			/*
 			// Put non-causality reaction to the end of the list
 			for (int i=0;i<nonCausalityList.size();i++){
 				int index = nonCausalityList.get(i);
 				iY[index].target(yBeginList+(count2+circleList.size()+1)*itemH2);
 				count2++;
-			}	
+			}*/	
 		}
 	}
 	

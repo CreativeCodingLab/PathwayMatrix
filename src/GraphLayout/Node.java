@@ -106,8 +106,8 @@ public class Node {
 		}
 		else if (MultipleReactionView.popupLayout.s==2){ //circular Layout
 			float al = MultipleReactionView.computeAlpha(nodeId);
-			float xR = MultipleReactionView.xCircular + MultipleReactionView.rCircular*PApplet.sin(al);
-			float yR = MultipleReactionView.yCircular + MultipleReactionView.rCircular*PApplet.cos(al);
+			float xR = MultipleReactionView.xCircular + (MultipleReactionView.rCircular+size/2)*PApplet.sin(al);
+			float yR = MultipleReactionView.yCircular + (MultipleReactionView.rCircular+size/2)*PApplet.cos(al);
 			iAlpha.target(al);
 			iX.target(xR);
 			iY.target(yR);

@@ -286,25 +286,40 @@ public class MultipleReactionView{
 			count++;
 		}
 		
-		float totalH = parent.height-40;
 		
+		// Compute nonCausality reaction
+		ArrayList<Integer> nonCausalityList = new ArrayList<Integer>();
+		for (int i=0;i<doneList.size();i++){
+			int index = doneList.get(i);
+			if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0)
+				nonCausalityList.add(index);
+		}
 		
-		float itemH2 = totalH/(rectList.size()+circleList.size()+1);
+		float totalH = parent.height-15;
+		float itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()*0.8f+1);
 		float circleGap = itemH2;
 		float circleGapSum = 0;
 		
 		int count2 = 0;
+		int count3 = 0;
+		float yStartCausality = 15 +(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
 		for (int i=0;i<doneList.size();i++){
 			int index = doneList.get(i);
-			if(circleList.contains(index)){
-				yLineUp[index] = circleGapSum+ 20+count2*itemH2+circleGap;
-				circleGapSum +=circleGap;
-			}
+			// Compute nonCausality reaction
+			if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0){
+				yLineUp[index] =  yStartCausality +count3*itemH2*0.2f;
+				count3++;
+			}	
 			else{
-				yLineUp[index] = circleGapSum+20+count2*itemH2;
+				if(circleList.contains(index)){
+					yLineUp[index] = circleGapSum+ 10+count2*itemH2+circleGap;
+					circleGapSum +=circleGap;
+				}
+				else{
+					yLineUp[index] = circleGapSum+10+count2*itemH2;
+				}
+				count2++;
 			}
-			count2++;
-			
 		}
 		
 		return b;
