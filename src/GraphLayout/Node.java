@@ -14,8 +14,8 @@ import processing.core.PImage;
 public class Node {
 	Vector3D f = new Vector3D(0, 0, 0);
 	float mass = 1;
-	float fontSize = 1;
-	public float wordWidth = 1;
+	float size = 1;
+	//public float wordWidth = 1;
 	public String name = "";
 	public PApplet parent;
 	public Color color = null;
@@ -40,7 +40,7 @@ public class Node {
 	}
 
 	public boolean containsNode(float x, float y) {
-		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<=fontSize/2+1)
+		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<=size/2+1)
 			return true;
 		else
 			return false;
@@ -80,7 +80,7 @@ public class Node {
 
 	public void setMass(float m) {
 		mass = m/10;
-		fontSize = m;
+		size = m;
 	}
 
 	public void setForce(Vector3D v) {
@@ -99,7 +99,12 @@ public class Node {
 	
 	
 	public void draw() {
-		if (MultipleReactionView.popupLayout.s==1){ //circular Layout
+		if (MultipleReactionView.popupLayout.s==1){ //Line up
+			iAlpha.target(0);
+			iX.target(MultipleReactionView.xCircular);
+			iY.target(MultipleReactionView.yLineUp[nodeId]);
+		}
+		else if (MultipleReactionView.popupLayout.s==2){ //circular Layout
 			float al = MultipleReactionView.computeAlpha(nodeId);
 			float xR = MultipleReactionView.xCircular + MultipleReactionView.rCircular*PApplet.sin(al);
 			float yR = MultipleReactionView.yCircular + MultipleReactionView.rCircular*PApplet.cos(al);
@@ -118,45 +123,54 @@ public class Node {
 		
 		if (g.getHoverNode() == this) {
 			parent.textAlign(PApplet.CENTER);
-			parent.textSize(fontSize);
+			parent.textSize(size);
 			
 			int sat =( parent.frameCount*22%200);
 			parent.noStroke();
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),55+sat);
 			// Draw node names
+			parent.textSize(12);
 			parent.text(name, xx, yy-7);
-			parent.ellipse(xx, yy, fontSize, fontSize);
+			parent.ellipse(xx, yy, size, size);
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);
 			parent.noStroke();
-			parent.ellipse(xx, yy, fontSize, fontSize);
+			parent.ellipse(xx, yy, size, size);
 		}
 		else{
-			if (0<=iAlpha.value && iAlpha.value<= PApplet.PI/2)
-				parent.textAlign(PApplet.LEFT);
-			else if (-PApplet.PI/2<=iAlpha.value && iAlpha.value<= 0)
-				parent.textAlign(PApplet.LEFT);
-			else if (PApplet.PI/2<=iAlpha.value )
-				parent.textAlign(PApplet.LEFT);
-			else
-				parent.textAlign(PApplet.LEFT);
-			parent.textSize(fontSize);
-			wordWidth = parent.textWidth(name);
+			
+			//wordWidth = parent.textWidth(name);
 			parent.noStroke();
 			parent.fill(color.getRGB());
 			if (MultipleReactionView.checkName.s){
 				// Draw node names
-				parent.translate(xx,yy);
-				parent.rotate(PApplet.PI/2-iAlpha.value);
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue());
-				parent.text(name, 0, 0);
-				parent.rotate(-(PApplet.PI/2-iAlpha.value));
-				parent.translate(-xx,-yy);
+				parent.textSize(12);
+				if(MultipleReactionView.popupLayout.s==2){
+					if (0<=iAlpha.value && iAlpha.value<= PApplet.PI/2)
+						parent.textAlign(PApplet.LEFT);
+					else if (-PApplet.PI/2<=iAlpha.value && iAlpha.value<= 0)
+						parent.textAlign(PApplet.LEFT);
+					else if (PApplet.PI/2<=iAlpha.value )
+						parent.textAlign(PApplet.LEFT);
+					else
+						parent.textAlign(PApplet.LEFT);
+					
+					parent.translate(xx,yy);
+					parent.rotate(PApplet.PI/2-iAlpha.value);
+					parent.text(name, 0, 0);
+					parent.rotate(-(PApplet.PI/2-iAlpha.value));
+					parent.translate(-xx,-yy);
+				}
+				else {
+					parent.textAlign(PApplet.CENTER);
+					parent.text(name, xx, yy);
+				}	
 			}
 			else{
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);
-				parent.ellipse(xx, yy, fontSize, fontSize);
+				parent.ellipse(xx, yy, size, size);
 			}
 		}
 	}

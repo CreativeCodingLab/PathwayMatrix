@@ -95,10 +95,10 @@ public class Edge {
 	  }
 	  public void drawLine(float sat) {
 		 parent.strokeWeight(1);
-		if (MultipleReactionView.popupLayout.s==1){   // Forced-directed Layout
+		if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==2){   // Forced-directed Layout
 			drawCircularRelationship(sat);
 		}
-		else if (MultipleReactionView.popupLayout.s==2) { // Circular layout
+		else if (MultipleReactionView.popupLayout.s==3) { // Circular layout
 			// parent.line(from.iX.value, from.iY.value, to.iX.value, to.iY.value);
 			
 			int numSec =6;

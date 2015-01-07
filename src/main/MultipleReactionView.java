@@ -50,6 +50,9 @@ public class MultipleReactionView{
 	public static PopupLayout popupLayout;
 	public static CheckBox checkName;
 	
+	// Line Up
+	public static float[] yLineUp;
+	
 	public MultipleReactionView(PApplet p){
 		parent = p;
 		slider2 = new Slider2(parent);
@@ -138,8 +141,7 @@ public class MultipleReactionView{
 			int pathwayId = rectFileList.get(i);
 			int reactId = rectOrderList.get(i);
 			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(8+PApplet.sqrt(rectSizeList.get(i)));
-			node.wordWidth = 30;//rectList.get(i).getDisplayName().toString();
+			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
 			node.nodeId = i;
 			node.name = rectList.get(i).getDisplayName();
 			if (node.name==null)
@@ -147,6 +149,9 @@ public class MultipleReactionView{
 			node.color = gradient.getGradient(colorScale*(pathwayId+(float)reactId/(pathwaySize[pathwayId]*2)));
 			g.addNode(node);
 		}	
+		
+		// Initialize topological ordering
+		orderTopological();
 	}
 	
 	public void updateEdges() {
@@ -159,7 +164,7 @@ public class MultipleReactionView{
 		for (int r = 0; r < rectList.size(); r++) {
 			Node node1 = g.nodes.get(r);
 			int degree = 0;
-			ArrayList<Integer> a = getDirectDownStream(r);
+			ArrayList<Integer> a = getDirectDownstream(r);
 			for (int j = 0; j < a.size(); j++) {
 				int r2 = a.get(j);
 				Node node2 = g.nodes.get(r2);
@@ -228,7 +233,12 @@ public class MultipleReactionView{
 			node.iAlpha.update();
 		}
 		
+
 		if (popupLayout.s==1){
+			g.drawNodes();
+			g.drawEdges();
+		}
+		if (popupLayout.s==2){
 			g.drawNodes();
 			g.drawEdges();
 			/*for (int r1=0; r1<rectList.size();r1++){
@@ -236,7 +246,7 @@ public class MultipleReactionView{
 				drawDownStreamReaction(r1, processedList, 255);
 			}*/
 		}
-		else if (popupLayout.s==2){
+		else if (popupLayout.s==3){
 			if (g==null) return;
 			doLayout();
 			g.drawEdges();
@@ -244,13 +254,187 @@ public class MultipleReactionView{
 		}
 		// Right PANEL
 		float wRight = parent.width-xRight;
-		parent.fill(0,50);
+		parent.fill(200,200);
 		parent.noStroke();
 		parent.rect(xRight, 25, wRight, parent.height-25);
 		slider2.draw("Edge length",xRight+100, 50);
 		checkName.draw(xRight+30, 80);
 		popupLayout.draw(parent.width-198);
 	}
+	
+	public ArrayList<Integer> orderTopological() {
+		yLineUp =  new float[rectList.size()];
+		ArrayList<Integer> b = new ArrayList<Integer>();
+		
+		ArrayList<Integer> doneList = new ArrayList<Integer>();
+		ArrayList<Integer> circleList = new ArrayList<Integer>();
+		
+		int count = 0;
+		int r = getNoneUpstream(doneList);
+		while (count<rectList.size()){
+		//	System.out.println(count+"	doneList="+doneList+"	r="+r);
+			if (r>=0){
+				doneList.add(r);
+				r = getNoneUpstream(doneList);
+			}
+			else{
+				int randomReaction = getReactionMaxDownstream(doneList);
+				doneList.add(randomReaction);
+				circleList.add(randomReaction);
+				r = getNoneUpstream(doneList);
+			}	
+			count++;
+		}
+		
+		float totalH = parent.height-40;
+		
+		
+		float itemH2 = totalH/(rectList.size()+circleList.size()+1);
+		float circleGap = itemH2;
+		float circleGapSum = 0;
+		
+		int count2 = 0;
+		for (int i=0;i<doneList.size();i++){
+			int index = doneList.get(i);
+			if(circleList.contains(index)){
+				yLineUp[index] = circleGapSum+ 20+count2*itemH2+circleGap;
+				circleGapSum +=circleGap;
+			}
+			else{
+				yLineUp[index] = circleGapSum+20+count2*itemH2;
+			}
+			count2++;
+			
+		}
+		
+		return b;
+	}
+	
+		
+	public int getNoneUpstream(ArrayList<Integer> doneList){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		for (int i=0;i<rectList.size();i++){
+			if (doneList.contains(i)) continue;
+			ArrayList<Integer> up = this.getDirectUpstream(i);
+			if (up.size()==0)  {//No upstream
+				a.add(i);
+			}	
+		}
+		if (a.size()>0){
+			return getReactionMinDownstreamIn(a);
+		}
+		else{
+			ArrayList<Integer> b = new ArrayList<Integer>();
+			for (int i=0;i<rectList.size();i++){
+				if (doneList.contains(i)) continue;
+				ArrayList<Integer> up = this.getDirectUpstream(i);
+				if (isContainedAllUpInDoneList(up,doneList)){  // Upstream are all in the doneList;
+				//	return i;
+					b.add(i);
+				}	
+			}
+			if (b.size()>0){
+				return getReactionMaxUpstreamIn(b);
+			}
+			return -1;
+		}
+	}
+	public boolean isContainedAllUpInDoneList(ArrayList<Integer> up, ArrayList<Integer> doneList){
+		for (int i=0;i<up.size();i++){
+			int r = up.get(i);
+			if (!doneList.contains(r))
+				return false;
+		}
+		return true;
+	}
+	
+	public int getReactionMaxUpstreamIn(ArrayList<Integer> list){
+		int numUpstream = 0;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> up = getDirectUpstream(index);
+			if (up.size()>=numUpstream){
+				numUpstream = up.size();
+				react =index;
+			}	
+		}
+		return react;
+	}
+	
+	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		for (int i=0;i<rectList.size();i++){
+			if (doneList.contains(i)) continue;
+			a.add(i);
+		}
+		return getReactionMaxDownstreamIn(a);
+	}
+	
+	public int getReactionMaxDownstreamIn(ArrayList<Integer> list){
+		int numDownstream = 0;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> down = getDirectDownstream(index);
+			if (down.size()>=numDownstream){
+				numDownstream = down.size();
+				react =index;
+			}	
+		}
+		return react;
+	}
+	
+	public int getReactionMinDownstreamIn(ArrayList<Integer> list){
+		int numDownstream = Integer.MAX_VALUE;
+		int react = -1;
+		for (int i=0;i<list.size();i++){
+			int index = list.get(i);
+			ArrayList<Integer> down = getDirectDownstream(index);
+			if (down.size()<numDownstream){
+				numDownstream = down.size();
+				react =index;
+			}	
+		}
+		return react;
+	}
+	
+	public ArrayList<Integer> getDirectDownstream(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	
+	
+	public ArrayList<Integer> getDirectUpstream(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sLeft = rectSelected.getLeft().toArray();
+		
+		// List current reaction
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sRight2 = rect2.getRight().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight2, sLeft);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	
+	
 	
 	public void doLayout() {
 		// calculate forces on each node
@@ -324,21 +508,6 @@ public class MultipleReactionView{
 		return PApplet.PI -((float)r)/(rectList.size())*2*PApplet.PI;
 	}
 		
-	public ArrayList<Integer> getDirectDownStream(int r){
-		ArrayList<Integer> a = new ArrayList<Integer>();
-		BiochemicalReaction rectSelected = rectList.get(r);
-		Object[] sRight1 = rectSelected.getRight().toArray();
-		for (int g=0;g<rectList.size();g++) {
-			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
-			Object[] sLeft2 = rect2.getLeft().toArray();
-			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
-			if (commonElements.size()>0){
-				a.add(g);
-			}
-		}
-		return a;
-	}
 	
 	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
 		ArrayList<String> results = new ArrayList<String>();
@@ -370,141 +539,10 @@ public class MultipleReactionView{
 		return results;
 	}
 	
-	/*
-	public void drawDownStreamReaction(int r, ArrayList<Integer> processedList, float sat){
-		BiochemicalReaction rectSelected = rectList.get(r);
-		Object[] sRight1 = rectSelected.getRight().toArray();
-		for (int g=0;g<rectList.size();g++) {
-			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
-			Object[] sLeft2 = rect2.getLeft().toArray();
-			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
-			if (commonElements.size()>0){
-				if (r<g)
-					drawCircularRelationship(r,g,Color.MAGENTA);
-				else
-					drawCircularRelationship(g,r,Color.GREEN);
-			}
-		}
-	}*/
 	
 	
 	
-	
-	/*
-	public void drawCircularRelationship(int r1, int r2, Color color){
-		float a1 = computeAlpha(r1);
-		float x1 =  xCircular+rCircular*PApplet.sin(a1);
-		float y1 =  yCircular+rCircular*PApplet.cos(a1);
-		
-		float a2 = computeAlpha(r2);
-		float x2 =  xCircular+rCircular*PApplet.sin(a2);
-		float y2 =  yCircular+rCircular*PApplet.cos(a2);
-		
-		
-		float alpha = (y2-y1)/(x2-x1);
-		alpha = PApplet.atan(alpha);
-		float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
-		float dd = PApplet.sqrt(dis);
-		
-		float alCircular =0;
-		float d3, x3, y3, newR;
-		if (r2-r1<=rectList.size()/2){
-			 alCircular = PApplet.PI-((float) (r2-r1)*2/rectList.size())*PApplet.PI;
-			 if (alCircular==0)       // Straight line
-				 alCircular = 0.01f; 
-			 newR = (dd/2)/PApplet.sin(alCircular/2);
-	    	 d3 = PApplet.dist(x1,y1,x2,y2);
-			 x3 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-		}
-		else{ // relationship of 2 wordcloud away
-			 alCircular = ((float) (r2-r1)*2/rectList.size())*PApplet.PI-PApplet.PI;
-			 newR = (dd/2)/PApplet.sin(alCircular/2);
-			 d3 = PApplet.dist(x1,y1,x2,y2);
-			 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			 
-			 //parent.strokeWeight(1);
-			 //	parent.stroke(0,50);
-			 //	parent.line(x1,y1,x2,y2);
-				
-		}
-		
-		float delX1 = (x1-x3);
-		float delY1 = (y1-y3);
-		float delX2 = (x2-x3);
-		float delY2 = (y2-y3);
-		float al1 = PApplet.atan2(delY1,delX1);
-		float al2 = PApplet.atan2(delY2,delX2);
-		if (al1-al2>PApplet.PI)
-			al1=al1-2*PApplet.PI;
-		if (al2-al1>PApplet.PI)
-			al2=al2-2*PApplet.PI;
-		
-		// Check brushing a relationship
-		/*
-		float distCenter = PApplet.dist(this.mouseX, this.mouseY, WordCloud.xC, WordCloud.yC);
-		float dist = PApplet.dist(this.mouseX, this.mouseY, x3, y3);
-		if (distCenter<WordCloud.rC && (newR-1<=dist && dist<=newR+strokeWeight) && bWord1<0){
-			bWord1 = i1;
-			bWord2 = j1;
-			bCloud1 = index1;
-			bCloud2 = index2;
-			
-			bX3 = x3;
-			bY3 = y3;
-			bR3 = newR;
-			if (al1<al2)	{	
-				bAl1 = al1;
-				bAl2 = al2;
-			}	
-			else{
-				bAl1 = al2;
-				bAl2 = al1;
-			}
-			
-			bStrokeWeight=strokeWeight;
-			bColor = color;
-		}*/
-	/*
-		parent.noFill();
-		parent.stroke(color.getRed(),color.getGreen(),color.getBlue());
-		parent.strokeWeight(1);
-		if (al1<al2)		
-			drawArc(x3, y3, newR*2,  al1, al2, 255);
-		else
-			drawArc(x3, y3, newR*2,  al2, al1, 255);
-		parent.strokeWeight(1);
-	}*/
-	
-	/*
-	public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
-		parent.smooth();
-		int numSec = (int) 15;
-		if (numSec==0) return;
-			
-		float beginAngle = al1;
-		for (int k=0;k<=numSec;k++){
-			float endAngle = al1+k*(al2-al1)/numSec;
-			parent.noFill();
-			float sss = (float) k/numSec;
-			sss = PApplet.pow(sss,0.75f);
-			
-			float sat2 = 255-220*sss;
-			if (sat<255)
-				sat2=sat;
-				
-			float red = 255;
-			float green = sss*255;
-			float blue = 255-255*sss;
-			
-			parent.stroke(red,green,blue,sat2);
-			parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
-			beginAngle = endAngle;
-		}
-	}
-	*/
+
 	
 	
 	public void keyPressed() {
