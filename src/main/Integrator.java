@@ -31,7 +31,7 @@ public class Integrator {
 	  }
 
 
-	  void set(float v) {
+	  public void set(float v) {
 	    value = v;
 	  }
 

@@ -138,7 +138,7 @@ public class Graph {
 		return nodes;
 	}
 
-	public void draw() {
+	public void drawEdges() {
 		// Reset brushing node
 		for (int i = 0; i < nodes.size(); i++) {
 			Node n = (Node) nodes.get(i);
@@ -149,10 +149,10 @@ public class Graph {
 			Edge e = (Edge) edges.get(i);
 			e.draw();
 		}
-
+	}
+	public void drawNodes() {
 		for (int i = 0; i < nodes.size(); i++) {
-			Node n = (Node) nodes.get(i);
-			n.draw();
+			nodes.get(i).draw();
 		}
 
 	}

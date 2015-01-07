@@ -93,7 +93,7 @@ public class Edge {
 	  public void drawLine(float sat) {
 		parent.stroke(0,sat);
 		parent.strokeWeight(strokeWeight);
-  		parent.line(from.getX(), from.getY(), to.getX(), to.getY());
+  		parent.line(from.iX.value, from.iY.value, to.iX.value, to.iY.value);
  	  }
 		  
 }

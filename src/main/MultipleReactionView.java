@@ -30,7 +30,7 @@ public class MultipleReactionView{
 	public ArrayList<String> complexList = new ArrayList<String>(); 
 	public ArrayList<String> proteinList = new ArrayList<String>();
 	
-	public ArrayList<BiochemicalReaction> rectList;
+	public static ArrayList<BiochemicalReaction> rectList;
 	public ArrayList<Integer> rectSizeList;
 	public ArrayList<Integer> rectFileList;
 	public ArrayList<Integer> rectOrderList;
@@ -41,18 +41,20 @@ public class MultipleReactionView{
 	public Gradient gradient = new Gradient();
 	public float colorScale=0;
 	public static Integrator[][] iS;
-	public float xCircular, yCircular, rCircular; 
+	public static float xCircular, yCircular, rCircular; 
 	
 	
 	public static Graph g;
 	public static float xRight =0;
 	public Slider2 slider2;
-	public PopupLayout popupLayout;
+	public static PopupLayout popupLayout;
+	public static CheckBox checkName;
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
 		slider2 = new Slider2(parent);
 		popupLayout = new PopupLayout(parent);
+		checkName = new CheckBox(parent,"Reactions names");
 		
 		xRight = parent.width*7.5f/10;
 		float v=0.5f;
@@ -212,8 +214,6 @@ public class MultipleReactionView{
 		 return components;
 	}
 	
-	
-	
 	public void draw(){
 		if (!isAllowedDrawing) return;
 		xRight = parent.width*7.5f/10;
@@ -221,44 +221,26 @@ public class MultipleReactionView{
 		yCircular = parent.height/2;
 		rCircular = parent.height*3/7;
 		
-		int count = 0;
-		// Draw causality
-		
-		/*
-		//System.out.println("nFiles="+nFiles+"	"+rectList.size());
-		for (int r=0; r<rectSizeList.size();r++){
-			int f = rectFileList.get(r);
-			int index = rectOrderList.get(r);
-			Color color = gradient.getGradient(colorScale*(f+(float)index/(pathwaySize[f]*2)));
-			BiochemicalReaction react = rectList.get(r);
-			float al = computeAlpha(r);
-			float xR =  xCircular+rCircular*PApplet.sin(al);
-			float yR =  yCircular+rCircular*PApplet.cos(al);
-			float radius = PApplet.map(PApplet.sqrt(rectSizeList.get(r)), 0, PApplet.sqrt(maxSize), 3, 15);  // 10 is the max radius
-			
-			//System.out.println("	al="+al+"	f="+f+"	yR="+yR+"	"+radius);
-			
-			parent.fill(color.getRGB());
-			parent.noStroke();
-			parent.ellipse(xR, yR, radius, radius);
-			count++;
+		if (popupLayout.s==1){
+			g.drawNodes();
+			for (int r1=0; r1<rectList.size();r1++){
+				ArrayList<Integer> processedList =  new ArrayList<Integer>();
+				drawDownStreamReaction(r1, processedList, 255);
+			}
 		}
-		
-		for (int r1=0; r1<rectList.size();r1++){
-			ArrayList<Integer> processedList =  new ArrayList<Integer>();
-			drawDownStreamReaction(r1, processedList, 255);
-		}*/
-		
-		if (g==null) return;
-		doLayout();
-		g.draw();
-		
+		else if (popupLayout.s==2){
+			if (g==null) return;
+			doLayout();
+			g.drawEdges();
+			g.drawNodes();
+		}
 		// Right PANEL
 		float wRight = parent.width-xRight;
 		parent.fill(0,50);
 		parent.noStroke();
 		parent.rect(xRight, 25, wRight, parent.height-25);
 		slider2.draw("Edge length",xRight+100, 50);
+		checkName.draw(xRight+30, 80);
 		popupLayout.draw(parent.width-198);
 	}
 	
@@ -281,7 +263,6 @@ public class MultipleReactionView{
 				Vector3D f = e.getForceTo();
 				n.applyForce(f);
 			}
-
 		}
 
 		// calculate the anti-gravitational forces on each node
@@ -305,7 +286,6 @@ public class MultipleReactionView{
 						Vector3D vf = new Vector3D(-dx * f, -dy * f, 0);
 						a.applyForce(vf);
 					}
-					
 				}
 			}
 		}
@@ -315,13 +295,11 @@ public class MultipleReactionView{
 			float dx = xCircular - a.getX();
 			float dy = yCircular - a.getY();
 			float r2 = dx * dx + dy * dy;
-			
 			float f =  r2/5000000;
 			if (a.degree>0){
 				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
 				a.applyForce(vf);
 			}
-			
 		}
 
 		// move nodes according to forces
@@ -334,7 +312,7 @@ public class MultipleReactionView{
 	}
 	
 	
-	public float computeAlpha(int r){
+	public static float computeAlpha(int r){
 		return PApplet.PI -((float)r)/(rectList.size())*2*PApplet.PI;
 	}
 		
@@ -353,6 +331,7 @@ public class MultipleReactionView{
 		}
 		return a;
 	}
+	
 	public void drawDownStreamReaction(int r, ArrayList<Integer> processedList, float sat){
 		BiochemicalReaction rectSelected = rectList.get(r);
 		Object[] sRight1 = rectSelected.getRight().toArray();
@@ -510,7 +489,7 @@ public class MultipleReactionView{
 			float blue = 255-255*sss;
 			
 			parent.stroke(red,green,blue,sat2);
-			parent.strokeWeight(2);
+			parent.strokeWeight(1);
 			parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
 			beginAngle = endAngle;
 			parent.strokeWeight(1);
@@ -522,13 +501,13 @@ public class MultipleReactionView{
 	public void keyPressed() {
 		if (g!=null){
 			ArrayList<Node> nodes= g.getNodes();
-			if (parent.key == '+') {
+			/*if (parent.key == '+') {
 				//g.removeNode(g.getNodes().get(1));
 				return;
 			} else if (parent.key == '-') {
 				g.removeNode(nodes.get(4));
 				return;
-			}
+			}*/
 		}
 	}
 
@@ -565,10 +544,11 @@ public class MultipleReactionView{
 	
 	public void mouseClicked() {
 		if (g==null) return;
-		
 		if (popupLayout.b>=0){
 			popupLayout.mouseClicked();
 		}
+		else if (checkName.b)
+			checkName.mouseClicked();
 		else{
 			g.setSelectedNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {
@@ -579,8 +559,6 @@ public class MultipleReactionView{
 			}
 		}
 	}
-
-	
 
 	public void mouseDragged() {
 		slider2.checkSelectedSlider3();

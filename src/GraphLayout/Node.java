@@ -21,16 +21,14 @@ public class Node {
 	public Color color = null;
 
 	Vector3D position;
-	float h = 10;
-	float w = 10;
 	Graph g;
 	public boolean isConnected = false;
 	public int wordId = -99;
 	public static int bWord = -99;
 	public int degree = -1;
-	public Integrator iAlpha = new Integrator(0,0.2f,0.5f);
-	public Integrator iX = new Integrator(0,0.2f,0.5f);
-	public Integrator iY = new Integrator(0,0.2f,0.5f);
+	public Integrator iAlpha = new Integrator(0,0.1f,0.4f);
+	public Integrator iX = new Integrator(0,0.1f,0.4f);
+	public Integrator iY = new Integrator(0,0.1f,0.4f);
 	
 	public Node(Vector3D v, PApplet p) {
 		position = v;
@@ -42,7 +40,7 @@ public class Node {
 	}
 
 	public boolean containsWord(float x, float y) {
-		if (PApplet.dist(getX(), getY(), parent.mouseX, parent.mouseY)<=fontSize)
+		if (PApplet.dist(iX.value, iY.value, parent.mouseX, parent.mouseY)<=fontSize/2+1)
 			return true;
 		else
 			return false;
@@ -83,8 +81,6 @@ public class Node {
 	public void setMass(float m) {
 		mass = m/10;
 		fontSize = m;
-		h = m;
-		w = m;
 	}
 
 	public void setForce(Vector3D v) {
@@ -108,37 +104,60 @@ public class Node {
 	}
 	
 	public void draw() {
-		iAlpha.target(0);
-		iAlpha.update();
-		// Draw node names
-		float xx = getX();
-		float yy = getY();
-		
+		if (MultipleReactionView.popupLayout.s==1){ //circular Layout
+			float al = MultipleReactionView.computeAlpha(wordId);
+			float xR = MultipleReactionView.xCircular + MultipleReactionView.rCircular*PApplet.sin(al);
+			float yR = MultipleReactionView.yCircular + MultipleReactionView.rCircular*PApplet.cos(al);
+			iAlpha.target(al);
+			iX.target(xR);
+			iY.target(yR);
+		}
+		else{
+			iAlpha.target(0);
+			iX.target(getX());
+			iY.target(getY());
+		}
+		float xx = iX.value;
+		float yy = iY.value;
+	
 		
 		if (g.getHoverNode() == this) {
 			parent.textAlign(PApplet.CENTER);
 			parent.textSize(fontSize);
 			
-			int sat =( parent.frameCount*20%200);
+			int sat =( parent.frameCount*22%200);
 			parent.noStroke();
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),55+sat);
-			parent.text(name, xx, yy);
+			// Draw node names
+			parent.text(name, xx, yy-7);
 			parent.ellipse(xx, yy, fontSize, fontSize);
-			
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
+			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);
+			parent.ellipse(xx, yy, fontSize, fontSize);
 		}
-		else {
+		else{
 			parent.textAlign(PApplet.CENTER);
 			parent.textSize(fontSize);
 			wordWidth = parent.textWidth(name);
+			parent.noStroke();
 			parent.fill(color.getRGB());
-			parent.ellipse(xx, yy, fontSize, fontSize);
-			parent.translate(xx,yy);
-			parent.rotate(iAlpha.value);
-		//	parent.text(name, 0, 0);
-			parent.rotate(-iAlpha.value);
-			parent.translate(-xx,-yy);
+			if (MultipleReactionView.checkName.s){
+				// Draw node names
+				parent.translate(xx,yy);
+				parent.rotate(iAlpha.value);
+				parent.fill(color.getRed(), color.getGreen(), color.getBlue());
+				parent.text(name, 0, 0);
+				parent.rotate(-iAlpha.value);
+				parent.translate(-xx,-yy);
+			}
+			else{
+				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);
+				parent.ellipse(xx, yy, fontSize, fontSize);
+			}
 		}
+		iX.update();
+		iY.update();
+		iAlpha.update();
 	}
 }

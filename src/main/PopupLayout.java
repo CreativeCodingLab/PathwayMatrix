@@ -7,7 +7,7 @@ import processing.core.PFont;
 
 public class PopupLayout{
 	public int b = -1;
-	public int s=0;
+	public int s=1;
 	public PApplet parent;
 	public float x = 0;
 	public int y = 0;
