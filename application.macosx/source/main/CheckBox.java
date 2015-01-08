@@ -1,25 +1,22 @@
 package main;
 
-import java.awt.Color;
 import processing.core.PApplet;
 
 public class CheckBox{
 	public boolean s;
 	public boolean b;
 	public PApplet parent;
-	public int x = 0;
-	public int y = 0;
+	public float x = 0;
+	public float y = 0;
 	public String text = "";
 	
-	int count =0;
-	  
 	public CheckBox(PApplet parent_, String text_){
 		parent = parent_;
 		text = text_;
 	}
 	
 		
-	public void draw(int  x_, int y_){
+	public void draw(float  x_, float y_){
 		x = x_;
 		y = y_;
 		
@@ -66,18 +63,12 @@ public class CheckBox{
 			parent.text(text.replace("Protein reaction", ""),x+20,y+13);
 			parent.fill(main.ReactionView.proteinRectionColor.getRed(),main.ReactionView.proteinRectionColor.getGreen(),main.ReactionView.proteinRectionColor.getBlue());
 			parent.text("Protein reaction",x+95,y+13);
-			
 		//	parent.fill(main.PopupReaction.unidentifiedElementColor.getRed(),main.PopupReaction.unidentifiedElementColor.getGreen(),main.PopupReaction.unidentifiedElementColor.getBlue());
 		//	parent.text("Unidentified elements",x+95,y+32);
-		
 		}
 			
 		else	
 			parent.text(text,x+20,y+13);
-		
-		count++;
-	    if (count==10000)
-	    	count=200;
 	}
 	
 	public void checkBrushing() {

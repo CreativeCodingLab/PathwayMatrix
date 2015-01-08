@@ -17,11 +17,9 @@ public class PopupReactionOrder{
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
 	public static String[] items={"None","Protein Similarity","Topological Ordering"}; 
-	public Slider slider;
-
+	
 	public PopupReactionOrder(PApplet parent_){
 		parent = parent_;
-		slider =  new Slider(parent_,5);
 	}
 	
 	public void draw(float x_){

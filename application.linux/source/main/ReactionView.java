@@ -740,19 +740,28 @@ public class ReactionView{
 			
 			float totalH = itemH2*rectList.size();
 			
-			
-			System.out.println("1  itemH2="+itemH2);
-			itemH2 = totalH/(rectList.size()+circleList.size()+1);
-			float circleGap = itemH2;
-			float circleGapSum = 0;
-			
-			System.out.println("2  itemH2="+itemH2);
+			// Compute nonCausality reaction
 			ArrayList<Integer> nonCausalityList = new ArrayList<Integer>();
-			int count2 = 0;
 			for (int i=0;i<doneList.size();i++){
 				int index = doneList.get(i);
 				if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0)
 					nonCausalityList.add(index);
+			}
+			
+			itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()/2+1);
+			float circleGap = itemH2;
+			float circleGapSum = 0;
+			
+			int count2 = 0;
+			int count3 = 0;
+			float yStartCausality = yBeginList+(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
+			for (int i=0;i<doneList.size();i++){
+				int index = doneList.get(i);
+				// Compute nonCausality reaction
+				if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0){
+					iY[index].target(yStartCausality +count3*itemH2/2);
+					count3++;
+				}	
 				else{
 					if(circleList.contains(index)){
 						iY[index].target(circleGapSum+ yBeginList+count2*itemH2+circleGap);
@@ -762,20 +771,19 @@ public class ReactionView{
 						iY[index].target(circleGapSum+yBeginList+count2*itemH2);
 					}
 					count2++;
-					
 				}
 			}
+			/*
 			// Put non-causality reaction to the end of the list
 			for (int i=0;i<nonCausalityList.size();i++){
 				int index = nonCausalityList.get(i);
 				iY[index].target(yBeginList+(count2+circleList.size()+1)*itemH2);
 				count2++;
-			}	
-		
-			
+			}*/	
 		}
-		
 	}
+	
+	
 	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
 		for (int i=0;i<rectList.size();i++){
@@ -784,8 +792,6 @@ public class ReactionView{
 		}
 		return getReactionMaxDownstreamIn(a);
 	}
-	
-	
 	
 	public int getReactionMaxDownstreamIn(ArrayList<Integer> list){
 		int numDownstream = 0;
@@ -1554,8 +1560,6 @@ public class ReactionView{
 						drawReactionNode(entry, i, 25);
 					else
 						drawReactionNode(entry, i, 200);
-					
-					
 					i++;
 				}
 			}
@@ -2072,7 +2076,6 @@ public class ReactionView{
 				parent.arc(xRect, yy, d,d, beginAngle, endAngle);
 				
 				if(brushingReactionsForCommonDownstream.indexOf(r)>=0){
-					System.out.println("brushingReactionsForCommonDownstream="+brushingReactionsForCommonDownstream);
 					float sat3 = parent.frameCount*22%256;
 					parent.stroke(0,0,0,(sss)*sat3);
 					parent.strokeWeight(3);
@@ -3203,7 +3206,6 @@ public class ReactionView{
 			resetSelectionSimulation();
 		}
 		else if (popupCausality.b>=0){
-			System.out.println("popupCausality.b="+popupCausality.b);
 			popupCausality.mouseClicked();
 			// reset simulation
 			deleteReactionList = new ArrayList<Integer>();
@@ -3315,9 +3317,6 @@ public class ReactionView{
 					}
 					else if (selectedProteinForCommonDownstream.size()>0){
 						selectedReactionsForCommonDownstream = listDown1;
-						System.out.println("listDown1="+listDown1+"	listDown2"+listDown2);
-						
-						
 					}
 					else if (selectedComplexForCommonDownstream.size()>0){
 						selectedReactionsForCommonDownstream = listDown2;
