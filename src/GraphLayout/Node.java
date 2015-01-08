@@ -102,7 +102,7 @@ public class Node {
 	
 	public void draw() {
 		if (MultipleReactionView.popupLayout.s==1){ //Line up
-			iAlpha.target(0);
+			iAlpha.target(PApplet.PI/2);
 			iX.target(MultipleReactionView.xCircular);
 			iY.target(MultipleReactionView.yLineUp[nodeId]);
 			difX = 0;
@@ -122,7 +122,7 @@ public class Node {
 			iY.target(yR);
 		}
 		else{
-			iAlpha.target(PApplet.PI);
+			iAlpha.target(PApplet.PI/2);
 			iX.target(getX());
 			iY.target(getY());
 			difX = 0;
@@ -158,26 +158,21 @@ public class Node {
 				// Draw node names
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue());
 				parent.textSize(12);
-				if(MultipleReactionView.popupLayout.s==2){
-					if (0<=iAlpha.value && iAlpha.value<= PApplet.PI/2)
-						parent.textAlign(PApplet.LEFT);
-					else if (-PApplet.PI/2<=iAlpha.value && iAlpha.value<= 0)
-						parent.textAlign(PApplet.LEFT);
-					else if (PApplet.PI/2<=iAlpha.value )
-						parent.textAlign(PApplet.LEFT);
-					else
-						parent.textAlign(PApplet.LEFT);
-					
-					parent.translate(xx,yy);
-					parent.rotate(PApplet.PI/2-iAlpha.value);
-					parent.text(name, 0, 0);
-					parent.rotate(-(PApplet.PI/2-iAlpha.value));
-					parent.translate(-xx,-yy);
-				}
-				else {
-					parent.textAlign(PApplet.CENTER);
-					parent.text(name, xx, yy);
-				}	
+				if (0<=iAlpha.value && iAlpha.value<= PApplet.PI/2)
+					parent.textAlign(PApplet.LEFT);
+				else if (-PApplet.PI/2<=iAlpha.value && iAlpha.value<= 0)
+					parent.textAlign(PApplet.LEFT);
+				else if (PApplet.PI/2<=iAlpha.value )
+					parent.textAlign(PApplet.LEFT);
+				else
+					parent.textAlign(PApplet.LEFT);
+				
+				parent.translate(xx,yy);
+				parent.rotate(PApplet.PI/2-iAlpha.value);
+				parent.text(name, 0, 0);
+				parent.rotate(-(PApplet.PI/2-iAlpha.value));
+				parent.translate(-xx,-yy);
+				
 			}
 			else{
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);

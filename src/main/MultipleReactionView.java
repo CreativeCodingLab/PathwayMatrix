@@ -50,8 +50,10 @@ public class MultipleReactionView{
 	public static PopupLayout popupLayout;
 	public static CheckBox checkName;
 	
+	
 	// Line Up
 	public static float[] yLineUp;
+	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
@@ -240,14 +242,18 @@ public class MultipleReactionView{
 			node.iX.update();
 			node.iY.update();
 			node.iAlpha.update();
+			
 		}
 		
-
 		if (popupLayout.s==1){
+			iTransition.target(PApplet.PI);
+			iTransition.update();
 			g.drawNodes();
 			g.drawEdges();
 		}
 		if (popupLayout.s==2){
+			iTransition.target(1);
+			iTransition.update();
 			g.drawNodes();
 			g.drawEdges();
 			/*for (int r1=0; r1<rectList.size();r1++){
@@ -256,6 +262,8 @@ public class MultipleReactionView{
 			}*/
 		}
 		else if (popupLayout.s==3){
+			iTransition.target(0);
+			iTransition.update();
 			if (g==null) return;
 			doLayout();
 			g.drawEdges();
