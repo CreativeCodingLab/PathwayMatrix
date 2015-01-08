@@ -29,6 +29,8 @@ public class Node {
 	public Integrator iAlpha = new Integrator(0,0.1f,0.4f);
 	public Integrator iX = new Integrator(0,0.1f,0.4f);
 	public Integrator iY = new Integrator(0,0.1f,0.4f);
+	public float difX = 0;
+	public float difY = 0;
 	
 	public Node(Vector3D v, PApplet p) {
 		position = v;
@@ -103,19 +105,28 @@ public class Node {
 			iAlpha.target(0);
 			iX.target(MultipleReactionView.xCircular);
 			iY.target(MultipleReactionView.yLineUp[nodeId]);
+			difX = 0;
+			difY = 0;
 		}
 		else if (MultipleReactionView.popupLayout.s==2){ //circular Layout
 			float al = MultipleReactionView.computeAlpha(nodeId);
 			float xR = MultipleReactionView.xCircular + (MultipleReactionView.rCircular+size/2)*PApplet.sin(al);
 			float yR = MultipleReactionView.yCircular + (MultipleReactionView.rCircular+size/2)*PApplet.cos(al);
+			float xR2 = MultipleReactionView.xCircular + (MultipleReactionView.rCircular)*PApplet.sin(al);
+			float yR2 = MultipleReactionView.yCircular + (MultipleReactionView.rCircular)*PApplet.cos(al);
+			difX = xR-xR2;
+			difY = yR-yR2;
+			
 			iAlpha.target(al);
 			iX.target(xR);
 			iY.target(yR);
 		}
 		else{
-			iAlpha.target(0);
+			iAlpha.target(PApplet.PI);
 			iX.target(getX());
 			iY.target(getY());
+			difX = 0;
+			difY = 0;
 		}
 		float xx = iX.value;
 		float yy = iY.value;

@@ -102,9 +102,10 @@ public class Edge {
 			drawCircularRelationship(sat);
 		}
 		else if (MultipleReactionView.popupLayout.s==3) { // Circular layout
-			// parent.line(from.iX.value, from.iY.value, to.iX.value, to.iY.value);
+			drawCircularRelationship(sat);
 			
-			int numSec =6;
+			// Draw gradient lines
+			/*int numSec =6;
 			float x1 = from.iX.value;
 			float y1 = from.iY.value;
 			for (int i=1;i<=numSec;i++){
@@ -118,20 +119,20 @@ public class Edge {
 				parent.line(x1,y1,x2,y2);
 				x1=x2;
 				y1=y2;
-			}
+			}*/
 		}	
  	  }
 	  
 	  public void drawCircularRelationship(float sat){
-		 // float a1 = from.iAlpha.value;
+		  float a1 = from.iAlpha.value;
 		  	int r1 = from.nodeId;
-			float x1 = from.iX.value;
-			float y1 = from.iY.value;
+			float x1 = from.iX.value-from.difX;
+			float y1 = from.iY.value-from.difY;
 			
-		//	float a2 = to.iAlpha.value;
+			float a2 = to.iAlpha.value;
 			int r2 = to.nodeId;
-			float x2 = to.iX.value;
-			float y2 = to.iY.value;
+			float x2 = to.iX.value-to.difX;
+			float y2 = to.iY.value-to.difY;
 			
 			
 			float alpha = (y2-y1)/(x2-x1);
@@ -143,16 +144,17 @@ public class Edge {
 			float d3, x3, y3, newR;
 			
 			if (0<r2-r1 && r2-r1<=MultipleReactionView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI;
-				 if (alCircular==0)       // Straight line
-					 alCircular = 0.01f; 
+				 alCircular = PApplet.PI-(a1-a2);//PApplet.PI-((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI;
+				// if (alCircular==0)       // Straight line
+					// alCircular = 0.01f; 
+					 alCircular = PApplet.PI;
 				 newR = (dd/2)/PApplet.sin(alCircular/2);
 		    	 d3 = PApplet.dist(x1,y1,x2,y2);
 				 x3 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 				 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			}
 			else if (r2-r1>MultipleReactionView.rectList.size()/2){ // relationship of 2 wordcloud away
-				 alCircular = ((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
+				alCircular = (a1-a2) -PApplet.PI; //alCircular = ((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
 				 newR = (dd/2)/PApplet.sin(alCircular/2);
 				 d3 = PApplet.dist(x1,y1,x2,y2);
 				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
@@ -163,7 +165,7 @@ public class Edge {
 				 //	parent.line(x1,y1,x2,y2);
 			}
 			else if (0<r1-r2 && r1-r2<=MultipleReactionView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI;
+				 alCircular = PApplet.PI+(a1-a2);//PAppletPI-((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI;
 				 if (alCircular==0)       // Straight line
 					 alCircular = 0.01f; 
 				 newR = (dd/2)/PApplet.sin(alCircular/2);
@@ -172,7 +174,7 @@ public class Edge {
 				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			}
 			else if (r1-r2>MultipleReactionView.rectList.size()/2){
-				 alCircular = ((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
+				 alCircular = (a1-a2)-PApplet.PI;//((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
 				 if (alCircular==0)       // Straight line
 					 alCircular = 0.01f; 
 				 newR = (dd/2)/PApplet.sin(alCircular/2);
@@ -200,6 +202,7 @@ public class Edge {
 			
 			parent.noFill();
 			parent.strokeWeight(1);
+			
 			
 			boolean down = true;
 			if (r2<r1)

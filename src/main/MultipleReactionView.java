@@ -146,13 +146,22 @@ public class MultipleReactionView{
 			node.name = rectList.get(i).getDisplayName();
 			if (node.name==null)
 				node.name = "NULL";
-			node.color = gradient.getGradient(colorScale*(pathwayId+(float)reactId/(pathwaySize[pathwayId]*2)));
+			node.color = gradient.getGradient(colorScale*(transferID(pathwayId)+(float)reactId/(pathwaySize[pathwayId]*2)));
 			g.addNode(node);
 		}	
 		
 		// Initialize topological ordering
 		orderTopological();
 	}
+	// Make sure pathways next to each other receive different colora
+	public float transferID(int id) {
+		float newId = id;
+		if (id%2==1){
+			newId =  ((newId+(float) nFiles/2)%nFiles);
+		}
+		return newId;
+	}
+		
 	
 	public void updateEdges() {
 		g.edges = new ArrayList<Edge>();
