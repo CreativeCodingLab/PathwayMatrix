@@ -11,7 +11,6 @@ import processing.core.PApplet;
 
 public class Edge {
 	float k=0.12f; //stiffness
-	float strokeWeight=0; 
 	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;
@@ -22,14 +21,12 @@ public class Edge {
 		parent = papa;
 		from = from_;
 		to = to_;
+	   naturalLength = Slider2.val;
 	}
-	public void setStrokeWeight(float wei) {
-		strokeWeight = wei;
-	    naturalLength = Slider2.val;
-	 }
+	
 	public float getNaturalLength() {
 	    return naturalLength;
-	  }
+	 }
 	  
 	public void setGraph(Graph h) {
 		g = h;
@@ -78,23 +75,23 @@ public class Edge {
 
 	  public void draw() {
 	    if (parent!=null && g!=null){
-	    	parent.strokeWeight(strokeWeight);
-    	    if (g.getHoverNode() ==null){
-    	    	drawLine(200);
+	    	parent.strokeWeight(1);
+	        if (g.getHoverNode() ==null){
+    	    	drawLink(240);
 	    	}
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
-	    		drawLine(255);
+	    		parent.strokeWeight(2);
+		        drawLink(255);
 			    from.isConnected =true;
 			    to.isConnected = true;
 	    	}
 	    	else{
-	    		drawLine(20);
+	    		drawLink(15);
 	     	}
 	 	}
 	  }
-	  public void drawLine(float sat) {
-		 parent.strokeWeight(1);
+	  public void drawLink(float sat) {
 		 if (MultipleReactionView.popupLayout.s==1){  // LineUp
 			drawCircularRelationship(sat);
 		 }
@@ -231,13 +228,11 @@ public class Edge {
 				al2=al2-2*PApplet.PI;
 			
 			parent.noFill();
-			parent.strokeWeight(1);
 			
 			if (al1<al2)
 				drawArc(x3, y3, newR*2,  al1, al2, sat);
 			else
 				drawArc(x3, y3, newR*2,  al2, al1, sat);
-			parent.strokeWeight(1);
 			
 	  }
 
@@ -282,8 +277,10 @@ public class Edge {
 					sss = (float) (numSec-k)/numSec;
 				float sat2 = sat*sss;
 				float r = sat-sat2;
-				if(sat2<50)
-					sat2=50;
+				
+				float minSat = PApplet.min(50, sat);
+				if(sat2<minSat)
+					sat2=minSat;
 				
 				parent.stroke(r,r,0,sat2);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);

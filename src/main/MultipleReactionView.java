@@ -180,7 +180,6 @@ public class MultipleReactionView{
 				int r2 = a.get(j);
 				Node node2 = g.nodes.get(r2);
 				Edge e = new Edge(node1, node2, parent);
-				e.setStrokeWeight(2);
 				g.addEdge(e);
 				degree++;
 			}
@@ -231,7 +230,7 @@ public class MultipleReactionView{
 	}
 	
 	public void draw(){
-		if (!isAllowedDrawing) return;
+		if (!isAllowedDrawing || g==null || g.nodes==null) return;
 		xRight = parent.width*7.5f/10;
 		xCircular = xRight/2;
 		yCircular = parent.height/2;
@@ -319,7 +318,7 @@ public class MultipleReactionView{
 		
 		int count2 = 0;
 		int count3 = 0;
-		float yStartCausality = 15 +(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
+		float yStartCausality = 10 +(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
 		for (int i=0;i<doneList.size();i++){
 			int index = doneList.get(i);
 			// Compute nonCausality reaction
