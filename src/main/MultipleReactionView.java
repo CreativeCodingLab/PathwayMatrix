@@ -53,7 +53,7 @@ public class MultipleReactionView{
 	
 	// Line Up
 	public static float[] yLineUp;
-	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
+	public static Integrator iTransition = new Integrator(0,0.1f,0.1f);
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;

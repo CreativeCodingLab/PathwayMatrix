@@ -243,17 +243,38 @@ public class Edge {
 
 	  
 	  public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
-			int numSec = 15;
-			float beginAngle = al1;
-			if (al2<al1)
-				beginAngle = al2;
-			
 			float x1 = x3+d3/2*PApplet.cos(al1);
 			float y1 = y3+d3/2*PApplet.sin(al1);
 			boolean down = true;
 			if (PApplet.dist(x1, y1, from.iX.value-from.difX, from.iY.value-from.difY)
 					>PApplet.dist(x1, y1, to.iX.value-to.difX, to.iY.value-to.difY))
 				down = false;
+			
+			if (MultipleReactionView.popupLayout.s==1 && PApplet.abs(from.iX.value-MultipleReactionView.xCircular)<1f){
+				System.out.println("from.iX.value="+from.iX.value+"	"+MultipleReactionView.xCircular);
+				down = true;
+				float x11 = from.iX.value-from.difX;
+				float y11 = from.iY.value-from.difY;
+				float x22 = to.iX.value-to.difX;
+				float y22 = to.iY.value-to.difY;
+				x3 = (x11+x22)/2;
+				y3 = (y11+y22)/2;
+				
+				if (from.iY.value<to.iY.value){
+					al1 = PApplet.PI/2;
+					al2 = PApplet.PI*3/2;
+				}
+				else{
+					al1 = -PApplet.PI/2;
+					al2 = PApplet.PI/2;
+				}
+				down = false;
+			}
+			
+			int numSec = 15;
+			float beginAngle = al1;
+			if (al2<al1)
+				beginAngle = al2;
 			for (int k=1;k<=numSec;k++){
 				float endAngle = al1+k*(al2-al1)/numSec;
 				parent.noFill();
@@ -268,6 +289,7 @@ public class Edge {
 				parent.stroke(r,r,0,sat2);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
 				
+				//System.out.println("	x3="+x3+"	y3="+y3+"	beginAngle="+beginAngle+"	endAngle="+endAngle);
 				/*float xx = x3+d3/2*PApplet.cos(endAngle);
 				float yy = y3+d3/2*PApplet.sin(endAngle);
 				parent.fill(0,sat2);
