@@ -51,8 +51,9 @@ public class MultipleReactionView{
 	public static CheckBox checkName;
 	
 	
-	// Line Up
+	// position
 	public static float[] yLineUp;
+	public static float[] yTree;
 	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
 	
 	public MultipleReactionView(PApplet p){
@@ -81,8 +82,6 @@ public class MultipleReactionView{
 			}
 		}	
 		
-		
-	
 		// Compute proteinList and complexList
 		complexList = new ArrayList<String>(); 
 		proteinList = new ArrayList<String>();
@@ -133,7 +132,7 @@ public class MultipleReactionView{
 				maxSize = size;
 		}
 			
-		colorScale = (float) gradient.colors.size()/ (nFiles+1) ;
+		colorScale = (float) gradient.colors.size()/ (nFiles+0.6f) ;
 		isAllowedDrawing = true;
 	}
 	
@@ -148,19 +147,18 @@ public class MultipleReactionView{
 			node.name = rectList.get(i).getDisplayName();
 			if (node.name==null)
 				node.name = "NULL";
-			node.color = gradient.getGradient(colorScale*(transferID(pathwayId)+(float)reactId/(pathwaySize[pathwayId]*2)));
+			node.color = gradient.getGradient(colorScale*(transferID(pathwayId)));
 			g.addNode(node);
 		}	
 		
 		// Initialize topological ordering
+		orderTree();
 		orderTopological();
 	}
 	// Make sure pathways next to each other receive different colora
 	public float transferID(int id) {
-		float newId = id;
-		if (id%2==1){
-			newId =  ((newId+(float) nFiles/2)%nFiles);
-		}
+		float newId = (id*(nFiles+1)/2)%nFiles;
+		
 		return newId;
 	}
 		
@@ -244,13 +242,19 @@ public class MultipleReactionView{
 			
 		}
 		
-		if (popupLayout.s==1){
+		if (popupLayout.s==0){
 			iTransition.target(PApplet.PI);
 			iTransition.update();
 			g.drawNodes();
 			g.drawEdges();
 		}
-		if (popupLayout.s==2){
+		else if (popupLayout.s==1){
+			iTransition.target(PApplet.PI);
+			iTransition.update();
+			g.drawNodes();
+			g.drawEdges();
+		}
+		else if (popupLayout.s==2){
 			iTransition.target(1);
 			iTransition.update();
 			g.drawNodes();
@@ -278,10 +282,8 @@ public class MultipleReactionView{
 		popupLayout.draw(parent.width-198);
 	}
 	
-	public ArrayList<Integer> orderTopological() {
+	public void orderTopological() {
 		yLineUp =  new float[rectList.size()];
-		ArrayList<Integer> b = new ArrayList<Integer>();
-		
 		ArrayList<Integer> doneList = new ArrayList<Integer>();
 		ArrayList<Integer> circleList = new ArrayList<Integer>();
 		
@@ -337,10 +339,17 @@ public class MultipleReactionView{
 				count2++;
 			}
 		}
-		
-		return b;
 	}
 	
+	public void orderTree() {
+		yTree =  new float[rectList.size()];
+		for (int i=0; i<rectList.size();i++){
+			float totalH = parent.height-10;
+			float itemH2 = (totalH-10*nFiles)/(rectList.size()-1);
+			yTree[i] = 10+i*itemH2+10*rectFileList.get(i);
+		}
+		
+	}
 		
 	public int getNoneUpstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
