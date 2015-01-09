@@ -251,7 +251,6 @@ public class Edge {
 				down = false;
 			
 			if (MultipleReactionView.popupLayout.s==1 && PApplet.abs(from.iX.value-MultipleReactionView.xCircular)<1f){
-				System.out.println("from.iX.value="+from.iX.value+"	"+MultipleReactionView.xCircular);
 				down = true;
 				float x11 = from.iX.value-from.difX;
 				float y11 = from.iY.value-from.difY;
@@ -282,19 +281,12 @@ public class Edge {
 				if (!down)
 					sss = (float) (numSec-k)/numSec;
 				float sat2 = sat*sss;
-				float r = 255-sat2;
+				float r = sat-sat2;
 				if(sat2<50)
 					sat2=50;
 				
 				parent.stroke(r,r,0,sat2);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
-				
-				//System.out.println("	x3="+x3+"	y3="+y3+"	beginAngle="+beginAngle+"	endAngle="+endAngle);
-				/*float xx = x3+d3/2*PApplet.cos(endAngle);
-				float yy = y3+d3/2*PApplet.sin(endAngle);
-				parent.fill(0,sat2);
-				parent.ellipse(xx, yy, 10, 10);*/
-				
 				beginAngle = endAngle;
 			}
 			
