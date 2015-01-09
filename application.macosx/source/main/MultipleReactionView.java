@@ -243,6 +243,8 @@ public class MultipleReactionView{
 		}
 		
 		if (popupLayout.s==0){
+			drawTree();
+			
 			iTransition.target(PApplet.PI);
 			iTransition.update();
 			g.drawNodes();
@@ -280,8 +282,61 @@ public class MultipleReactionView{
 		slider2.draw("Edge length",xRight+100, 50);
 		checkName.draw(xRight+30, 80);
 		popupLayout.draw(parent.width-198);
+		
+		// File names
+		parent.textSize(12);
+		parent.textAlign(PApplet.LEFT);
+		for (int f=0; f<nFiles; f++){
+			float yy = 200+f*18;
+			parent.line(10,parent.height/2,200,yy);
+			String[] str = files.get(f).split("/");
+			String nameFile = str[str.length-1];
+			Color color = gradient.getGradient(colorScale*(transferID(f)));
+			parent.fill(color.getRGB());
+			parent.text(nameFile, xRight+20,yy); 
+		}		
 	}
 	
+	
+	public void drawTree() {
+		parent.fill(0);
+		parent.textSize(12);
+		parent.textAlign(PApplet.LEFT);
+		parent.text(nFiles+" files", 3, parent.height/2+5);
+		float[] yF = new float[nFiles];
+		float[] nF = new float[nFiles];
+		for (int i=0; i<rectList.size(); i++){
+			int f = rectFileList.get(i);
+			yF[f] += g.nodes.get(i).iY.value;
+			nF[f] ++;
+		}
+		parent.stroke(0);
+		parent.strokeWeight(1);
+		parent.textSize(11);
+		for (int f=0; f<nFiles; f++){
+			float yy = yF[f]/nF[f];
+			parent.line(40,parent.height/2,250,yy);
+			
+		}
+		for (int i=0; i<rectList.size(); i++){
+			int f = rectFileList.get(i);
+			float yy = yF[f]/nF[f];
+			Color color = gradient.getGradient(colorScale*(transferID(f)));
+			parent.stroke(color.getRed(), color.getGreen(), color.getBlue(),60);
+			parent.line(250,yy, g.nodes.get(i).iX.value,g.nodes.get(i).iY.value);
+		}
+			
+		for (int f=0; f<nFiles; f++){
+			float yy = yF[f]/nF[f];
+			String[] str = files.get(f).split("/");
+			String nameFile = str[str.length-1];
+			Color color = gradient.getGradient(colorScale*(transferID(f)));
+			parent.fill(color.getRGB());
+			parent.text(nameFile, 250,yy); 
+		}
+	
+	}
+		
 	public void orderTopological() {
 		yLineUp =  new float[rectList.size()];
 		ArrayList<Integer> doneList = new ArrayList<Integer>();
@@ -348,7 +403,6 @@ public class MultipleReactionView{
 			float itemH2 = (totalH-10*nFiles)/(rectList.size()-1);
 			yTree[i] = 10+i*itemH2+10*rectFileList.get(i);
 		}
-		
 	}
 		
 	public int getNoneUpstream(ArrayList<Integer> doneList){

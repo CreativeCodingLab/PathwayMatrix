@@ -103,7 +103,7 @@ public class Node {
 	public void draw() {
 		if (MultipleReactionView.popupLayout.s==0){ //Tree
 			iAlpha.target(PApplet.PI/2);
-			iX.target(parent.width/2);
+			iX.target(parent.width/2-50);
 			iY.target(MultipleReactionView.yTree[nodeId]);
 			difX = 0;
 			difY = 0;

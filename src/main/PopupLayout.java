@@ -16,7 +16,7 @@ public class PopupLayout{
 	public int h;
 	public int itemH = 20;
 	public Color cGray  = new Color(240,240,240);
-	public static String[] items={"Tree","Line Up","Circular","Forced-Directed"}; 
+	public static String[] items={"Tree","Topological","Circular","Forced-Directed"}; 
 	
 	public PopupLayout(PApplet parent_){
 		parent = parent_;
