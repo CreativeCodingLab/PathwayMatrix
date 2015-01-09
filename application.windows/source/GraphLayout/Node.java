@@ -101,7 +101,14 @@ public class Node {
 	
 	
 	public void draw() {
-		if (MultipleReactionView.popupLayout.s==1){ //Line up
+		if (MultipleReactionView.popupLayout.s==0){ //Tree
+			iAlpha.target(PApplet.PI/2);
+			iX.target(parent.width/2);
+			iY.target(MultipleReactionView.yTree[nodeId]);
+			difX = 0;
+			difY = 0;
+		}
+		else if (MultipleReactionView.popupLayout.s==1){ //Line up
 			iAlpha.target(PApplet.PI/2);
 			iX.target(MultipleReactionView.xCircular);
 			iY.target(MultipleReactionView.yLineUp[nodeId]);

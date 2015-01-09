@@ -11,7 +11,6 @@ import processing.core.PApplet;
 
 public class Edge {
 	float k=0.12f; //stiffness
-	float strokeWeight=0; 
 	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;
@@ -22,14 +21,12 @@ public class Edge {
 		parent = papa;
 		from = from_;
 		to = to_;
+	   naturalLength = Slider2.val;
 	}
-	public void setStrokeWeight(float wei) {
-		strokeWeight = wei;
-	    naturalLength = Slider2.val;
-	 }
+	
 	public float getNaturalLength() {
 	    return naturalLength;
-	  }
+	 }
 	  
 	public void setGraph(Graph h) {
 		g = h;
@@ -78,34 +75,23 @@ public class Edge {
 
 	  public void draw() {
 	    if (parent!=null && g!=null){
-	    	parent.strokeWeight(strokeWeight);
-    	    if (g.getHoverNode() ==null){
-    	    	drawLine(200);
+	    	parent.strokeWeight(1);
+	        if (g.getHoverNode() ==null){
+    	    	drawLink(240);
 	    	}
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
-	    		drawLine(255);
+	    		parent.strokeWeight(2);
+		        drawLink(255);
 			    from.isConnected =true;
 			    to.isConnected = true;
 	    	}
 	    	else{
-	    		drawLine(20);
+	    		drawLink(15);
 	     	}
 	 	}
 	  }
-	  public void drawLine(float sat) {
-		 parent.strokeWeight(1);
-		 if (MultipleReactionView.popupLayout.s==1){  // LineUp
-			drawCircularRelationship(sat);
-		 }
-		 else if (MultipleReactionView.popupLayout.s==2){   // Forced-directed Layout
-			drawCircularRelationship(sat);
-		}
-		else if (MultipleReactionView.popupLayout.s==3) { // Circular layout
-			drawCircularRelationship(sat);
-			
-			
-		}
+	  public void drawLink(float sat) {
 		// Draw gradient lines
 		/*int numSec =6;
 		float x1 = from.iX.value;
@@ -122,10 +108,7 @@ public class Edge {
 			x1=x2;
 			y1=y2;
 		}*/
- 	  }
-	  
-	  public void drawCircularRelationship(float sat){
-		  	int r1 = from.nodeId;
+ 	    	int r1 = from.nodeId;
 			float x1 = from.iX.value-from.difX;
 			float y1 = from.iY.value-from.difY;
 			
@@ -144,7 +127,7 @@ public class Edge {
 			
 			if (0<r2-r1 && r2-r1<=MultipleReactionView.rectList.size()/2){
 				 alCircular = PApplet.PI-((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1)
+				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
 					 alCircular += MultipleReactionView.iTransition.value;
 				 else if (MultipleReactionView.popupLayout.s==2)
 					 alCircular *= MultipleReactionView.iTransition.value;
@@ -162,7 +145,7 @@ public class Edge {
 			}
 			else if (r2-r1>MultipleReactionView.rectList.size()/2){ // relationship of 2 wordcloud away
 				 alCircular = ((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1)
+				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
 					 alCircular += MultipleReactionView.iTransition.value;
 				 else if (MultipleReactionView.popupLayout.s==2)
 					 alCircular *= MultipleReactionView.iTransition.value;
@@ -177,14 +160,10 @@ public class Edge {
 				 d3 = PApplet.dist(x1,y1,x2,y2);
 				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-				 
-				 //parent.strokeWeight(1);
-				 //	parent.stroke(0,50);
-				 //	parent.line(x1,y1,x2,y2);
 			}
 			else if (0<r1-r2 && r1-r2<=MultipleReactionView.rectList.size()/2){
 				 alCircular = PApplet.PI-((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1)
+				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
 					 alCircular += MultipleReactionView.iTransition.value;
 				 else if (MultipleReactionView.popupLayout.s==2)
 					 alCircular *= MultipleReactionView.iTransition.value;
@@ -202,7 +181,7 @@ public class Edge {
 			}
 			else if (r1-r2>MultipleReactionView.rectList.size()/2){
 				 alCircular = ((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1)
+				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
 					 alCircular += MultipleReactionView.iTransition.value;
 				 else if (MultipleReactionView.popupLayout.s==2)
 					 alCircular *= MultipleReactionView.iTransition.value;
@@ -229,31 +208,60 @@ public class Edge {
 				al1=al1-2*PApplet.PI;
 			else if (al2-al1>PApplet.PI)
 				al2=al2-2*PApplet.PI;
-			
 			parent.noFill();
-			parent.strokeWeight(1);
 			
 			if (al1<al2)
 				drawArc(x3, y3, newR*2,  al1, al2, sat);
 			else
 				drawArc(x3, y3, newR*2,  al2, al1, sat);
-			parent.strokeWeight(1);
-			
 	  }
 
 	  
 	  public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
-			int numSec = 15;
-			float beginAngle = al1;
-			if (al2<al1)
-				beginAngle = al2;
-			
 			float x1 = x3+d3/2*PApplet.cos(al1);
 			float y1 = y3+d3/2*PApplet.sin(al1);
 			boolean down = true;
 			if (PApplet.dist(x1, y1, from.iX.value-from.difX, from.iY.value-from.difY)
 					>PApplet.dist(x1, y1, to.iX.value-to.difX, to.iY.value-to.difY))
 				down = false;
+			
+			if (MultipleReactionView.popupLayout.s==0 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
+				float x11 = from.iX.value-from.difX;
+				float y11 = from.iY.value-from.difY;
+				float x22 = to.iX.value-to.difX;
+				float y22 = to.iY.value-to.difY;
+				x3 = (x11+x22)/2;
+				y3 = (y11+y22)/2;
+				al1 = -PApplet.PI/2;
+				al2 = PApplet.PI/2;
+				if (from.iY.value<to.iY.value)
+					down = true;
+				else
+					down = false;
+			}
+			if (MultipleReactionView.popupLayout.s==1 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
+				float x11 = from.iX.value-from.difX;
+				float y11 = from.iY.value-from.difY;
+				float x22 = to.iX.value-to.difX;
+				float y22 = to.iY.value-to.difY;
+				x3 = (x11+x22)/2;
+				y3 = (y11+y22)/2;
+				
+				if (from.iY.value<to.iY.value){
+					al1 = PApplet.PI/2;
+					al2 = PApplet.PI*3/2;
+				}
+				else{
+					al1 = -PApplet.PI/2;
+					al2 = PApplet.PI/2;
+				}
+				down = false;
+			}
+			
+			int numSec = 15;
+			float beginAngle = al1;
+			if (al2<al1)
+				beginAngle = al2;
 			for (int k=1;k<=numSec;k++){
 				float endAngle = al1+k*(al2-al1)/numSec;
 				parent.noFill();
@@ -261,18 +269,14 @@ public class Edge {
 				if (!down)
 					sss = (float) (numSec-k)/numSec;
 				float sat2 = sat*sss;
-				float r = 255-sat2;
-				if(sat2<50)
-					sat2=50;
+				float r = sat-sat2;
+				
+				float minSat = PApplet.min(50, sat);
+				if(sat2<minSat)
+					sat2=minSat;
 				
 				parent.stroke(r,r,0,sat2);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
-				
-				/*float xx = x3+d3/2*PApplet.cos(endAngle);
-				float yy = y3+d3/2*PApplet.sin(endAngle);
-				parent.fill(0,sat2);
-				parent.ellipse(xx, yy, 10, 10);*/
-				
 				beginAngle = endAngle;
 			}
 			

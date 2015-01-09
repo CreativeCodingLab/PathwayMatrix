@@ -13,7 +13,7 @@ public class Integrator {
 	  float damping = DAMPING;
 	  float attraction = ATTRACTION;
 	  boolean targeting;
-	  float target;
+	  public float target;
 
 
 	  public Integrator() { }
