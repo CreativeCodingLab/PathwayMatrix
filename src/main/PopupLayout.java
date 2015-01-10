@@ -22,6 +22,7 @@ public class PopupLayout{
 		parent = parent_;
 	}
 	
+	
 	public void draw(float x_){
 		x = x_;
 		if (b>=0){
