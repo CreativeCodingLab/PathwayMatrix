@@ -1,14 +1,19 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import main.PathwayViewer_2_3.ThreadLoader4;
+
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
 import org.biopax.paxtools.model.level3.SmallMolecule;
+
+import edu.uic.ncdm.venn.Venn_Overview;
 
 import processing.core.PApplet;
 import GraphLayout.*;
@@ -49,15 +54,18 @@ public class MultipleReactionView{
 	public Slider2 slider2;
 	public static PopupLayout popupLayout;
 	public static CheckBox checkName;
+	public ThreadLoader5 loader5;
+	public Thread thread5 = new Thread(loader5);
 	
 	
 	// position
-	public static float[] yLineUp;
+	public static float[] yTopological;
 	public static float[] yTree;
 	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
+		loader5= new ThreadLoader5(parent);
 		slider2 = new Slider2(parent);
 		popupLayout = new PopupLayout(parent);
 		checkName = new CheckBox(parent,"Reactions names");
@@ -153,6 +161,7 @@ public class MultipleReactionView{
 		
 		// Initialize topological ordering
 		orderTree();
+		yTopological =  new float[rectList.size()];
 		orderTopological();
 	}
 	// Make sure pathways next to each other receive different colora
@@ -338,7 +347,6 @@ public class MultipleReactionView{
 	}
 		
 	public void orderTopological() {
-		yLineUp =  new float[rectList.size()];
 		ArrayList<Integer> doneList = new ArrayList<Integer>();
 		ArrayList<Integer> circleList = new ArrayList<Integer>();
 		
@@ -380,16 +388,16 @@ public class MultipleReactionView{
 			int index = doneList.get(i);
 			// Compute nonCausality reaction
 			if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0){
-				yLineUp[index] =  yStartCausality +count3*itemH2*0.2f;
+				yTopological[index] =  yStartCausality +count3*itemH2*0.2f;
 				count3++;
 			}	
 			else{
 				if(circleList.contains(index)){
-					yLineUp[index] = circleGapSum+ 10+count2*itemH2+circleGap;
+					yTopological[index] = circleGapSum+ 10+count2*itemH2+circleGap;
 					circleGapSum +=circleGap;
 				}
 				else{
-					yLineUp[index] = circleGapSum+10+count2*itemH2;
+					yTopological[index] = circleGapSum+10+count2*itemH2;
 				}
 				count2++;
 			}
@@ -528,8 +536,6 @@ public class MultipleReactionView{
 		return a;
 	}
 	
-	
-	
 	public void doLayout() {
 		// calculate forces on each node
 		// calculate spring forces on each node
@@ -542,7 +548,6 @@ public class MultipleReactionView{
 				Vector3D f = e.getForceFrom();
 				n.applyForce(f);
 			}
-
 			edges = (ArrayList) g.getEdgesTo(n);
 			for (int j = 0; edges != null && j < edges.size(); j++) {
 				Edge e = (Edge) edges.get(j);
@@ -575,13 +580,12 @@ public class MultipleReactionView{
 				}
 			}
 		}
-		
 		for (int i = 0; i < g.getNodes().size(); i++) {
 			Node a = (Node) g.getNodes().get(i);
 			float dx = xCircular - a.getX();
 			float dy = yCircular - a.getY();
 			float r2 = dx * dx + dy * dy;
-			float f =  r2/5000000;
+			float f =  r2/20000000;
 			if (a.degree>0){
 				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
 				a.applyForce(vf);
@@ -688,10 +692,15 @@ public class MultipleReactionView{
 		if (popupLayout.b>=0){
 			popupLayout.mouseClicked();
 
-			if (popupLayout.s==1){
-				iTransition.target(PApplet.PI);
+			if (popupLayout.s==0){
+				orderTree();
 			}
-			if (popupLayout.s==2){
+			else if (popupLayout.s==1){
+				iTransition.target(PApplet.PI);
+				thread5 = new Thread(loader5);
+				thread5.start();
+			}
+			else  if (popupLayout.s==2){
 				iTransition.target(1);
 			}
 			else if (popupLayout.s==3)
@@ -720,6 +729,21 @@ public class MultipleReactionView{
 							new Vector3D(parent.mouseX, parent.mouseY, 0));
 		}
 	}
+	
+
+	// Thread for grouping
+	class ThreadLoader5 implements Runnable {
+		PApplet parent;
+		public ThreadLoader5(PApplet p) {
+			parent = p;
+		}
+		public void run() {
+			System.out.println("orderTopological");
+			orderTopological();
+			System.out.println("orderTopological 2");
+			
+		}
+	}	
 	
 }
 	
