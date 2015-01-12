@@ -1,0 +1,4 @@
+#!/bin/sh
+
+APPDIR=$(dirname "$0")
+java -Xmx10g -Djava.library.path="$APPDIR" -cp "lib/PathwayViewer_2_4.jar"main.PathwayViewer_2_4

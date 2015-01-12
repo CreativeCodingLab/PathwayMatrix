@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import main.PathwayViewer_2_3.ThreadLoader4;
+import main.PathwayViewer_2_4.ThreadLoader4;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;

@@ -111,7 +111,7 @@ public class Node {
 		else if (MultipleReactionView.popupLayout.s==1){ //Line up
 			iAlpha.target(PApplet.PI/2);
 			iX.target(MultipleReactionView.xCircular);
-			iY.target(MultipleReactionView.yLineUp[nodeId]);
+			iY.target(MultipleReactionView.yTopological[nodeId]);
 			difX = 0;
 			difY = 0;
 		}

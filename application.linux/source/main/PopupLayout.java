@@ -22,6 +22,7 @@ public class PopupLayout{
 		parent = parent_;
 	}
 	
+	
 	public void draw(float x_){
 		x = x_;
 		if (b>=0){
@@ -35,8 +36,8 @@ public class PopupLayout{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_2_3.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_2_3.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_2_4.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_2_4.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
