@@ -585,7 +585,7 @@ public class MultipleReactionView{
 			float dx = xCircular - a.getX();
 			float dy = yCircular - a.getY();
 			float r2 = dx * dx + dy * dy;
-			float f =  r2/20000000;
+			float f =  r2/10000000;
 			if (a.degree>0){
 				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
 				a.applyForce(vf);
