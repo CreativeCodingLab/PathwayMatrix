@@ -555,6 +555,7 @@ public class MultipleReactionView{
 				n.applyForce(f);
 			}
 		}
+		
 
 		// calculate the anti-gravitational forces on each node
 		// this is the N^2 shittiness that needs to be optimized
