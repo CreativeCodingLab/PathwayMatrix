@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.biopax.paxtools.model.level3.Complex;
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
 
 import processing.core.PApplet;
 
@@ -19,18 +19,18 @@ public class PopupPathway{
 	public static boolean sAll = false;
 	public static int b = -1000;
 	public PApplet parent;
-	public float x = 800;
+	public float x = 0;
 	public static float yBegin = 23;
 	public static float yBeginList = 70;
 	public int w1 = 98;
-	public int w = 600;
+	public int w = 350;
 	public int h = 28;
 	public static int s=-100;
 	public static float maxSize = 0;
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
-	public float maxH = 20;
-	public static Map<Complex, Integer> itemHash =  new HashMap<Complex, Integer>();
+	public float maxH = 18;
+	public ArrayList<String> pathwayList;
 	
 	public PopupPathway(PApplet parent_){
 		parent = parent_;
@@ -38,55 +38,30 @@ public class PopupPathway{
 	
 	public void setItems(){
 		maxSize =0;
-		Map<Complex, Integer> unsortMap  =  new HashMap<Complex, Integer>();
 		s=-400;
-		for (int i=0; i<main.PathwayViewer_2_4.complexList.size();i++){
-			Complex com = main.PathwayViewer_2_4.complexList.get(i);
-			int size = main.PathwayViewer_2_4.proteinsInComplex[i].size();
-			unsortMap.put(com, size);
+		for (int i=0; i<pathwayList.size();i++){
+			int size = 5;
 			if (size>maxSize)
 				maxSize = size;
 		}
-		itemHash = sortByComparator(unsortMap);
 		
 		// positions of items
-		iX = new Integrator[itemHash.size()];
-		iY = new Integrator[itemHash.size()];
-		iH = new Integrator[itemHash.size()];
-		for (int i=0;i<itemHash.size();i++){
+		iX = new Integrator[pathwayList.size()];
+		iY = new Integrator[pathwayList.size()];
+		iH = new Integrator[pathwayList.size()];
+		for (int i=0;i<pathwayList.size();i++){
 			iX[i] = new Integrator(x, 0.5f,0.1f);
 			iY[i] = new Integrator(20, 0.5f,0.1f);
 			iH[i] = new Integrator(10, 0.5f,0.1f);
 		}
 		
-		hightlightList =  new int[itemHash.size()];
-		for (int i=0;i<itemHash.size();i++){
+		hightlightList =  new int[pathwayList.size()];
+		for (int i=0;i<pathwayList.size();i++){
 			hightlightList[i] = -1;
 		}
+		
 	}
 		
-	// Sort decreasing order
-	public static Map<Complex, Integer> sortByComparator(Map<Complex, Integer> unsortMap) {
-		// Convert Map to List
-		List<Map.Entry<Complex, Integer>> list = 
-			new LinkedList<Map.Entry<Complex, Integer>>(unsortMap.entrySet());
- 
-		// Sort list with comparator, to compare the Map values
-		Collections.sort(list, new Comparator<Map.Entry<Complex, Integer>>() {
-			public int compare(Map.Entry<Complex, Integer> o1,
-                                           Map.Entry<Complex, Integer> o2) {
-				return -(o1.getValue()).compareTo(o2.getValue());
-			}
-		});
- 
-		// Convert sorted map back to a Map
-		Map<Complex, Integer> sortedMap = new LinkedHashMap<Complex, Integer>();
-		for (Iterator<Map.Entry<Complex, Integer>> it = list.iterator(); it.hasNext();) {
-			Map.Entry<Complex, Integer> entry = it.next();
-			sortedMap.put(entry.getKey(), entry.getValue());
-		}
-		return sortedMap;
-	}
 	
 	public void draw(float x_){
 		x = x_;
@@ -96,10 +71,10 @@ public class PopupPathway{
 		parent.rect(x,0,w1,23);
 		parent.fill(0);
 		parent.textAlign(PApplet.CENTER);
-		parent.text("Complex",x+w1/2,17);
+		parent.text("Pathways",x+w1/2,17);
 		
 		
-		x = x_-150;
+		x = x_-40;
 		
 		
 		if (hightlightList==null) return;
@@ -112,28 +87,24 @@ public class PopupPathway{
 		}
 		if (bPopup == true || b>=-1){
 			// Compute positions
-			float itemH2 = (parent.height-yBeginList)/(itemHash.size());
+			float itemH2 = (parent.height-yBeginList)/(MultipleReactionView.pathwayList.size());
 			if (itemH2>maxH)
 				itemH2 =maxH;
-			for (int i=0;i<itemHash.size();i++){
+			for (int i=0;i<MultipleReactionView.pathwayList.size();i++){
 				iY[i].target(yBeginList+i*itemH2);
 				iH[i].target(itemH2);
 			}
 			
-			for (int i=0;i<itemHash.size();i++){
+			for (int i=0;i<MultipleReactionView.pathwayList.size();i++){
 				iY[i].update();
 				iH[i].update();
 			}
 		
 		
-			parent.fill(200);
-			//parent.fill(255);
-			parent.stroke(0,150);
-			parent.noStroke();
+			parent.fill(255,230);
+			parent.stroke(0,100);
+			parent.rect(x, yBegin, w,iY[MultipleReactionView.pathwayList.size()-1].value-10);
 			
-			parent.rect(x-260, yBegin, w+200,iY[itemHash.size()-1].value-10);
-			
-			int i=0;
 			
 			// Draw another button
 			if (sAll){
@@ -150,12 +121,13 @@ public class PopupPathway{
 			}
 			parent.textSize(12);
 			parent.textAlign(PApplet.LEFT);
-			parent.text("All complexes",x+50,45);
+			parent.text("All Pathways",x+50,45);
 			
-			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-				float textSixe = PApplet.map(iH[i].value, 0, 20, 5, 13);
-				parent.textSize(textSixe);
+			for (int i=0;i<MultipleReactionView.pathwayList.size();i++) {
 				
+				String pathwayName = MultipleReactionView.pathwayList.get(i);
+				float textSixe = PApplet.map(iH[i].value, 0, maxH, 4, 12);
+				parent.textSize(textSixe);
 				if (i==s){
 					parent.noStroke();
 					parent.fill(0);
@@ -169,43 +141,29 @@ public class PopupPathway{
 					parent.fill(0);
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(entry.getKey().getDisplayName(),x+45,iY[i].value-iH[i].value/4);
-				float r = PApplet.map(PApplet.sqrt(entry.getValue()), 0, PApplet.sqrt(maxSize), 0, maxH/2);
-				
-				parent.noStroke();
-				if (i==s){
-					parent.fill(255,0,0);
-				}
-				else if (i==b){
-					parent.fill(255);
-				}
-				else{
-					parent.fill(0);
-				}
-				parent.ellipse(x+30,iY[i].value-iH[i].value/2, r, r);
+				parent.text(pathwayName,x+20,iY[i].value-iH[i].value/4);
 				
 				// Draw structures
 				if (i==b){
-					int indexSet = getIndexInSet(b);
-					drawRelationshipDownStream(indexSet,b, 255,0,50,150, true,0);
-					drawRelationshipUpStream(entry,indexSet,b, 255,50,0,150, true,0);
+					//int indexSet = getIndexInSet(b);
+					//drawRelationshipDownStream(indexSet,b, 255,0,50,150, true,0);
+					//drawRelationshipUpStream(entry,indexSet,b, 255,50,0,150, true,0);
 				}
-				i++;
 			}	
 		}
 		 if (b==-1){
 			int i=0;
-			for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-				int indexSet = getIndexInSet(i);
-				drawRelationshipDownStream(indexSet,i, 0,0,0,80, false, 0);
+			//for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
+			//	int indexSet = getIndexInSet(i);
+			//	drawRelationshipDownStream(indexSet,i, 0,0,0,80, false, 0);
 				i++;
-			}
+			//}
 				
 		}
 			
 	}
 	
-	 
+	 /*
 	 public ArrayList<Integer> getUpSreamSetId(Map.Entry<Complex, Integer> entry, int indexSet, int indexHash) {
 		 ArrayList<Integer> results = new ArrayList<Integer>();
 		 int indexHashParent=0;
@@ -294,69 +252,14 @@ public class PopupPathway{
 	 }
 		
 	
-	public Map.Entry<Complex, Integer> getEntryHashId(int hashID) {
-	 	 int i=0;
-	 	 for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-			if (i==hashID){
-				return entry;
-			}
-			i++;
-		 }
-		 return null;
-	 }
+	*/
 	
-	 public int getIndexSetByName(String name) {
-	 	for (int i=0; i<main.PathwayViewer_2_4.complexList.size();i++){
-			Complex com = main.PathwayViewer_2_4.complexList.get(i);
-			if (com.getDisplayName().equals(name)){
-				 return i;
-			 }
-		 }
-		 return -33;
-	 }
 	 
-	 public int getIndexHashByName(String name) {
-	 	 int i=0;
-		 for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-			 if (entry.getKey().getDisplayName().equals(name)){
-			  return i;
-			 }
-		 }
-		i++;		
-		 return -11;
-	 }
+	 
 	 
 	
-	public int getIndexInSet(int brushing) {
-		String name = "";
-		int i=0;
-		for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-			if (i==brushing){
-				name = entry.getKey().getDisplayName();
-			}
-			i++;
-		}	
-		
-		for (i=0; i<main.PathwayViewer_2_4.complexList.size();i++){
-			Complex com = main.PathwayViewer_2_4.complexList.get(i);
-			if (com.getDisplayName().equals(name))
-				return i;
-		}
-		return -5;	
-	}
 	
-	public int getIndexInHash(int indexSet) {
-		String name = main.PathwayViewer_2_4.complexList.get(indexSet).getDisplayName();
-		
-		int i=0;
-		for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-			if (entry.getKey().getDisplayName().equals(name)){
-				return i;
-			}
-			i++;
-		}	
-		return -5;	
-	}
+	
 		
 	 public void mouseClicked() {
 		if (b==-1){
@@ -372,9 +275,10 @@ public class PopupPathway{
 	}
 	 
 	public void checkBrushing() {
-		if (itemHash==null || iH==null || iH.length==0) return;
+		if (iH==null || iH.length==0) return;
 		int mX = parent.mouseX;
 		int mY = parent.mouseY;
+		
 		if (x<mX && mX<x+w1 && 0<=mY && mY<=yBegin){
 			bPopup=true;
 			return;
@@ -384,7 +288,7 @@ public class PopupPathway{
 				b=-1;
 				return;
 			}	
-			for (int i=0; i<itemHash.size(); i++){
+			for (int i=0; i<MultipleReactionView.pathwayList.size(); i++){
 				if (x-200<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					b =i;
 					hightlightList[i] = 1; 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import main.Integrator;
 import main.MultipleReactionView;
+import main.PopupPathway;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -182,6 +183,10 @@ public class Node {
 				
 			}
 			else{
+				if(PopupPathway.b>=0){
+					
+				}
+				
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);
 				parent.ellipse(xx, yy, size, size);
 			}

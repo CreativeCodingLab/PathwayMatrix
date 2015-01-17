@@ -66,7 +66,7 @@ public class MultipleReactionView{
 	// Hierarchy 
 	public Pathway2[] filePathway = null;
 	//public Pathway2[] filePathway = null;
-	
+	public PopupPathway popupPathway;
 	
 	public MultipleReactionView(PApplet p){
 		parent = p;
@@ -74,6 +74,7 @@ public class MultipleReactionView{
 		slider2 = new Slider2(parent);
 		popupLayout = new PopupLayout(parent);
 		checkName = new CheckBox(parent,"Reactions names");
+		popupPathway = new PopupPathway(parent);
 		
 		xRight = parent.width*7.5f/10;
 		float v=0.5f;
@@ -295,8 +296,6 @@ public class MultipleReactionView{
 		parent.rect(xRight, 25, wRight, parent.height-25);
 		slider2.draw("Edge length",xRight+100, 50);
 		checkName.draw(xRight+30, 80);
-		popupLayout.draw(parent.width-198);
-		
 		// File names
 		parent.textSize(12);
 		parent.textAlign(PApplet.LEFT);
@@ -308,7 +307,11 @@ public class MultipleReactionView{
 			Color color = gradient.getGradient(colorScale*(transferID(f)));
 			parent.fill(color.getRGB());
 			parent.text(nameFile, xRight+20,yy); 
-		}		
+		}	
+		// Draw popups
+		popupLayout.draw(parent.width-198);
+		popupPathway.draw(parent.width-298);
+		
 	}
 	
 	
@@ -712,6 +715,9 @@ public class MultipleReactionView{
 			else if (popupLayout.s==3)
 				iTransition.target(0);
 			
+		}
+		else if(popupPathway.bPopup){
+			popupPathway.mouseClicked();
 		}
 		else if (checkName.b)
 			checkName.mouseClicked();

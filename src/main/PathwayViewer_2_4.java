@@ -134,7 +134,7 @@ public class PathwayViewer_2_4 extends PApplet {
 	public int bX,bY;
 	
 	// Order genes
-	public static PopupComplex popupComplex1;
+	public static PopupComplex popupComplex;
 	public static ReactionView popupReaction;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
@@ -1259,6 +1259,7 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.maxSize=0;
 				multipleReaction.pathwaySize = new int[multipleReaction.nFiles];
 				multipleReaction.filePathway = new Pathway2[multipleReaction.nFiles];
+				multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
 				for (int f=0;f<multipleReaction.files.size();f++){
 					 File modFile = new File(multipleReaction.files.get(f));
 					 SimpleIOHandler io = new SimpleIOHandler();
@@ -1300,7 +1301,6 @@ public class PathwayViewer_2_4 extends PApplet {
 					 i2=0;
 					 multipleReaction.filePathway[f] = new Pathway2(f,multipleReaction.files.get(f),0);
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
-						 System.out.println(i2+" "+aPathway.getDisplayName());
 						 Pathway2 newPathway = new Pathway2(f,aPathway.getDisplayName(),multipleReaction.filePathway[f].level+1);
 						 multipleReaction.filePathway[f].subPathwayList.add(newPathway);
 						 i2++;
@@ -1309,6 +1309,7 @@ public class PathwayViewer_2_4 extends PApplet {
 					 i2=0;
 					 int reactId = 0;
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
+						 System.out.println(i2+" "+aPathway.getDisplayName());
 						 reactId = extractProteinUrefsFromPathway(aPathway, multipleReaction.filePathway[f], f, reactId);
 				    	 i2++;
 					 }	
@@ -1318,6 +1319,9 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.setItems();
 				multipleReaction.updateNodes();
 				multipleReaction.updateEdges();
+				multipleReaction.popupPathway.setItems();
+				System.out.println("	DONE DONE-------------------" );
+				
 			 }
 			 
 			 catch (FileNotFoundException e){
@@ -1332,24 +1336,43 @@ public class PathwayViewer_2_4 extends PApplet {
 		int r = reactId;
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				//System.out.println("	" + aProcess.getDisplayName());
+				if (!multipleReaction.popupPathway.pathwayList.contains(aProcess.getDisplayName()))
+					multipleReaction.popupPathway.pathwayList.add(aProcess.getDisplayName());
+				if (pPathway.level==0)
+					System.out.println("  " + aProcess.getDisplayName());
+				else if (pPathway.level==1)
+					System.out.println("    " + aProcess.getDisplayName());
+				else if (pPathway.level==2)
+					System.out.println("      " + aProcess.getDisplayName());
+				else if (pPathway.level==3)
+					System.out.println("        " + aProcess.getDisplayName());
+				
 				Pathway2 newPathway = new Pathway2(f,aProcess.getDisplayName(),pPathway.level+1);
 				pPathway.subPathwayList.add(newPathway);
 				extractProteinUrefsFromPathway((Pathway) aProcess,newPathway,f,reactId);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
 				//System.out.println(r + "	---" + aProcess.getDisplayName());
-				multipleReaction.rectList.add((BiochemicalReaction) aProcess);
-				multipleReaction.rectFileList.add(f);
-				multipleReaction.rectOrderList.add(r);
-				pPathway.reactList.add(aProcess.getDisplayName());
-				r++;
+				if (!isContainReaction(aProcess.getDisplayName(),MultipleReactionView.rectList)){
+					MultipleReactionView.rectList.add((BiochemicalReaction) aProcess);
+					multipleReaction.rectFileList.add(f);
+					multipleReaction.rectOrderList.add(r);
+					pPathway.reactList.add(aProcess.getDisplayName());
+					r++;
+				}
 			} else { 
-				System.out.println("	???" + aProcess.getDisplayName());
+				//System.out.println("	???" + aProcess.getDisplayName());
 			}
 		}
 		return r;
 	}
-	
+	public  boolean isContainReaction(String s, ArrayList<BiochemicalReaction> a) {
+		for (int r=0;r<a.size();r++){
+			if (a.get(r).getDisplayName().equals(s))
+				return true;
+		}
+		return false;
+	}
+		
 	
 	// This function returns all the files in a directory as an array of Strings
 	public  ArrayList<String> listFileNames(String dir, String imgType) {
