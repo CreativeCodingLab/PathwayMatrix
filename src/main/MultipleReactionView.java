@@ -560,7 +560,7 @@ public class MultipleReactionView{
 		// calculate the anti-gravitational forces on each node
 		// this is the N^2 shittiness that needs to be optimized
 		// TODO: at least make it N^2/2 since forces are symmetrical
-		for (int i = 0; i < g.getNodes().size(); i++) {
+		for (int i = 0; i < g.getNodes().size(); i++)  {
 			Node a = (Node) g.getNodes().get(i);
 			for (int j = 0; j < g.getNodes().size(); j++) {
 				Node b = (Node) g.getNodes().get(j);
@@ -739,10 +739,7 @@ public class MultipleReactionView{
 			parent = p;
 		}
 		public void run() {
-			System.out.println("orderTopological");
 			orderTopological();
-			System.out.println("orderTopological 2");
-			
 		}
 	}	
 	

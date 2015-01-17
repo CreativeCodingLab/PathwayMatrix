@@ -1151,25 +1151,19 @@ public class PathwayViewer_2_4 extends PApplet {
 				 }
 				 reactionSet = model.getObjects(BiochemicalReaction.class);
 				
+				
 				 /*
 				 Set<PathwayStep> set3 = 	 model.getObjects(PathwayStep.class);
 				 i2=0;
-				 System.out.println("SET2 ******:"+set2);
+				 System.out.println("SET2 ******:"+set3);
 				 for (PathwayStep current : set3){
 				//	 System.out.println("PathwayStep"+i2+"	"+current.getNextStepOf()+"	"+current.getPathwayOrderOf());
 				//	 System.out.println("		"+current.getNextStep());
 					 i2++;
-				 }
+				 }*/
 				 
-				 // PATHWAY excited
-				 for (Pathway aPathway : model.getObjects(Pathway.class)){
-					 System.out.println();
-					 System.out.println();
-					 System.out.println();
-					  System.out.println("aPathway ******:"+aPathway.getDisplayName());
-					  extractProteinUrefsFromPathway(aPathway);
-				}
-				*/
+				 
+				
 			}
 			catch (FileNotFoundException e){
 				e.printStackTrace();
@@ -1234,6 +1228,7 @@ public class PathwayViewer_2_4 extends PApplet {
 			check2.s  = false;
 		}
 	}
+	
 	
 	
 	// Thread for Venn Diagram
@@ -1303,13 +1298,17 @@ public class PathwayViewer_2_4 extends PApplet {
 					 Set<BiochemicalReaction> reactionSet = model.getObjects(BiochemicalReaction.class);
 					 int r=0;
 					 for (BiochemicalReaction current : reactionSet){
-						 multipleReaction.rectList.add(current);
-						 multipleReaction.rectFileList.add(f);
-						 multipleReaction.rectOrderList.add(r);
 						r++;
 					}
 					multipleReaction.pathwaySize[f] = r;   // number of reaction in pathway f
-						
+					// PATHWAY excited
+					 i2=0;
+					 int reactId = 0;
+					 for (Pathway aPathway : model.getObjects(Pathway.class)){
+						 System.out.println(i2+" "+aPathway.getDisplayName());
+						 reactId = extractProteinUrefsFromPathway(aPathway, f, reactId);
+				    	  i2++;
+					}	
 				}
 				multipleReaction.setItems();
 				multipleReaction.updateNodes();
@@ -1323,6 +1322,55 @@ public class PathwayViewer_2_4 extends PApplet {
 				}
 		}	 
 	}
+	
+	public int extractProteinUrefsFromPathway(Pathway aPathway, int f, int reactId) {
+		int r = reactId;
+		for (Process aProcess : aPathway.getPathwayComponent()) {
+			if (aProcess instanceof Pathway) { // Dig into the nested structure
+				System.out.println("	" + aProcess.getDisplayName());
+
+			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
+				System.out.println(r + "	---" + aProcess.getDisplayName());
+				multipleReaction.rectList.add((BiochemicalReaction) aProcess);
+				multipleReaction.rectFileList.add(f);
+				multipleReaction.rectOrderList.add(r);
+				r++;
+			} else { 
+				System.out.println("	???" + aProcess.getDisplayName());
+
+				// extractAndPrintProteinUrefs((Interaction)aProcess);
+			}
+		}
+		return r;
+	}
+	
+	public void extractAndPrintProteinUrefs(Interaction anInteraction) {
+		// System.out.println();
+		System.out.println("	  ---"+ anInteraction.getDisplayName());
+
+		for (Entity participant : anInteraction.getParticipant()) {
+			
+			if (participant instanceof Protein) {
+				//System.out.println("	 Protein=   " + participant.getDisplayName());
+
+				EntityReference entityReference = ((Protein) participant)
+						.getEntityReference();
+				if (entityReference != null) {
+					Set<Xref> xrefSet = entityReference.getXref();
+					for (Xref currentRef : xrefSet) {
+						// if (currentRef instanceof UnificationXref)
+						// System.out.println("Unification XRef: " +
+						// currentRef.getDb() + ": " +
+						// currentRef.getId()+"	"+currentRef.toString());
+					}
+				}
+			}
+			else{
+				//System.out.println("	 " + participant.getDisplayName());
+			}
+		}
+	}
+	
 	
 	// This function returns all the files in a directory as an array of Strings
 	public  ArrayList<String> listFileNames(String dir, String imgType) {
@@ -1410,11 +1458,6 @@ public class PathwayViewer_2_4 extends PApplet {
 		 }
 		 return components;
 	}
-	
-	
-	
-		
-	
 	
 	// Thread for grouping
 	class ThreadLoader3 implements Runnable {
