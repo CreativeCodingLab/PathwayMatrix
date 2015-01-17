@@ -134,7 +134,7 @@ public class PathwayViewer_2_4 extends PApplet {
 	public int bX,bY;
 	
 	// Order genes
-	public static PopupComplex popupComplex;
+	public static PopupComplex popupComplex1;
 	public static ReactionView popupReaction;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
@@ -1258,7 +1258,7 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.rectOrderList = new ArrayList<Integer>();
 				multipleReaction.maxSize=0;
 				multipleReaction.pathwaySize = new int[multipleReaction.nFiles];
-				
+				multipleReaction.filePathway = new Pathway2[multipleReaction.nFiles];
 				for (int f=0;f<multipleReaction.files.size();f++){
 					 File modFile = new File(multipleReaction.files.get(f));
 					 SimpleIOHandler io = new SimpleIOHandler();
@@ -1295,20 +1295,25 @@ public class PathwayViewer_2_4 extends PApplet {
 					 i2=0;
 					 
 					 
-					 Set<BiochemicalReaction> reactionSet = model.getObjects(BiochemicalReaction.class);
-					 int r=0;
-					 for (BiochemicalReaction current : reactionSet){
-						r++;
-					}
-					multipleReaction.pathwaySize[f] = r;   // number of reaction in pathway f
+					
 					// PATHWAY excited
+					 i2=0;
+					 multipleReaction.filePathway[f] = new Pathway2(f,multipleReaction.files.get(f),0);
+					 for (Pathway aPathway : model.getObjects(Pathway.class)){
+						 System.out.println(i2+" "+aPathway.getDisplayName());
+						 Pathway2 newPathway = new Pathway2(f,aPathway.getDisplayName(),multipleReaction.filePathway[f].level+1);
+						 multipleReaction.filePathway[f].subPathwayList.add(newPathway);
+						 i2++;
+					 }
+							
 					 i2=0;
 					 int reactId = 0;
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
-						 System.out.println(i2+" "+aPathway.getDisplayName());
-						 reactId = extractProteinUrefsFromPathway(aPathway, f, reactId);
-				    	  i2++;
-					}	
+						 reactId = extractProteinUrefsFromPathway(aPathway, multipleReaction.filePathway[f], f, reactId);
+				    	 i2++;
+					 }	
+					 multipleReaction.pathwaySize[f] = reactId;   // number of reaction in pathway f
+					
 				}
 				multipleReaction.setItems();
 				multipleReaction.updateNodes();
@@ -1323,52 +1328,26 @@ public class PathwayViewer_2_4 extends PApplet {
 		}	 
 	}
 	
-	public int extractProteinUrefsFromPathway(Pathway aPathway, int f, int reactId) {
+	public int extractProteinUrefsFromPathway(Pathway aPathway, Pathway2 pPathway, int f, int reactId) {
 		int r = reactId;
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				System.out.println("	" + aProcess.getDisplayName());
-
+				//System.out.println("	" + aProcess.getDisplayName());
+				Pathway2 newPathway = new Pathway2(f,aProcess.getDisplayName(),pPathway.level+1);
+				pPathway.subPathwayList.add(newPathway);
+				extractProteinUrefsFromPathway((Pathway) aProcess,newPathway,f,reactId);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
-				System.out.println(r + "	---" + aProcess.getDisplayName());
+				//System.out.println(r + "	---" + aProcess.getDisplayName());
 				multipleReaction.rectList.add((BiochemicalReaction) aProcess);
 				multipleReaction.rectFileList.add(f);
 				multipleReaction.rectOrderList.add(r);
+				pPathway.reactList.add(aProcess.getDisplayName());
 				r++;
 			} else { 
 				System.out.println("	???" + aProcess.getDisplayName());
-
-				// extractAndPrintProteinUrefs((Interaction)aProcess);
 			}
 		}
 		return r;
-	}
-	
-	public void extractAndPrintProteinUrefs(Interaction anInteraction) {
-		// System.out.println();
-		System.out.println("	  ---"+ anInteraction.getDisplayName());
-
-		for (Entity participant : anInteraction.getParticipant()) {
-			
-			if (participant instanceof Protein) {
-				//System.out.println("	 Protein=   " + participant.getDisplayName());
-
-				EntityReference entityReference = ((Protein) participant)
-						.getEntityReference();
-				if (entityReference != null) {
-					Set<Xref> xrefSet = entityReference.getXref();
-					for (Xref currentRef : xrefSet) {
-						// if (currentRef instanceof UnificationXref)
-						// System.out.println("Unification XRef: " +
-						// currentRef.getDb() + ": " +
-						// currentRef.getId()+"	"+currentRef.toString());
-					}
-				}
-			}
-			else{
-				//System.out.println("	 " + participant.getDisplayName());
-			}
-		}
 	}
 	
 	

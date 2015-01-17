@@ -63,6 +63,11 @@ public class MultipleReactionView{
 	public static float[] yTree;
 	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
 	
+	// Hierarchy 
+	public Pathway2[] filePathway = null;
+	//public Pathway2[] filePathway = null;
+	
+	
 	public MultipleReactionView(PApplet p){
 		parent = p;
 		loader5= new ThreadLoader5(parent);
