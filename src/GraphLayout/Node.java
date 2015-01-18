@@ -187,12 +187,38 @@ public class Node {
 				if(PopupPathway.b>=0){
 					Pathway2 pathway = PopupPathway.pathwayList.get(PopupPathway.b);
 					if (pathway.isContainReaction(name)){
-						parent.fill(0,100);
+						parent.fill(0,15+parent.frameCount*22%240);
 						parent.ellipse(xx, yy, size*2, size*2);
 					}	
 				}
-				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);
-				parent.ellipse(xx, yy, size, size);
+				
+				// check redundant reactions
+				ArrayList<Integer> fileList =  new ArrayList<Integer>();
+				for (int i=0;i<PopupPathway.redundantPathway.size();i++){
+					Pathway2 pathway = PopupPathway.redundantPathway.get(i);
+					if (pathway.isContainReaction(name)){
+						//parent.fill(255,0,255);
+						if (!fileList.contains(pathway.f))
+							fileList.add(pathway.f);
+					}	
+				}
+				if (fileList.size()>0){ // This reaction is in multiple file
+					float increase = 2*PApplet.PI/fileList.size();
+					float al1 = -PApplet.PI;
+					for (int i=0;i<fileList.size();i++){
+						float al2 =al1+increase; 
+						Color color2 = MultipleReactionView.getColor(fileList.get(i));
+						parent.fill(color2.getRed(), color2.getGreen(), color2.getBlue(),200);
+						parent.noStroke();
+						parent.arc(xx, yy, size, size, al1, al2);
+						al1=al2;
+					}
+						
+				}
+				else{
+					parent.fill(color.getRed(), color.getGreen(), color.getBlue(),200);
+					parent.ellipse(xx, yy, size, size);
+				}
 			}
 		}
 	}

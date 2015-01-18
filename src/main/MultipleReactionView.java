@@ -146,7 +146,7 @@ public class MultipleReactionView{
 				maxSize = size;
 		}
 			
-		colorScale = (float) gradient.colors.size()/ (nFiles+0.6f) ;
+		colorScale = (float) (gradient.colors.size()-0.8f)/ (nFiles) ;
 		isAllowedDrawing = true;
 	}
 	

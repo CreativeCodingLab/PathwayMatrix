@@ -22,8 +22,8 @@ public class PopupPathway{
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
 	public float maxH = 17;
-	public static ArrayList<Pathway2> pathwayList;
-	public static ArrayList<Pathway2> redundantPathway;
+	public static ArrayList<Pathway2> pathwayList = new ArrayList<Pathway2>();
+	public static ArrayList<Pathway2> redundantPathway = new ArrayList<Pathway2>();
 	 
 	
 	public PopupPathway(PApplet parent_){
@@ -37,22 +37,25 @@ public class PopupPathway{
 		// compute the pathway List and remove redundent pathways.
 		pathwayList = new ArrayList<Pathway2>();
 		redundantPathway = new ArrayList<Pathway2>();
-		ArrayList<String> processed = new ArrayList<String>();
+		ArrayList<Pathway2> processed = new  ArrayList<Pathway2>();
 		int redundantLevel =1000; 
 		for (int f=0;f<MultipleReactionView.nFiles;f++){
 			ArrayList<Pathway2> a = MultipleReactionView.filePathway[f].printRecursively();
 			redundantLevel =1000;   // reset the redundant option when go to the next file
 			for (int i=0;i<a.size();i++){
 				if (a.get(i).level>0) {  // Skip the file level
-					if (processed.contains(a.get(i).displayName) && a.get(i).level<redundantLevel) {  //break if found redundant pathway
+					if (isInList(processed,a.get(i).displayName) && a.get(i).level<redundantLevel) {  //break if found redundant pathway
 						pathwayList.add(a.get(i)); 
-						processed.add(a.get(i).displayName);
+						processed.add(a.get(i));
+						Pathway2 path1 = getFirstMatch(processed,a.get(i).displayName);
+						if (!redundantPathway.contains(path1))
+							redundantPathway.add(path1);
 						redundantPathway.add(a.get(i));
 						redundantLevel = a.get(i).level;
 					}
 					else if (a.get(i).level<redundantLevel){
 						pathwayList.add(a.get(i));
-						processed.add(a.get(i).displayName);
+						processed.add(a.get(i));
 						redundantLevel = 1000;
 					}
 					else{
@@ -125,7 +128,7 @@ public class PopupPathway{
 			for (int i=0;i<pathwayList.size();i++) {
 				String pathwayName = pathwayList.get(i).displayName;
 				Color color = MultipleReactionView.getColor(pathwayList.get(i).f);
-				if (isInRedundantList(pathwayName)){
+				if (isInList(redundantPathway,pathwayName)){
 					parent.noStroke();
 					parent.fill(0,80);
 					parent.rect(x+15+pathwayList.get(i).level*10,iY[i].value-iH[i].value, parent.textWidth(pathwayName)+10,iH[i].value);
@@ -140,7 +143,7 @@ public class PopupPathway{
 					parent.fill(255,0,0);
 				}
 				else if (i==b){
-					parent.fill(0,50);
+					parent.fill(0,15+parent.frameCount*22%240);
 					parent.noStroke();
 					parent.rect(x+10,iY[i].value-iH[i].value,w-25,iH[i].value);
 					parent.fill(color.getRGB());
@@ -161,14 +164,25 @@ public class PopupPathway{
 		}
 	}
 	
-	public boolean isInRedundantList(String s){
-		for (int i=0;i<redundantPathway.size();i++){
-			String pName = redundantPathway.get(i).displayName;
+	public boolean isInList(ArrayList<Pathway2> list, String s){
+		for (int i=0;i<list.size();i++){
+			String pName = list.get(i).displayName;
 			if (pName.equals(s))
 				return true;
 		}
 		
 		return false;
+	}
+	
+	public Pathway2 getFirstMatch(ArrayList<Pathway2> list, String s){
+		for (int i=0;i<list.size();i++){
+			String pName = list.get(i).displayName;
+			if (pName.equals(s)){
+				return list.get(i);
+			}	
+		}
+		
+		return null;
 	}
 		
 	 /*
