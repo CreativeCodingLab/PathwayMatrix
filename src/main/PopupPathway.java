@@ -11,7 +11,7 @@ public class PopupPathway{
 	public PApplet parent;
 	public float x = 0;
 	public static float yBegin = 23;
-	public static float yBeginList = 50;
+	public static float yBeginList = 45;
 	public int w1 = 98;
 	public int w = 350;
 	public int h = 28;
@@ -19,7 +19,7 @@ public class PopupPathway{
 	public static float maxSize = 0;
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
-	public float maxH = 18;
+	public float maxH = 17;
 	public static ArrayList<String> pathwayList;
 	public static ArrayList<Integer> pathwayListFile;
 	
@@ -30,11 +30,6 @@ public class PopupPathway{
 	public void setItems(){
 		maxSize =0;
 		s=-100;
-		for (int i=0; i<pathwayList.size();i++){
-			int size = 5;
-			if (size>maxSize)
-				maxSize = size;
-		}
 		
 		// positions of items
 		iX = new Integrator[pathwayList.size()];
@@ -77,7 +72,7 @@ public class PopupPathway{
 		}
 		if (bPopup == true || b>=-1){
 			// Compute positions
-			float itemH2 = (parent.height-yBeginList)/(pathwayList.size());
+			float itemH2 = (parent.height-yBeginList)/(pathwayList.size()-0.5f);
 			if (itemH2>maxH)
 				itemH2 =maxH;
 			for (int i=0;i<pathwayList.size();i++){
@@ -93,7 +88,7 @@ public class PopupPathway{
 		
 			parent.fill(255,230);
 			parent.stroke(0,100);
-			parent.rect(x, yBegin, w,iY[pathwayList.size()-1].value-10);
+			parent.rect(x, yBegin, w,iY[pathwayList.size()-1].value-5);
 			
 			for (int i=0;i<pathwayList.size();i++) {
 				String pathwayName = pathwayList.get(i);
@@ -116,7 +111,7 @@ public class PopupPathway{
 					parent.fill(color.getRGB());
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(pathwayName,x+20,iY[i].value-iH[i].value/4);
+				parent.text(i+" "+pathwayName,x+20,iY[i].value-iH[i].value/4);
 				
 				// Draw structures
 				if (i==b){

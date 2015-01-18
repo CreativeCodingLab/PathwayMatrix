@@ -36,6 +36,17 @@ public class Pathway2{
 	  }
 	  return false;
   }
+  
+  public boolean isContainPathway(String pName){
+	  //if (pName.equals(displayName))
+	  //	  return true;
+	  for (int p=0;p<subPathwayList.size();p++){
+		  Pathway2 path = subPathwayList.get(p);
+		  if (path.displayName.equals(pName) || path.isContainPathway(pName))
+			  return true;
+	  }
+	  return false;
+  }
    
   
   

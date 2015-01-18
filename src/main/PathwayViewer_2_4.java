@@ -1300,20 +1300,36 @@ public class PathwayViewer_2_4 extends PApplet {
 					
 					// PATHWAY excited
 					 i2=0;
+					 int reactId = 0;
 					 multipleReaction.filePathway[f] = new Pathway2(f,multipleReaction.files.get(f),0);
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
 						 Pathway2 newPathway = new Pathway2(f,aPathway.getDisplayName(),multipleReaction.filePathway[f].level+1);
 						 multipleReaction.filePathway[f].subPathwayList.add(newPathway);
-						 i2++;
+						 System.out.println(i2+" **** "+aPathway.getDisplayName());
+						 reactId = extractProteinUrefsFromPathway(aPathway, newPathway, f, reactId);
+				    	 i2++;
 					 }
 							
-					 i2=0;
-					 int reactId = 0;
-					 for (Pathway aPathway : model.getObjects(Pathway.class)){
-						 System.out.println(i2+" "+aPathway.getDisplayName());
-						 reactId = extractProteinUrefsFromPathway(aPathway, multipleReaction.filePathway[f], f, reactId);
-				    	 i2++;
-					 }	
+					
+					 
+					 // Remove nested pathway from the top level
+					 ArrayList<Integer> removeList = new ArrayList<Integer>();
+					 for (int p1=0;p1< multipleReaction.filePathway[f].subPathwayList.size();p1++){
+						 Pathway2 path1 = multipleReaction.filePathway[f].subPathwayList.get(p1);
+						 
+						 //System.out.println(p1+"	path1="+path1.displayName);
+						 for (int p2=0;p2< multipleReaction.filePathway[f].subPathwayList.size();p2++){
+							 Pathway2 path2 = multipleReaction.filePathway[f].subPathwayList.get(p2);
+							 if (path2.isContainPathway(path1.displayName)){
+								 if (!removeList.contains(p1))
+								 removeList.add(p1);
+							 }
+						 }
+								 
+					 }
+					 //multipleReaction.filePathway[f].subPathwayList.remo
+					 System.out.println("	removeList="+removeList+"	multipleReaction.filePathway[f].subPathwayList.size()="+multipleReaction.filePathway[f].subPathwayList.size());
+					 
 					 multipleReaction.pathwaySize[f] = reactId;   // number of reaction in pathway f
 					
 				}
@@ -1321,7 +1337,7 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.updateNodes();
 				multipleReaction.updateEdges();
 				multipleReaction.popupPathway.setItems();
-				System.out.println("	DONE DONE-------------------" );
+				System.out.println("	DONE DONE-------------------pathwayList.size="+multipleReaction.popupPathway.pathwayList.size());
 				
 			 }
 			 
@@ -1333,25 +1349,34 @@ public class PathwayViewer_2_4 extends PApplet {
 		}	 
 	}
 	
-	public int extractProteinUrefsFromPathway(Pathway aPathway, Pathway2 pPathway, int f, int reactId) {
+	public int extractProteinUrefsFromPathway(Pathway aPathway, Pathway2 thisPathway, int f, int reactId) {
 		int r = reactId;
+		System.out.println("  aProcess.getDisplayName()2=" + aPathway.getDisplayName());
 		for (Process aProcess : aPathway.getPathwayComponent()) {
+			System.out.println("  aProcess.getDisplayName()3=" + aProcess.getDisplayName());
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				if (!multipleReaction.popupPathway.pathwayList.contains(aProcess.getDisplayName())){
-					multipleReaction.popupPathway.pathwayList.add(aProcess.getDisplayName());
-					multipleReaction.popupPathway.pathwayListFile.add(f);
+				System.out.println("  aProcess.getDisplayName()4=" + aProcess.getDisplayName());
+				if (!PopupPathway.pathwayList.contains(aProcess.getDisplayName())){
+					PopupPathway.pathwayList.add(aProcess.getDisplayName());
+					PopupPathway.pathwayListFile.add(f);
+					System.out.println("  aProcess.getDisplayName()11=" + aProcess.getDisplayName());
 				}	
-				if (pPathway.level==0)
+				else{
+					System.out.println("  aProcess.getDisplayName()22=" + aProcess.getDisplayName());
+				}
+				
+				if (thisPathway.level==0)
 					System.out.println("  " + aProcess.getDisplayName());
-				else if (pPathway.level==1)
+				else if (thisPathway.level==1)
 					System.out.println("    " + aProcess.getDisplayName());
-				else if (pPathway.level==2)
+				else if (thisPathway.level==2)
 					System.out.println("      " + aProcess.getDisplayName());
-				else if (pPathway.level==3)
+				else if (thisPathway.level==3)
 					System.out.println("        " + aProcess.getDisplayName());
 				
-				Pathway2 newPathway = new Pathway2(f,aProcess.getDisplayName(),pPathway.level+1);
-				pPathway.subPathwayList.add(newPathway);
+				
+				Pathway2 newPathway = new Pathway2(f,aProcess.getDisplayName(),thisPathway.level+1);
+				thisPathway.subPathwayList.add(newPathway);
 				extractProteinUrefsFromPathway((Pathway) aProcess,newPathway,f,reactId);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
 				//System.out.println(r + "	---" + aProcess.getDisplayName());
@@ -1359,10 +1384,10 @@ public class PathwayViewer_2_4 extends PApplet {
 					MultipleReactionView.rectList.add((BiochemicalReaction) aProcess);
 					multipleReaction.rectFileList.add(f);
 					multipleReaction.rectOrderList.add(r);
-					pPathway.reactList.add(aProcess.getDisplayName());
+					thisPathway.reactList.add(aProcess.getDisplayName());
 					r++;
 				}
-				pPathway.reactList.add(aProcess.getDisplayName());
+				thisPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
 				// System.out.println("	???" + aProcess.getDisplayName());
 			}
@@ -1373,6 +1398,8 @@ public class PathwayViewer_2_4 extends PApplet {
 		if (a==null || s==null)
 			return false;
 		for (int r=0;r<a.size();r++){
+			if (a.get(r)==null || a.get(r).getDisplayName()==null) continue;
+			
 			if (a.get(r).getDisplayName().equals(s))
 				return true;
 		}
