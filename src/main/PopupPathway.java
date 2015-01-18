@@ -1,16 +1,6 @@
 package main;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.biopax.paxtools.model.level3.BiochemicalReaction;
 
 import processing.core.PApplet;
 
@@ -21,7 +11,7 @@ public class PopupPathway{
 	public PApplet parent;
 	public float x = 0;
 	public static float yBegin = 23;
-	public static float yBeginList = 70;
+	public static float yBeginList = 50;
 	public int w1 = 98;
 	public int w = 350;
 	public int h = 28;
@@ -31,6 +21,7 @@ public class PopupPathway{
 	public int[] hightlightList;
 	public float maxH = 18;
 	public static ArrayList<String> pathwayList;
+	public static ArrayList<Integer> pathwayListFile;
 	
 	public PopupPathway(PApplet parent_){
 		parent = parent_;
@@ -38,7 +29,7 @@ public class PopupPathway{
 	
 	public void setItems(){
 		maxSize =0;
-		s=-400;
+		s=-100;
 		for (int i=0; i<pathwayList.size();i++){
 			int size = 5;
 			if (size>maxSize)
@@ -59,7 +50,6 @@ public class PopupPathway{
 		for (int i=0;i<pathwayList.size();i++){
 			hightlightList[i] = -1;
 		}
-		
 	}
 		
 	
@@ -105,27 +95,9 @@ public class PopupPathway{
 			parent.stroke(0,100);
 			parent.rect(x, yBegin, w,iY[pathwayList.size()-1].value-10);
 			
-			
-			// Draw another button
-			if (sAll){
-				parent.noStroke();
-				parent.fill(0);
-				parent.rect(x+10,30,200,19);
-				parent.fill(180);
-			}
-			else if (b==-1){
-				parent.fill(0);
-			}
-			else{
-				parent.fill(50);
-			}
-			parent.textSize(12);
-			parent.textAlign(PApplet.LEFT);
-			parent.text("All Pathways",x+50,45);
-			
 			for (int i=0;i<pathwayList.size();i++) {
-				
 				String pathwayName = pathwayList.get(i);
+				Color color = MultipleReactionView.getColor(pathwayListFile.get(i));
 				float textSixe = PApplet.map(iH[i].value, 0, maxH, 4, 12);
 				parent.textSize(textSixe);
 				if (i==s){
@@ -135,10 +107,13 @@ public class PopupPathway{
 					parent.fill(255,0,0);
 				}
 				else if (i==b){
-					parent.fill(200,0,0);
+					parent.fill(0,50);
+					parent.noStroke();
+					parent.rect(x+10,iY[i].value-iH[i].value,w-25,iH[i].value);
+					parent.fill(color.getRGB());
 				}
 				else{
-					parent.fill(0);
+					parent.fill(color.getRGB());
 				}
 				parent.textAlign(PApplet.LEFT);
 				parent.text(pathwayName,x+20,iY[i].value-iH[i].value/4);
@@ -151,16 +126,6 @@ public class PopupPathway{
 				}
 			}	
 		}
-		 if (b==-1){
-			int i=0;
-			//for (Map.Entry<Complex, Integer> entry : itemHash.entrySet()) {
-			//	int indexSet = getIndexInSet(i);
-			//	drawRelationshipDownStream(indexSet,i, 0,0,0,80, false, 0);
-				i++;
-			//}
-				
-		}
-			
 	}
 	
 	 /*
@@ -262,16 +227,10 @@ public class PopupPathway{
 	
 		
 	 public void mouseClicked() {
-		if (b==-1){
-			sAll = !sAll;
-		}
-		else{
-			if (b!=s)
-				s = b;
-			else
-				s =-200;
-		}
-		
+		if (b!=s)
+			s = b;
+		else
+			s =-200;
 	}
 	 
 	public void checkBrushing() {
@@ -284,12 +243,12 @@ public class PopupPathway{
 			return;
 		}	
 		else if (bPopup){
-			if (x-200<mX && mX<x+w1 && yBegin<=mY && mY<=iY[0].value-iH[0].value){
+			if (x-20<mX && mX<x+w1 && yBegin<=mY && mY<=iY[0].value-iH[0].value){
 				b=-1;
 				return;
 			}	
 			for (int i=0; i<pathwayList.size(); i++){
-				if (x-200<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
+				if (x-20<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					b =i;
 					hightlightList[i] = 1; 
 					return;

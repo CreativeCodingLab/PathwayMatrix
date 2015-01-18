@@ -43,8 +43,8 @@ public class MultipleReactionView{
 	
 	
 	public int maxSize = 0;
-	public Gradient gradient = new Gradient();
-	public float colorScale=0;
+	public static Gradient gradient = new Gradient();
+	public static float colorScale=0;
 	public static Integrator[][] iS;
 	public static float xCircular, yCircular, rCircular; 
 	
@@ -153,7 +153,7 @@ public class MultipleReactionView{
 	public void updateNodes() {
 		g = new Graph();
 		for (int i = 0; i < rectList.size(); i++) {
-			int pathwayId = rectFileList.get(i);
+			int fileId = rectFileList.get(i);
 			int reactId = rectOrderList.get(i);
 			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
 			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
@@ -161,7 +161,7 @@ public class MultipleReactionView{
 			node.name = rectList.get(i).getDisplayName();
 			if (node.name==null)
 				node.name = "NULL";
-			node.color = gradient.getGradient(colorScale*(transferID(pathwayId)));
+			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
 			g.addNode(node);
 		}	
 		
@@ -170,8 +170,13 @@ public class MultipleReactionView{
 		yTopological =  new float[rectList.size()];
 		orderTopological();
 	}
+	public static Color getColor(int fileId) {
+		return gradient.getGradient(colorScale*(transferID(fileId)));
+	}
+		
+	
 	// Make sure pathways next to each other receive different colora
-	public float transferID(int id) {
+	public static float transferID(int id) {
 		float newId = (id*(nFiles+1)/2)%nFiles;
 		
 		return newId;
@@ -301,7 +306,6 @@ public class MultipleReactionView{
 		parent.textAlign(PApplet.LEFT);
 		for (int f=0; f<nFiles; f++){
 			float yy = 200+f*18;
-			parent.line(10,parent.height/2,200,yy);
 			String[] str = files.get(f).split("/");
 			String nameFile = str[str.length-1];
 			Color color = gradient.getGradient(colorScale*(transferID(f)));

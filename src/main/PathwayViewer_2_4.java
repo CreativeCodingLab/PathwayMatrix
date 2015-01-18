@@ -1260,6 +1260,7 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.pathwaySize = new int[multipleReaction.nFiles];
 				multipleReaction.filePathway = new Pathway2[multipleReaction.nFiles];
 				multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
+				multipleReaction.popupPathway.pathwayListFile = new ArrayList<Integer>();
 				for (int f=0;f<multipleReaction.files.size();f++){
 					 File modFile = new File(multipleReaction.files.get(f));
 					 SimpleIOHandler io = new SimpleIOHandler();
@@ -1336,8 +1337,10 @@ public class PathwayViewer_2_4 extends PApplet {
 		int r = reactId;
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				if (!multipleReaction.popupPathway.pathwayList.contains(aProcess.getDisplayName()))
+				if (!multipleReaction.popupPathway.pathwayList.contains(aProcess.getDisplayName())){
 					multipleReaction.popupPathway.pathwayList.add(aProcess.getDisplayName());
+					multipleReaction.popupPathway.pathwayListFile.add(f);
+				}	
 				if (pPathway.level==0)
 					System.out.println("  " + aProcess.getDisplayName());
 				else if (pPathway.level==1)
@@ -1361,12 +1364,14 @@ public class PathwayViewer_2_4 extends PApplet {
 				}
 				pPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
-				//System.out.println("	???" + aProcess.getDisplayName());
+				// System.out.println("	???" + aProcess.getDisplayName());
 			}
 		}
 		return r;
 	}
 	public  boolean isContainReaction(String s, ArrayList<BiochemicalReaction> a) {
+		if (a==null || s==null)
+			return false;
 		for (int r=0;r<a.size();r++){
 			if (a.get(r).getDisplayName().equals(s))
 				return true;
