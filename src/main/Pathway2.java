@@ -2,6 +2,8 @@ package main;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Pathway2{
@@ -25,7 +27,8 @@ public class Pathway2{
   public boolean isContainReaction(String rName){
 	  for (int r=0;r<reactList.size();r++){
 		  String name = reactList.get(r);
-		  if (name.equals(rName))
+		  if (name==null) continue;
+ 		  if (name.equals(rName))
 			  return true;
 	  }
 	  for (int p=0;p<subPathwayList.size();p++){
@@ -46,6 +49,19 @@ public class Pathway2{
 			  return true;
 	  }
 	  return false;
+  }
+  
+  public ArrayList<Pathway2> printRecursively(){
+	  ArrayList<Pathway2> a = new ArrayList<Pathway2>();
+	  a.add(this);	
+	  
+	  for (int p=0;p<subPathwayList.size();p++){
+		  ArrayList<Pathway2> b = subPathwayList.get(p).printRecursively();
+		  for (int i=0;i<b.size();i++){
+			  a.add(b.get(i));
+		  }
+	  }
+	  return a;
   }
    
   

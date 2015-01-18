@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import main.Integrator;
 import main.MultipleReactionView;
+import main.Pathway2;
 import main.PopupPathway;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -184,19 +185,11 @@ public class Node {
 			}
 			else{
 				if(PopupPathway.b>=0){
-					String pathwayName = PopupPathway.pathwayList.get(PopupPathway.b);
-					for (int f=0;f<MultipleReactionView.nFiles;f++){
-						for (int p=0;p<MultipleReactionView.filePathway[f].subPathwayList.size();p++){
-							String rName = MultipleReactionView.filePathway[f].subPathwayList.get(p).displayName;
-							if (rName.equals(pathwayName)){
-								if (MultipleReactionView.filePathway[f].subPathwayList.get(p).isContainReaction(name)){
-								//	parent.fill(0);
-									parent.fill(0,100);
-									parent.ellipse(xx, yy, size*2, size*2);
-								}	
-							}	
-						}
-					}
+					Pathway2 pathway = PopupPathway.pathwayList.get(PopupPathway.b);
+					if (pathway.isContainReaction(name)){
+						parent.fill(0,100);
+						parent.ellipse(xx, yy, size*2, size*2);
+					}	
 				}
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue(),220);
 				parent.ellipse(xx, yy, size, size);

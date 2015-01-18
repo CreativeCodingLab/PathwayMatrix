@@ -1,6 +1,8 @@
 package main;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import processing.core.PApplet;
 
@@ -20,8 +22,9 @@ public class PopupPathway{
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
 	public float maxH = 17;
-	public static ArrayList<String> pathwayList;
-	public static ArrayList<Integer> pathwayListFile;
+	public static ArrayList<Pathway2> pathwayList;
+	public static ArrayList<Pathway2> redundantPathway;
+	 
 	
 	public PopupPathway(PApplet parent_){
 		parent = parent_;
@@ -30,6 +33,35 @@ public class PopupPathway{
 	public void setItems(){
 		maxSize =0;
 		s=-100;
+		
+		// compute the pathway List and remove redundent pathways.
+		pathwayList = new ArrayList<Pathway2>();
+		redundantPathway = new ArrayList<Pathway2>();
+		ArrayList<String> processed = new ArrayList<String>();
+		int redundantLevel =1000; 
+		for (int f=0;f<MultipleReactionView.nFiles;f++){
+			ArrayList<Pathway2> a = MultipleReactionView.filePathway[f].printRecursively();
+			redundantLevel =1000;   // reset the redundant option when go to the next file
+			for (int i=0;i<a.size();i++){
+				if (a.get(i).level>0) {  // Skip the file level
+					if (processed.contains(a.get(i).displayName) && a.get(i).level<redundantLevel) {  //break if found redundant pathway
+						pathwayList.add(a.get(i)); 
+						processed.add(a.get(i).displayName);
+						redundantPathway.add(a.get(i));
+						redundantLevel = a.get(i).level;
+					}
+					else if (a.get(i).level<redundantLevel){
+						pathwayList.add(a.get(i));
+						processed.add(a.get(i).displayName);
+						redundantLevel = 1000;
+					}
+					else{
+						
+					}
+				}
+			}
+		}
+		
 		
 		// positions of items
 		iX = new Integrator[pathwayList.size()];
@@ -59,7 +91,7 @@ public class PopupPathway{
 		parent.text("Pathways",x+w1/2,17);
 		
 		
-		x = x_-40;
+		x = x_-50;
 		
 		
 		if (hightlightList==null) return;
@@ -86,13 +118,19 @@ public class PopupPathway{
 			}
 		
 		
-			parent.fill(255,230);
+			parent.fill(255);
 			parent.stroke(0,100);
 			parent.rect(x, yBegin, w,iY[pathwayList.size()-1].value-5);
 			
 			for (int i=0;i<pathwayList.size();i++) {
-				String pathwayName = pathwayList.get(i);
-				Color color = MultipleReactionView.getColor(pathwayListFile.get(i));
+				String pathwayName = pathwayList.get(i).displayName;
+				Color color = MultipleReactionView.getColor(pathwayList.get(i).f);
+				if (isInRedundantList(pathwayName)){
+					parent.noStroke();
+					parent.fill(0,80);
+					parent.rect(x+15+pathwayList.get(i).level*10,iY[i].value-iH[i].value, parent.textWidth(pathwayName)+10,iH[i].value);
+				}
+				
 				float textSixe = PApplet.map(iH[i].value, 0, maxH, 4, 12);
 				parent.textSize(textSixe);
 				if (i==s){
@@ -111,7 +149,7 @@ public class PopupPathway{
 					parent.fill(color.getRGB());
 				}
 				parent.textAlign(PApplet.LEFT);
-				parent.text(i+" "+pathwayName,x+20,iY[i].value-iH[i].value/4);
+				parent.text(pathwayName,x+20+pathwayList.get(i).level*10,iY[i].value-iH[i].value/4);
 				
 				// Draw structures
 				if (i==b){
@@ -123,6 +161,16 @@ public class PopupPathway{
 		}
 	}
 	
+	public boolean isInRedundantList(String s){
+		for (int i=0;i<redundantPathway.size();i++){
+			String pName = redundantPathway.get(i).displayName;
+			if (pName.equals(s))
+				return true;
+		}
+		
+		return false;
+	}
+		
 	 /*
 	 public ArrayList<Integer> getUpSreamSetId(Map.Entry<Complex, Integer> entry, int indexSet, int indexHash) {
 		 ArrayList<Integer> results = new ArrayList<Integer>();
