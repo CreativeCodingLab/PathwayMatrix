@@ -171,7 +171,7 @@ public class PathwayViewer_2_4 extends PApplet {
 	
 	// Multiple pathways 
 	public PopupView popupView = new PopupView(this);
-	public MultipleReactionView multipleReaction;
+	public PathwayView multipleReaction;
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { PathwayViewer_2_4.class.getName() });
@@ -255,7 +255,7 @@ public class PathwayViewer_2_4 extends PApplet {
 		check2 = new CheckBox(this, "Grouping by Similarity");
 		check3 = new CheckBox(this, "Highlighting groups");
 		
-		multipleReaction = new MultipleReactionView(this);
+		multipleReaction = new PathwayView(this);
 		
 		
 		//VEN DIAGRAM
@@ -1390,8 +1390,8 @@ public class PathwayViewer_2_4 extends PApplet {
 				reactId = processPathway((Pathway) aProcess,newPathway,f,reactId);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
 				//System.out.println("		---Reaction "+reactId + " " + aProcess.getDisplayName());
-				if (!isContainReaction(aProcess.getDisplayName(),MultipleReactionView.rectList)){
-					MultipleReactionView.rectList.add((BiochemicalReaction) aProcess);
+				if (!isContainReaction(aProcess.getDisplayName(),PathwayView.rectList)){
+					PathwayView.rectList.add((BiochemicalReaction) aProcess);
 					multipleReaction.rectFileList.add(f);
 					multipleReaction.rectOrderList.add(reactId);
 					thisPathway.reactList.add(aProcess.getDisplayName());

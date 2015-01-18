@@ -19,7 +19,7 @@ import processing.core.PApplet;
 import GraphLayout.*;
 
 
-public class MultipleReactionView{
+public class PathwayView{
 	public PApplet parent;
 	public ArrayList<String> files;
 	public static int nFiles;
@@ -68,7 +68,7 @@ public class MultipleReactionView{
 	//public Pathway2[] filePathway = null;
 	public PopupPathway popupPathway;
 	
-	public MultipleReactionView(PApplet p){
+	public PathwayView(PApplet p){
 		parent = p;
 		loader5= new ThreadLoader5(parent);
 		slider2 = new Slider2(parent);
@@ -192,16 +192,31 @@ public class MultipleReactionView{
 		System.out.println();
 		for (int r = 0; r < rectList.size(); r++) {
 			Node node1 = g.nodes.get(r);
-			int degree = 0;
 			ArrayList<Integer> a = getDirectDownstream(r);
 			for (int j = 0; j < a.size(); j++) {
 				int r2 = a.get(j);
 				Node node2 = g.nodes.get(r2);
-				Edge e = new Edge(node1, node2, parent);
+				Edge e = new Edge(node1, node2, 0, parent); //
 				g.addEdge(e);
-				degree++;
+				node1.degree++;
 			}
-			node1.degree = degree;
+			/*
+			ArrayList<Integer> b = getReactionWithSameInput(r);
+			for (int j = 0; j < b.size(); j++) {
+				int r2 = b.get(j);
+				Node node2 = g.nodes.get(r2);
+				Edge e = new Edge(node1, node2, 1, parent);  // Same input
+				g.addEdge(e);
+				node1.degree++;
+			}
+			ArrayList<Integer> c = getReactionWithSameOutput(r);
+			for (int j = 0; j < c.size(); j++) {
+				int r2 = c.get(j);
+				Node node2 = g.nodes.get(r2);
+				Edge e = new Edge(node1, node2, 2, parent);  // Same output
+				g.addEdge(e);
+				node1.degree++;
+			}*/
 		}	
 	}
 	
@@ -512,6 +527,38 @@ public class MultipleReactionView{
 		}
 		return react;
 	}
+	
+	public ArrayList<Integer> getReactionWithSameInput(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sLeft1 = rectSelected.getLeft().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sLeft2 = rect2.getLeft().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sLeft1, sLeft2);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	public ArrayList<Integer> getReactionWithSameOutput(int r){
+		ArrayList<Integer> a = new ArrayList<Integer>();
+		BiochemicalReaction rectSelected = rectList.get(r);
+		Object[] sRight1 = rectSelected.getRight().toArray();
+		for (int g=0;g<rectList.size();g++) {
+			if(g==r) continue;
+			BiochemicalReaction rect2 = rectList.get(g);
+			Object[] sRight2 = rect2.getRight().toArray();
+			ArrayList<String> commonElements = compareInputOutput(sRight1, sRight2);
+			if (commonElements.size()>0){
+				a.add(g);
+			}
+		}
+		return a;
+	}
+	
 	
 	public ArrayList<Integer> getDirectDownstream(int r){
 		ArrayList<Integer> a = new ArrayList<Integer>();

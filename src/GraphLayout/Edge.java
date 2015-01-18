@@ -2,7 +2,7 @@ package GraphLayout;
 
 import java.awt.Color;
 
-import main.MultipleReactionView;
+import main.PathwayView;
 import main.Slider2;
 import processing.core.PApplet;
 
@@ -10,17 +10,21 @@ import processing.core.PApplet;
 //banksean at yahoo
 
 public class Edge {
-	float k=0.12f; //stiffness
+	float k=0.05f; //stiffness
 	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;
+	int type = -1;  
 	Graph g;
 	PApplet parent;
 
-	public Edge(Node from_, Node to_, PApplet papa) {
+	public Edge(Node from_, Node to_,int type_, PApplet papa) {
 		parent = papa;
 		from = from_;
 		to = to_;
+		type = type_;  	// type=0: causality
+						// type=1: same input
+						// type=2: same output
 	   naturalLength = Slider2.val;
 	}
 	
@@ -125,14 +129,14 @@ public class Edge {
 			float alCircular =0;
 			float d3, x3=0, y3=0, newR=100;
 			
-			if (0<r2-r1 && r2-r1<=MultipleReactionView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
-					 alCircular += MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==2)
-					 alCircular *= MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==3)
-					 alCircular *= MultipleReactionView.iTransition.value;
+			if (0<r2-r1 && r2-r1<=PathwayView.rectList.size()/2){
+				 alCircular = PApplet.PI-((float) (r2-r1)*2/PathwayView.rectList.size())*PApplet.PI;
+				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+					 alCircular += PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==2)
+					 alCircular *= PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==3)
+					 alCircular *= PathwayView.iTransition.value;
 				
 				 if (alCircular<0.01f)
 					 alCircular=0.01f;
@@ -143,14 +147,14 @@ public class Edge {
 				 x3 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 				 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			}
-			else if (r2-r1>MultipleReactionView.rectList.size()/2){ // relationship of 2 wordcloud away
-				 alCircular = ((float) (r2-r1)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
-					 alCircular += MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==2)
-					 alCircular *= MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==3)
-					 alCircular *= MultipleReactionView.iTransition.value;
+			else if (r2-r1>PathwayView.rectList.size()/2){ // relationship of 2 wordcloud away
+				 alCircular = ((float) (r2-r1)*2/PathwayView.rectList.size())*PApplet.PI-PApplet.PI;
+				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+					 alCircular += PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==2)
+					 alCircular *= PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==3)
+					 alCircular *= PathwayView.iTransition.value;
 				
 				 if (alCircular<0.01f)
 					 alCircular=0.01f;
@@ -161,14 +165,14 @@ public class Edge {
 				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			}
-			else if (0<r1-r2 && r1-r2<=MultipleReactionView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
-					 alCircular += MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==2)
-					 alCircular *= MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==3)
-					 alCircular *= MultipleReactionView.iTransition.value;
+			else if (0<r1-r2 && r1-r2<=PathwayView.rectList.size()/2){
+				 alCircular = PApplet.PI-((float) (r1-r2)*2/PathwayView.rectList.size())*PApplet.PI;
+				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+					 alCircular += PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==2)
+					 alCircular *= PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==3)
+					 alCircular *= PathwayView.iTransition.value;
 				
 				 if (alCircular<0.01f)
 					 alCircular=0.01f;
@@ -179,14 +183,14 @@ public class Edge {
 				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 			}
-			else if (r1-r2>MultipleReactionView.rectList.size()/2){
-				 alCircular = ((float) (r1-r2)*2/MultipleReactionView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (MultipleReactionView.popupLayout.s==1 || MultipleReactionView.popupLayout.s==0)
-					 alCircular += MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==2)
-					 alCircular *= MultipleReactionView.iTransition.value;
-				 else if (MultipleReactionView.popupLayout.s==3)
-					 alCircular *= MultipleReactionView.iTransition.value;
+			else if (r1-r2>PathwayView.rectList.size()/2){
+				 alCircular = ((float) (r1-r2)*2/PathwayView.rectList.size())*PApplet.PI-PApplet.PI;
+				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+					 alCircular += PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==2)
+					 alCircular *= PathwayView.iTransition.value;
+				 else if (PathwayView.popupLayout.s==3)
+					 alCircular *= PathwayView.iTransition.value;
 				
 				 if (alCircular<0.01f)
 					 alCircular=0.01f;
@@ -210,10 +214,26 @@ public class Edge {
 				al2=al2-2*PApplet.PI;
 			parent.noFill();
 			
-			if (al1<al2)
-				drawArc(x3, y3, newR*2,  al1, al2, sat);
-			else
-				drawArc(x3, y3, newR*2,  al2, al1, sat);
+			if (type==0){
+				if (al1<al2)
+					drawArc(x3, y3, newR*2,  al1, al2, sat);
+				else
+					drawArc(x3, y3, newR*2,  al2, al1, sat);
+			}
+			else if (type==1){
+				parent.stroke(255,0,255);
+				if (al1<al2)
+					parent.arc(x3, y3, newR*2, newR*2,  al1, al2);
+				else
+					parent.arc(x3, y3, newR*2, newR*2,  al2, al1);
+			}
+			else if (type==2){
+				parent.stroke(0,255,0);
+				if (al1<al2)
+					parent.arc(x3, y3, newR*2, newR*2,  al1, al2);
+				else
+					parent.arc(x3, y3, newR*2, newR*2,  al2, al1);
+			}
 	  }
 
 	  
@@ -225,7 +245,7 @@ public class Edge {
 					>PApplet.dist(x1, y1, to.iX.value-to.difX, to.iY.value-to.difY))
 				down = false;
 			
-			if (MultipleReactionView.popupLayout.s==0 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
+			if (PathwayView.popupLayout.s==0 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
 				float x11 = from.iX.value-from.difX;
 				float y11 = from.iY.value-from.difY;
 				float x22 = to.iX.value-to.difX;
@@ -239,7 +259,7 @@ public class Edge {
 				else
 					down = false;
 			}
-			if (MultipleReactionView.popupLayout.s==1 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
+			if (PathwayView.popupLayout.s==1 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
 				float x11 = from.iX.value-from.difX;
 				float y11 = from.iY.value-from.difY;
 				float x22 = to.iX.value-to.difX;

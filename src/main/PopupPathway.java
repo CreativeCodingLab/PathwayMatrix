@@ -39,8 +39,8 @@ public class PopupPathway{
 		redundantPathway = new ArrayList<Pathway2>();
 		ArrayList<Pathway2> processed = new  ArrayList<Pathway2>();
 		int redundantLevel =1000; 
-		for (int f=0;f<MultipleReactionView.nFiles;f++){
-			ArrayList<Pathway2> a = MultipleReactionView.filePathway[f].printRecursively();
+		for (int f=0;f<PathwayView.nFiles;f++){
+			ArrayList<Pathway2> a = PathwayView.filePathway[f].printRecursively();
 			redundantLevel =1000;   // reset the redundant option when go to the next file
 			for (int i=0;i<a.size();i++){
 				if (a.get(i).level>0) {  // Skip the file level
@@ -127,7 +127,7 @@ public class PopupPathway{
 			
 			for (int i=0;i<pathwayList.size();i++) {
 				String pathwayName = pathwayList.get(i).displayName;
-				Color color = MultipleReactionView.getColor(pathwayList.get(i).f);
+				Color color = PathwayView.getColor(pathwayList.get(i).f);
 				if (isInList(redundantPathway,pathwayName)){
 					parent.noStroke();
 					parent.fill(0,80);

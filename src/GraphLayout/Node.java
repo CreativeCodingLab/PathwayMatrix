@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import main.Integrator;
-import main.MultipleReactionView;
+import main.PathwayView;
 import main.Pathway2;
 import main.PopupPathway;
 import processing.core.PApplet;
@@ -27,7 +27,7 @@ public class Node {
 	public boolean isConnected = false;
 	public int nodeId = -99;
 	public static int bWord = -99;
-	public int degree = -1;
+	public int degree = 0;
 	public Integrator iAlpha = new Integrator(0,0.1f,0.4f);
 	public Integrator iX = new Integrator(0,0.1f,0.4f);
 	public Integrator iY = new Integrator(0,0.1f,0.4f);
@@ -62,8 +62,8 @@ public class Node {
 		position = v;
 		if (position.getX()<10)
 			position.setX(10);
-		else if (position.getX()>MultipleReactionView.xRight-10)
-			position.setX(MultipleReactionView.xRight-10);
+		else if (position.getX()>PathwayView.xRight-10)
+			position.setX(PathwayView.xRight-10);
 		if (position.getY()<10)
 			position.setY(10);
 		else if (position.getY()>parent.height-10)
@@ -103,26 +103,26 @@ public class Node {
 	
 	
 	public void draw() {
-		if (MultipleReactionView.popupLayout.s==0){ //Tree
+		if (PathwayView.popupLayout.s==0){ //Tree
 			iAlpha.target(PApplet.PI/2);
 			iX.target(parent.width/2-50);
-			iY.target(MultipleReactionView.yTree[nodeId]);
+			iY.target(PathwayView.yTree[nodeId]);
 			difX = 0;
 			difY = 0;
 		}
-		else if (MultipleReactionView.popupLayout.s==1){ //Line up
+		else if (PathwayView.popupLayout.s==1){ //Line up
 			iAlpha.target(PApplet.PI/2);
-			iX.target(MultipleReactionView.xCircular);
-			iY.target(MultipleReactionView.yTopological[nodeId]);
+			iX.target(PathwayView.xCircular);
+			iY.target(PathwayView.yTopological[nodeId]);
 			difX = 0;
 			difY = 0;
 		}
-		else if (MultipleReactionView.popupLayout.s==2){ //circular Layout
-			float al = MultipleReactionView.computeAlpha(nodeId);
-			float xR = MultipleReactionView.xCircular + (MultipleReactionView.rCircular+size/2)*PApplet.sin(al);
-			float yR = MultipleReactionView.yCircular + (MultipleReactionView.rCircular+size/2)*PApplet.cos(al);
-			float xR2 = MultipleReactionView.xCircular + (MultipleReactionView.rCircular)*PApplet.sin(al);
-			float yR2 = MultipleReactionView.yCircular + (MultipleReactionView.rCircular)*PApplet.cos(al);
+		else if (PathwayView.popupLayout.s==2){ //circular Layout
+			float al = PathwayView.computeAlpha(nodeId);
+			float xR = PathwayView.xCircular + (PathwayView.rCircular+size/2)*PApplet.sin(al);
+			float yR = PathwayView.yCircular + (PathwayView.rCircular+size/2)*PApplet.cos(al);
+			float xR2 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.sin(al);
+			float yR2 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.cos(al);
 			difX = xR-xR2;
 			difY = yR-yR2;
 			
@@ -163,7 +163,7 @@ public class Node {
 			//wordWidth = parent.textWidth(name);
 			parent.noStroke();
 			parent.fill(color.getRGB());
-			if (MultipleReactionView.checkName.s){
+			if (PathwayView.checkName.s){
 				// Draw node names
 				parent.fill(color.getRed(), color.getGreen(), color.getBlue());
 				parent.textSize(12);
@@ -207,7 +207,7 @@ public class Node {
 					float al1 = -PApplet.PI;
 					for (int i=0;i<fileList.size();i++){
 						float al2 =al1+increase; 
-						Color color2 = MultipleReactionView.getColor(fileList.get(i));
+						Color color2 = PathwayView.getColor(fileList.get(i));
 						parent.fill(color2.getRed(), color2.getGreen(), color2.getBlue(),200);
 						parent.noStroke();
 						parent.arc(xx, yy, size, size, al1, al2);
