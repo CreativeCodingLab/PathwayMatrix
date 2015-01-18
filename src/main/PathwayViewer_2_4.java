@@ -1359,6 +1359,7 @@ public class PathwayViewer_2_4 extends PApplet {
 					pPathway.reactList.add(aProcess.getDisplayName());
 					r++;
 				}
+				pPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
 				//System.out.println("	???" + aProcess.getDisplayName());
 			}

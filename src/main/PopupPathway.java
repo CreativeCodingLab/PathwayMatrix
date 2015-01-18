@@ -30,7 +30,7 @@ public class PopupPathway{
 	public Integrator[] iX, iY, iH;
 	public int[] hightlightList;
 	public float maxH = 18;
-	public ArrayList<String> pathwayList;
+	public static ArrayList<String> pathwayList;
 	
 	public PopupPathway(PApplet parent_){
 		parent = parent_;
@@ -87,15 +87,15 @@ public class PopupPathway{
 		}
 		if (bPopup == true || b>=-1){
 			// Compute positions
-			float itemH2 = (parent.height-yBeginList)/(MultipleReactionView.pathwayList.size());
+			float itemH2 = (parent.height-yBeginList)/(pathwayList.size());
 			if (itemH2>maxH)
 				itemH2 =maxH;
-			for (int i=0;i<MultipleReactionView.pathwayList.size();i++){
+			for (int i=0;i<pathwayList.size();i++){
 				iY[i].target(yBeginList+i*itemH2);
 				iH[i].target(itemH2);
 			}
 			
-			for (int i=0;i<MultipleReactionView.pathwayList.size();i++){
+			for (int i=0;i<pathwayList.size();i++){
 				iY[i].update();
 				iH[i].update();
 			}
@@ -103,7 +103,7 @@ public class PopupPathway{
 		
 			parent.fill(255,230);
 			parent.stroke(0,100);
-			parent.rect(x, yBegin, w,iY[MultipleReactionView.pathwayList.size()-1].value-10);
+			parent.rect(x, yBegin, w,iY[pathwayList.size()-1].value-10);
 			
 			
 			// Draw another button
@@ -123,9 +123,9 @@ public class PopupPathway{
 			parent.textAlign(PApplet.LEFT);
 			parent.text("All Pathways",x+50,45);
 			
-			for (int i=0;i<MultipleReactionView.pathwayList.size();i++) {
+			for (int i=0;i<pathwayList.size();i++) {
 				
-				String pathwayName = MultipleReactionView.pathwayList.get(i);
+				String pathwayName = pathwayList.get(i);
 				float textSixe = PApplet.map(iH[i].value, 0, maxH, 4, 12);
 				parent.textSize(textSixe);
 				if (i==s){
@@ -288,7 +288,7 @@ public class PopupPathway{
 				b=-1;
 				return;
 			}	
-			for (int i=0; i<MultipleReactionView.pathwayList.size(); i++){
+			for (int i=0; i<pathwayList.size(); i++){
 				if (x-200<=mX && mX<=x+w && iY[i].value-iH[i].value<=mY && mY<=iY[i].value){
 					b =i;
 					hightlightList[i] = 1; 

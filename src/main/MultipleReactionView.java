@@ -22,7 +22,7 @@ import GraphLayout.*;
 public class MultipleReactionView{
 	public PApplet parent;
 	public ArrayList<String> files;
-	public int nFiles;
+	public static int nFiles;
 	public boolean isAllowedDrawing = false;
 	
 	// Read data 
@@ -64,7 +64,7 @@ public class MultipleReactionView{
 	public static Integrator iTransition = new Integrator(0,0.1f,0.4f);
 	
 	// Hierarchy 
-	public Pathway2[] filePathway = null;
+	public static Pathway2[] filePathway = null;
 	//public Pathway2[] filePathway = null;
 	public PopupPathway popupPathway;
 	

@@ -22,9 +22,23 @@ public class Pathway2{
 	  
   }
    
-  void addColor(Color c){
+  public boolean isContainReaction(String rName){
+	  for (int r=0;r<reactList.size();r++){
+		  String name = reactList.get(r);
+		  if (name.equals(rName))
+			  return true;
+	  }
+	  for (int p=0;p<subPathwayList.size();p++){
+		  Pathway2 path = subPathwayList.get(p);
+		  boolean result = path.isContainReaction(rName);
+		  if (result)
+			  return true;
+	  }
+	  return false;
   }
    
+  
+  
   Color getGradient(float value){
    return Color.RED;
   }
