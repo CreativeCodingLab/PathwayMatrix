@@ -213,7 +213,6 @@ public class Node {
 						parent.arc(xx, yy, size, size, al1, al2);
 						al1=al2;
 					}
-						
 				}
 				else{
 					parent.fill(color.getRed(), color.getGreen(), color.getBlue(),200);
