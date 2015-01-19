@@ -304,7 +304,7 @@ public class PathwayView{
 				
 			xCircular = xRight/2;
 			yCircular = parent.height/2;
-			rCircular = PApplet.sqrt(countReactions)*8;
+			rCircular = PApplet.sqrt(countReactions)*10;
 			
 			float currentPos=0;
 			for (int i=0;i<filePathway.length;i++){

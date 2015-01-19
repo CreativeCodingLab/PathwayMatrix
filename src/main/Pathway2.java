@@ -42,7 +42,7 @@ public class Pathway2{
   }
 		
   public void draw(PApplet parent, float x_, float y_, float al_){
-	  radius = PApplet.sqrt(numReactions)*8;
+	  radius = PApplet.pow(numReactions,0.4f)*10;
 	  parent.noStroke();
 	  /*
 	  if (level==0){
@@ -75,16 +75,20 @@ public class Pathway2{
 			
 	  int countReactionLeft = 0;
 	  int countReactionRight = 0;
+	  float leftAl = al_-PApplet.PI*0.55f;
+	  float rightAl = al_+PApplet.PI*0.55f;
 	  for (int i=0; i<reactList.size();i++){
 		  String nodeName = reactList.get(i);
 		  Node node = getNodeByName(nodeName);
 		  float al=0;
 		  if (i%2==0){
-			  al = al_+PApplet.PI*0.6f -(countReactionRight+1f)/(numSect+1f)*PApplet.PI*1.2f;  // Right
+			  al = al_+PApplet.PI*0.55f -(countReactionRight+1f)/(numSect+1f)*PApplet.PI*1.1f;  // Right
+			  rightAl = al;
 			  countReactionRight++;
 		  }
 		  else{
-		  	  al = al_-PApplet.PI*0.6f +(countReactionLeft+1f)/(numSect+1f)*PApplet.PI*1.2f;
+		  	  al = al_-PApplet.PI*0.55f +(countReactionLeft+1f)/(numSect+1f)*PApplet.PI*1.1f;
+		  	  leftAl = al;
 			  countReactionLeft++;
 		  }
 		  float xR2 = x_ + (radius+node.size/2)*PApplet.cos(al);
@@ -93,15 +97,25 @@ public class Pathway2{
 		  node.iX.target(xR2);
 		  node.iY.target(yR2);
 	  }
-	  int current = countReactionLeft;
+	  
+	  float total = 0;
+	  float dif =rightAl-leftAl;
+	  for (int i=0; i<subPathwayList.size();i++){
+		  Pathway2 pathway = subPathwayList.get(i);
+		  total+=PApplet.sqrt(pathway.numReactions);
+	  }
+			
+	  float sum = 0;
 	  for (int i=0; i<subPathwayList.size();i++){
 		  Pathway2 pathway = subPathwayList.get(i);
 		  
-		  float al = al_-PApplet.PI*0.6f +(current+pathway.numReactions/4+1f)/(numSect+1)*PApplet.PI*1.2f;
-		  float xR2 = x_ + (radius+pathway.radius/4)*PApplet.cos(al);
-		  float yR2 = y_ + (radius+pathway.radius/4)*PApplet.sin(al);
+		  float percent = (sum+PApplet.sqrt(pathway.numReactions)/2)/total;
+		  float al = leftAl +percent*dif;
+		  float xR2 = x_ + (radius+pathway.radius/3)*PApplet.cos(al);
+		  float yR2 = y_ + (radius+pathway.radius/3)*PApplet.sin(al);
 		  pathway.draw(parent, xR2, yR2,al);
-		  current+=pathway.numReactions/2;
+		  sum+=PApplet.sqrt(pathway.numReactions);
+		  //current+=pathway.numReactions/2;
 	  }
 	  parent.fill(100+level*20);
 	  parent.arc(x_, y_, radius*2, radius*2,al_-PApplet.PI/2,al_-PApplet.PI/2+PApplet.PI*2);
