@@ -316,9 +316,7 @@ public class PathwayView{
 				currentPos += PApplet.sqrt(filePathway[i].numReactions);
 			}
 			g.drawNodes();
-		   	//g.drawEdges();
-			
-			
+		   	g.drawEdges();
 		}
 		else if (popupLayout.s==3){
 			iTransition.target(0);

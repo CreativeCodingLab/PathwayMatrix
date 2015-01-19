@@ -91,6 +91,8 @@ public class Pathway2{
 		  	  leftAl = al;
 			  countReactionLeft++;
 		  }
+		  //System.out.println("node="+node);
+		  if (node==null) return;
 		  float xR2 = x_ + (radius+node.size/2)*PApplet.cos(al);
 		  float yR2 = y_ + (radius+node.size/2)*PApplet.sin(al);
 		  node.iAlpha.target(al);
