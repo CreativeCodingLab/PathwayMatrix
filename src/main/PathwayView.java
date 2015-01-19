@@ -83,6 +83,7 @@ public class PathwayView{
 		gradient.addColor(new Color(v,0,0));
 		gradient.addColor(new Color(v,0,v));
 		gradient.addColor(new Color(0,0,v));
+		
 	}
 	
 	public void setItems(){
@@ -146,6 +147,14 @@ public class PathwayView{
 			
 		colorScale = (float) (gradient.colors.size()-0.8f)/ (nFiles) ;
 		isAllowedDrawing = true;
+		
+		float countReactions=0;
+		for (int i=0;i<filePathway.length;i++){
+			countReactions+=filePathway[i].numReactions;
+		}
+		xCircular = xRight/2-200;
+		yCircular = parent.height/2-110;
+		rCircular = PApplet.sqrt(countReactions)*10;
 	}
 	
 	public void updateNodes() {
@@ -296,15 +305,10 @@ public class PathwayView{
 			
 			//System.out.println("filePathway.length"+filePathway.length);
 			float totalSize=0;
-			float countReactions=0;
 			for (int i=0;i<filePathway.length;i++){
 				totalSize += PApplet.sqrt(filePathway[i].numReactions);
-				countReactions+=filePathway[i].numReactions;
 			}
-				
-			xCircular = xRight/2;
-			yCircular = parent.height/2;
-			rCircular = PApplet.sqrt(countReactions)*10;
+			
 			
 			float currentPos=0;
 			bPathway = null;
