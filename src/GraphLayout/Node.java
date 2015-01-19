@@ -118,7 +118,7 @@ public class Node {
 			difY = 0;
 		}
 		else if (PathwayView.popupLayout.s==2){ //circular Layout
-			float al = PathwayView.computeAlpha(nodeId);
+			/*float al = PathwayView.computeAlpha(nodeId);
 			float xR = PathwayView.xCircular + (PathwayView.rCircular+size/2)*PApplet.sin(al);
 			float yR = PathwayView.yCircular + (PathwayView.rCircular+size/2)*PApplet.cos(al);
 			float xR2 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.sin(al);
@@ -128,7 +128,7 @@ public class Node {
 			
 			iAlpha.target(al);
 			iX.target(xR);
-			iY.target(yR);
+			iY.target(yR);*/
 		}
 		else{
 			iAlpha.target(PApplet.PI/2);

@@ -1371,7 +1371,7 @@ public class PathwayViewer_2_4 extends PApplet {
 			PopupPathway.pathwayList.add(aPathway.getDisplayName());
 			PopupPathway.pathwayListFile.add(f);
 		}*/	
-		 
+		 /*
 		if (thisPathway.level==0)
 			System.out.println("  " + aPathway.getDisplayName());
 		else if (thisPathway.level==1)
@@ -1380,7 +1380,7 @@ public class PathwayViewer_2_4 extends PApplet {
 			System.out.println("      " + aPathway.getDisplayName());
 		else if (thisPathway.level==3)
 			System.out.println("        " + aPathway.getDisplayName());
-		
+		*/
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
 				//System.out.println("		nested pathway = " + aProcess.getDisplayName());
@@ -1395,9 +1395,10 @@ public class PathwayViewer_2_4 extends PApplet {
 					multipleReaction.rectFileList.add(f);
 					multipleReaction.rectOrderList.add(reactId);
 					thisPathway.reactList.add(aProcess.getDisplayName());
+					thisPathway.nodeIdList.add(PathwayView.rectList.size()-1);
 					reactId++;
 				}
-				thisPathway.reactList.add(aProcess.getDisplayName());
+				//thisPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
 				 System.out.println("		??? " + aProcess.getDisplayName());
 			}

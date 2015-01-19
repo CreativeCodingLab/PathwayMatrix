@@ -97,7 +97,7 @@ public class Edge {
 	  }
 	  public void drawLink(float sat) {
 		// Draw gradient lines
-		/*int numSec =6;
+		int numSec =6;
 		float x1 = from.iX.value;
 		float y1 = from.iY.value;
 		for (int i=1;i<=numSec;i++){
@@ -111,7 +111,8 @@ public class Edge {
 			parent.line(x1,y1,x2,y2);
 			x1=x2;
 			y1=y2;
-		}*/
+		}
+		/*
  	    	int r1 = from.nodeId;
 			float x1 = from.iX.value-from.difX;
 			float y1 = from.iY.value-from.difY;
@@ -234,6 +235,7 @@ public class Edge {
 				else
 					parent.arc(x3, y3, newR*2, newR*2,  al2, al1);
 			}
+		*/	
 	  }
 
 	  

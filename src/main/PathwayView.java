@@ -267,7 +267,7 @@ public class PathwayView{
 		xRight = parent.width*7.5f/10;
 		xCircular = xRight/2;
 		yCircular = parent.height/2;
-		rCircular = parent.height*3/7;
+		rCircular = parent.height/3;
 		
 		for (int i=0;i<g.nodes.size();i++){
 			Node node = g.nodes.get(i);
@@ -295,11 +295,22 @@ public class PathwayView{
 			iTransition.target(1);
 			iTransition.update();
 			g.drawNodes();
-			g.drawEdges();
-			/*for (int r1=0; r1<rectList.size();r1++){
-				ArrayList<Integer> processedList =  new ArrayList<Integer>();
-				drawDownStreamReaction(r1, processedList, 255);
-			}*/
+			//g.drawEdges();
+			
+			
+			parent.noStroke();
+			parent.fill(0,40);
+			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
+			
+			//System.out.println("filePathway.length"+filePathway.length);
+			for (int i=0;i<filePathway.length;i++){
+				float al = ((float)i)/(filePathway.length)*2*PApplet.PI - PApplet.PI/2;
+				float xR2 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.cos(al);
+				float yR2 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.sin(al);
+				filePathway[i].draw(parent, xR2, yR2,al);
+			}
+			
+			
 		}
 		else if (popupLayout.s==3){
 			iTransition.target(0);
@@ -665,7 +676,8 @@ public class PathwayView{
 	public static float computeAlpha(int r){
 		return PApplet.PI -((float)r)/(rectList.size())*2*PApplet.PI;
 	}
-		
+	
+			
 	
 	public ArrayList<String> compareInputOutput(Object[] a, Object[] b){
 		ArrayList<String> results = new ArrayList<String>();
