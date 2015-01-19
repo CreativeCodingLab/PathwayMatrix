@@ -81,7 +81,7 @@ import edu.uic.ncdm.venn.Venn_Overview;
 
 import processing.core.*;
 
-public class PathwayViewer_2_4 extends PApplet {
+public class PathwayViewer_2_5 extends PApplet {
 	private static final long serialVersionUID = 1L;
 	public int count = 0;
 	
@@ -174,7 +174,7 @@ public class PathwayViewer_2_4 extends PApplet {
 	public PathwayView multipleReaction;
 	
 	public static void main(String args[]){
-	  PApplet.main(new String[] { PathwayViewer_2_4.class.getName() });
+	  PApplet.main(new String[] { PathwayViewer_2_5.class.getName() });
     }
 
 	public void setup() {
@@ -973,12 +973,12 @@ public class PathwayViewer_2_4 extends PApplet {
 			else if (check2.b){
 			check2.mouseClicked();
 			if (check2.s){  
-				main.PathwayViewer_2_4.stateAnimation=0;
+				main.PathwayViewer_2_5.stateAnimation=0;
 				Gene.orderBySimilarity();
 				Gene.groupBySimilarity();
 			}	
 				else {
-					main.PathwayViewer_2_4.stateAnimation=0;
+					main.PathwayViewer_2_5.stateAnimation=0;
 					Gene.orderBySimilarity();
 				}	
 			}
