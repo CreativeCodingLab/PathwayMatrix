@@ -151,9 +151,6 @@ public class Graph {
 		}
 	}
 	public void drawNodes() {
-		
-		
-		
 		for (int i = 0; i < nodes.size(); i++) {
 			nodes.get(i).draw();
 		}

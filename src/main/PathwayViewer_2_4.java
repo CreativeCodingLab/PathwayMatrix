@@ -1255,9 +1255,7 @@ public class PathwayViewer_2_4 extends PApplet {
 				multipleReaction.rectList = new ArrayList<BiochemicalReaction>();
 				multipleReaction.rectSizeList = new ArrayList<Integer>();
 				multipleReaction.rectFileList = new ArrayList<Integer>();
-				multipleReaction.rectOrderList = new ArrayList<Integer>();
 				multipleReaction.maxSize=0;
-				multipleReaction.pathwaySize = new int[multipleReaction.nFiles];
 				multipleReaction.filePathway = new Pathway2[multipleReaction.nFiles];
 				//multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
 				//multipleReaction.popupPathway.pathwayListFile = new ArrayList<Integer>();
@@ -1302,14 +1300,13 @@ public class PathwayViewer_2_4 extends PApplet {
 					 
 					 
 					 i2=0;
-					 int reactId = 0;
 					 String[] str = multipleReaction.files.get(f).split("/");
 					 String nameFile = str[str.length-1];
 					 multipleReaction.filePathway[f] = new Pathway2(f,nameFile,0);
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
 						 Pathway2 newPathway = new Pathway2(f,aPathway.getDisplayName(),multipleReaction.filePathway[f].level+1);
 						 multipleReaction.filePathway[f].subPathwayList.add(newPathway);
-						 reactId = processPathway(aPathway, newPathway, f, reactId);
+						 processPathway(aPathway, newPathway, f);
 				    	 i2++;
 					 }
 					 
@@ -1339,16 +1336,13 @@ public class PathwayViewer_2_4 extends PApplet {
 								 isRedundentPathway = true;
 							 }
 						 }
-						 //System.out.println("	removeList="+removeList+"	multipleReaction.filePathway[f].subPathwayList.size()="+multipleReaction.filePathway[f].subPathwayList.size());
-						
 					 }
-					 for (int p1=0;p1< multipleReaction.filePathway[f].subPathwayList.size();p1++){
-							System.out.println("Final subpathways: "+p1 +"	"+multipleReaction.filePathway[f].subPathwayList.get(p1).displayName);
-					 }	
-					 
-					 multipleReaction.pathwaySize[f] = reactId;   // number of reaction in pathway f
-					
 				}
+				for (int f=0;f<multipleReaction.files.size();f++){
+					
+					multipleReaction.filePathway[f].computeSize();
+				}
+					
 				multipleReaction.setItems();
 				multipleReaction.updateNodes();
 				multipleReaction.updateEdges();
@@ -1365,7 +1359,7 @@ public class PathwayViewer_2_4 extends PApplet {
 		}	 
 	}
 	
-	public int processPathway(Pathway aPathway, Pathway2 thisPathway, int f, int reactId) {
+	public void processPathway(Pathway aPathway, Pathway2 thisPathway, int f) {
 		/*
 		if (!PopupPathway.pathwayList.contains(aPathway.getDisplayName())){
 			PopupPathway.pathwayList.add(aPathway.getDisplayName());
@@ -1387,23 +1381,20 @@ public class PathwayViewer_2_4 extends PApplet {
 				
 				Pathway2 newPathway = new Pathway2(f,aProcess.getDisplayName(),thisPathway.level+1);
 				thisPathway.subPathwayList.add(newPathway);
-				reactId = processPathway((Pathway) aProcess,newPathway,f,reactId);
+				processPathway((Pathway) aProcess,newPathway,f);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
 				//System.out.println("		---Reaction "+reactId + " " + aProcess.getDisplayName());
 				if (!isContainReaction(aProcess.getDisplayName(),PathwayView.rectList)){
 					PathwayView.rectList.add((BiochemicalReaction) aProcess);
 					multipleReaction.rectFileList.add(f);
-					multipleReaction.rectOrderList.add(reactId);
-					thisPathway.reactList.add(aProcess.getDisplayName());
-					thisPathway.nodeIdList.add(PathwayView.rectList.size()-1);
-					reactId++;
+				//	thisPathway.reactList.add(aProcess.getDisplayName());
+				//	thisPathway.nodeIdList.add(PathwayView.rectList.size()-1);
 				}
-				//thisPathway.reactList.add(aProcess.getDisplayName());
+				thisPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
 				 System.out.println("		??? " + aProcess.getDisplayName());
 			}
 		}
-		return reactId;
 	}
 	public  boolean isContainReaction(String s, ArrayList<BiochemicalReaction> a) {
 		if (a==null || s==null)

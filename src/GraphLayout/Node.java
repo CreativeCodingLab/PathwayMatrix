@@ -16,7 +16,7 @@ import processing.core.PImage;
 public class Node {
 	Vector3D f = new Vector3D(0, 0, 0);
 	float mass = 1;
-	float size = 1;
+	public float size = 1;
 	//public float wordWidth = 1;
 	public String name = "";
 	public PApplet parent;
@@ -142,6 +142,7 @@ public class Node {
 	
 		
 		if (g.getHoverNode() == this) {
+			/*
 			parent.textAlign(PApplet.CENTER);
 			parent.textSize(size);
 			
@@ -151,7 +152,7 @@ public class Node {
 			// Draw node names
 			parent.textSize(12);
 			parent.text(name, xx, yy-7);
-			parent.ellipse(xx, yy, size, size);
+			parent.ellipse(xx, yy, size, size);*/
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);

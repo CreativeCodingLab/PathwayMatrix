@@ -38,8 +38,6 @@ public class PathwayView{
 	public static ArrayList<BiochemicalReaction> rectList;
 	public ArrayList<Integer> rectSizeList;
 	public ArrayList<Integer> rectFileList;
-	public ArrayList<Integer> rectOrderList;
-	public int[] pathwaySize;
 	
 	
 	public int maxSize = 0;
@@ -154,7 +152,6 @@ public class PathwayView{
 		g = new Graph();
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
-			int reactId = rectOrderList.get(i);
 			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
 			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
 			node.nodeId = i;
@@ -265,9 +262,6 @@ public class PathwayView{
 	public void draw(){
 		if (!isAllowedDrawing || g==null || g.nodes==null) return;
 		xRight = parent.width*7.5f/10;
-		xCircular = xRight/2;
-		yCircular = parent.height/2;
-		rCircular = parent.height/3;
 		
 		for (int i=0;i<g.nodes.size();i++){
 			Node node = g.nodes.get(i);
@@ -294,21 +288,35 @@ public class PathwayView{
 		else if (popupLayout.s==2){
 			iTransition.target(1);
 			iTransition.update();
-			g.drawNodes();
-			//g.drawEdges();
 			
 			
 			parent.noStroke();
-			parent.fill(0,40);
+			parent.fill(100);
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			//System.out.println("filePathway.length"+filePathway.length);
+			float totalSize=0;
+			float countReactions=0;
 			for (int i=0;i<filePathway.length;i++){
-				float al = ((float)i)/(filePathway.length)*2*PApplet.PI - PApplet.PI/2;
+				totalSize += PApplet.sqrt(filePathway[i].numReactions);
+				countReactions+=filePathway[i].numReactions;
+			}
+				
+			xCircular = xRight/2;
+			yCircular = parent.height/2;
+			rCircular = PApplet.sqrt(countReactions)*8;
+			
+			float currentPos=0;
+			for (int i=0;i<filePathway.length;i++){
+				float newPos = currentPos+PApplet.sqrt(filePathway[i].numReactions)/2;
+				float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
 				float xR2 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.cos(al);
 				float yR2 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.sin(al);
 				filePathway[i].draw(parent, xR2, yR2,al);
+				currentPos += PApplet.sqrt(filePathway[i].numReactions);
 			}
+			g.drawNodes();
+		   	//g.drawEdges();
 			
 			
 		}
