@@ -28,9 +28,9 @@ public class Node {
 	public int nodeId = -99;
 	public static int bWord = -99;
 	public int degree = 0;
-	public Integrator iAlpha = new Integrator(0,0.1f,0.4f);
-	public Integrator iX = new Integrator(0,0.1f,0.4f);
-	public Integrator iY = new Integrator(0,0.1f,0.4f);
+	public Integrator iAlpha = new Integrator(0,0.2f,0.4f);
+	public Integrator iX = new Integrator(0,0.2f,0.4f);
+	public Integrator iY = new Integrator(0,0.2f,0.4f);
 	public float difX = 0;
 	public float difY = 0;
 	
@@ -115,6 +115,7 @@ public class Node {
 			iX.target(PathwayView.xCircular);
 			iY.target(PathwayView.yTopological[nodeId]);
 			difX = 0;
+			
 			difY = 0;
 		}
 		else if (PathwayView.popupLayout.s==2){ //circular Layout

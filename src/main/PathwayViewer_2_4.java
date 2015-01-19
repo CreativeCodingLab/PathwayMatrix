@@ -1311,14 +1311,12 @@ public class PathwayViewer_2_4 extends PApplet {
 					 }
 					 
 					 // Remove nested pathway from the top level
-					 
 					 boolean isRedundentPathway = true;
 					 while(isRedundentPathway){
 						 isRedundentPathway = false;
 						// ArrayList<Integer> removeList = new ArrayList<Integer>();
 						 for (int p1=0;p1< multipleReaction.filePathway[f].subPathwayList.size();p1++){
 							 Pathway2 path1 = multipleReaction.filePathway[f].subPathwayList.get(p1);
-							 
 							 //System.out.println(p1+"	path1="+path1.displayName);
 							 int redundentPathwayIndex = -1;
 							 for (int p2=0;p2< multipleReaction.filePathway[f].subPathwayList.size();p2++){

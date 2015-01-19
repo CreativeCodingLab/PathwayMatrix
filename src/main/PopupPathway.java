@@ -39,6 +39,7 @@ public class PopupPathway{
 		redundantPathway = new ArrayList<Pathway2>();
 		ArrayList<Pathway2> processed = new  ArrayList<Pathway2>();
 		int redundantLevel =1000; 
+		
 		for (int f=0;f<PathwayView.nFiles;f++){
 			ArrayList<Pathway2> a = PathwayView.filePathway[f].printRecursively();
 			redundantLevel =1000;   // reset the redundant option when go to the next file

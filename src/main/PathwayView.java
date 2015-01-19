@@ -65,7 +65,7 @@ public class PathwayView{
 	public static Pathway2[] filePathway = null;
 	//public Pathway2[] filePathway = null;
 	public PopupPathway popupPathway;
-	
+	public static Pathway2 bPathway;
 	public PathwayView(PApplet p){
 		parent = p;
 		loader5= new ThreadLoader5(parent);
@@ -307,6 +307,7 @@ public class PathwayView{
 			rCircular = PApplet.sqrt(countReactions)*10;
 			
 			float currentPos=0;
+			bPathway = null;
 			for (int i=0;i<filePathway.length;i++){
 				float newPos = currentPos+PApplet.sqrt(filePathway[i].numReactions)/2;
 				float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
@@ -315,8 +316,18 @@ public class PathwayView{
 				filePathway[i].draw(parent, xR2, yR2,al);
 				currentPos += PApplet.sqrt(filePathway[i].numReactions);
 			}
+			parent.noStroke();
+			parent.fill(80);
+			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
+			
+			
+			// Draw brushing pathway
+			if (bPathway!=null)
+				bPathway.drawWhenBrushing(parent);
+			
+			
 			g.drawNodes();
-		   	g.drawEdges();
+		   	//g.drawEdges();
 		}
 		else if (popupLayout.s==3){
 			iTransition.target(0);
@@ -790,6 +801,9 @@ public class PathwayView{
 		}
 		else if (checkName.b)
 			checkName.mouseClicked();
+		else if (bPathway!=null)
+			bPathway.isExpanded=!bPathway.isExpanded;
+		
 		else{
 			g.setSelectedNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {
