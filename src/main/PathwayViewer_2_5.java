@@ -1512,8 +1512,8 @@ public class PathwayViewer_2_5 extends PApplet {
 			PathwayView.isSetIntegrator = true;
 			
 			PathwayView.scale += delta/10f;
-			if (PathwayView.scale<1)
-				PathwayView.scale=1;
+			if (PathwayView.scale<0.1f)
+				PathwayView.scale=0.1f;
 			pathwayView.updateScale();
 		}
 		if (PopupComplex.b>=0){

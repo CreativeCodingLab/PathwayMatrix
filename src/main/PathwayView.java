@@ -67,7 +67,7 @@ public class PathwayView{
 	public PopupPathway popupPathway;
 	public static Pathway2 bPathway;
 	
-	public static float scale=10;
+	public static float scale=1;
 	boolean isExpanded =false;
 	boolean isBrushing =false;
 	public static boolean isSetIntegrator =false;
@@ -163,7 +163,7 @@ public class PathwayView{
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		rCircular = PApplet.pow(countReactions,0.55f)*scale;
+		rCircular = PApplet.pow(countReactions,0.55f)*10f*scale;
 	}
 		
 	public void updatePosistion() {
@@ -881,8 +881,8 @@ public class PathwayView{
 							new Vector3D(parent.mouseX, parent.mouseY, 0));
 		}
 		else{
-			xCircular += (parent.mouseX - parent.pmouseX);
-			yCircular += (parent.mouseY - parent.pmouseY);
+			xCircular += (parent.mouseX - parent.pmouseX)*PathwayView.scale;
+			yCircular += (parent.mouseY - parent.pmouseY)*PathwayView.scale;
 		}
 	}
 	
