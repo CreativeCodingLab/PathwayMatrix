@@ -66,6 +66,12 @@ public class PathwayView{
 	//public Pathway2[] filePathway = null;
 	public PopupPathway popupPathway;
 	public static Pathway2 bPathway;
+	
+	public static float scale=10;
+	boolean isExpanded =true;
+	boolean isBrushing =false;
+	public static boolean isSetIntegrator =false;
+	
 	public PathwayView(PApplet p){
 		parent = p;
 		loader5= new ThreadLoader5(parent);
@@ -147,14 +153,22 @@ public class PathwayView{
 			
 		colorScale = (float) (gradient.colors.size()-0.8f)/ (nFiles) ;
 		isAllowedDrawing = true;
-		
+		updatePosistion();
+		updateScale();
+	}
+	
+	
+	public void updateScale() {
 		float countReactions=0;
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		xCircular = xRight/2-200;
-		yCircular = parent.height/2-110;
-		rCircular = PApplet.sqrt(countReactions)*10;
+		rCircular = PApplet.sqrt(countReactions)*scale;
+	}
+		
+	public void updatePosistion() {
+		xCircular = xRight/2;
+		yCircular = parent.height/2;
 	}
 	
 	public void updateNodes() {
@@ -170,7 +184,6 @@ public class PathwayView{
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
 			g.addNode(node);
 		}	
-		
 		// Initialize topological ordering
 		orderTree();
 		yTopological =  new float[rectList.size()];
@@ -299,9 +312,6 @@ public class PathwayView{
 			iTransition.update();
 			
 			
-			parent.noStroke();
-			parent.fill(100);
-			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			//System.out.println("filePathway.length"+filePathway.length);
 			float totalSize=0;
@@ -309,29 +319,44 @@ public class PathwayView{
 				totalSize += PApplet.sqrt(filePathway[i].numReactions);
 			}
 			
-			
-			float currentPos=0;
-			bPathway = null;
-			for (int i=0;i<filePathway.length;i++){
-				float newPos = currentPos+PApplet.sqrt(filePathway[i].numReactions)/2;
-				float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
-				float xR2 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.cos(al);
-				float yR2 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.sin(al);
-				filePathway[i].draw(parent, xR2, yR2,al);
-				currentPos += PApplet.sqrt(filePathway[i].numReactions);
+			if (isExpanded){
+				float currentPos=0;
+				bPathway = null;
+				for (int i=0;i<filePathway.length;i++){
+					float newPos = currentPos+PApplet.sqrt(filePathway[i].numReactions)/2;
+					float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
+					float xR2 = PathwayView.xCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.cos(al);
+					float yR2 = PathwayView.yCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.sin(al);
+					filePathway[i].draw(xR2, yR2,al);
+					currentPos += PApplet.sqrt(filePathway[i].numReactions);
+				}
 			}
+			else{
+				
+			}
+			
+			
+			isBrushing =false;
+			float rCenter = rCircular/10;
+			if (PApplet.dist(xCircular, yCircular, parent.mouseX, parent.mouseY)<rCenter){
+				isBrushing = true;
+			}
+				
 			parent.noStroke();
 			parent.fill(80);
+			if (isBrushing)
+				parent.fill(200,200,100,200);
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
+			drawCenter(xCircular, yCircular,rCenter);
 			
 			// Draw brushing pathway
 			if (bPathway!=null)
-				bPathway.drawWhenBrushing(parent);
+				bPathway.drawWhenBrushing();
 			
 			
 			g.drawNodes();
-		   	//g.drawEdges();
+		   	g.drawEdges();
 		}
 		else if (popupLayout.s==3){
 			iTransition.target(0);
@@ -362,9 +387,20 @@ public class PathwayView{
 		// Draw popups
 		popupLayout.draw(parent.width-198);
 		popupPathway.draw(parent.width-298);
-		
+		isSetIntegrator = false;  // Set node to circular layout when dragging or changing scales
 	}
 	
+	 public void drawCenter(float x_, float y_, float r_){
+		parent.fill(50);
+	  	parent.ellipse(x_, y_, r_*2, r_*2);
+		
+	  	parent.strokeWeight(r_/10);
+		parent.stroke(150);
+		parent.line(x_-(r_*1.6f)/2,y_, x_+(r_*1.6f)/2,y_);
+		if (!isExpanded)
+			parent.line(x_,y_-(r_*1.6f)/2, x_,y_+(r_*1.6f)/2);
+	}
+		
 	
 	public void drawTree() {
 		parent.fill(0);
@@ -782,6 +818,10 @@ public class PathwayView{
 	
 	public void mouseClicked() {
 		if (g==null) return;
+		
+		if(isBrushing)
+			isExpanded = !isExpanded;
+		
 		if (popupLayout.b>=0){
 			popupLayout.mouseClicked();
 
@@ -821,11 +861,16 @@ public class PathwayView{
 
 	public void mouseDragged() {
 		slider2.checkSelectedSlider3();
+		isSetIntegrator = true;
 		if (g==null) return;
 		if (g.getDragNode() != null) {
 			g.getDragNode()
 					.setPosition(
 							new Vector3D(parent.mouseX, parent.mouseY, 0));
+		}
+		else{
+			xCircular += (parent.mouseX - parent.pmouseX);
+			yCircular += (parent.mouseY - parent.pmouseY);
 		}
 	}
 	

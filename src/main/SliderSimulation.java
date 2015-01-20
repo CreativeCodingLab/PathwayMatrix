@@ -25,8 +25,6 @@ public class SliderSimulation{
 		w= 300;
 	}
 		
-	
-		
 	public void draw(float x_, float y_, int maxLevel_){
 		checkBrushingSlider();
 		int maxLevel2 = maxLevel_+1;
