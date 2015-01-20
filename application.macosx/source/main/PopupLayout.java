@@ -7,7 +7,7 @@ import processing.core.PFont;
 
 public class PopupLayout{
 	public int b = -1;
-	public int s=0;
+	public int s=2;
 	public PApplet parent;
 	public float x = 0;
 	public int y = 0;
@@ -36,8 +36,8 @@ public class PopupLayout{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_2_4.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_2_4.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_2_5.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_2_5.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}

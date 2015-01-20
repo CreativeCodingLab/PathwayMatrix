@@ -32,8 +32,8 @@ public class Slider2{
 		val = (float) u;
 	}
 	public void updateEdgeLegth(){
-		for (int i=0; i<MultipleReactionView.g.edges.size();i++){
-			MultipleReactionView.g.edges.get(i).naturalLength = val;
+		for (int i=0; i<PathwayView.g.edges.size();i++){
+			PathwayView.g.edges.get(i).naturalLength = val;
 		}
 	}
 		
