@@ -56,7 +56,7 @@ public class Pathway2{
 	  x=x_;
 	  y=y_;
 	  al = al_;
-	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale/2;
+	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
 	  

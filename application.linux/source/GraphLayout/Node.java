@@ -112,7 +112,7 @@ public class Node {
 		}
 		else if (PathwayView.popupLayout.s==1){ //Line up
 			iAlpha.target(PApplet.PI/2);
-			float xx = parent.width*7.5f/20;
+			float xx = PathwayView.xRight/2;
 			iX.target(xx);
 			iY.target(PathwayView.yTopological[nodeId]);
 			difX = 0;

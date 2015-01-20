@@ -1287,8 +1287,6 @@ public class PathwayViewer_2_5 extends PApplet {
 					 
 					
 					// PATHWAY excited
-					 
-					 
 					 i2=0;
 					 String[] str = pathwayView.files.get(f).split("/");
 					 String nameFile = str[str.length-1];
@@ -1316,7 +1314,6 @@ public class PathwayViewer_2_5 extends PApplet {
 								 }
 							 }
 							 if (redundentPathwayIndex>=0){
-								 System.out.println("considering="+path1.displayName+"	redundent in ="+ pathwayView.filePathway[f].subPathwayList.get(redundentPathwayIndex).displayName);
 								 PathwayView.filePathway[f].subPathwayList.remove(p1);
 								 isRedundentPathway = true;
 							 }
@@ -1331,8 +1328,6 @@ public class PathwayViewer_2_5 extends PApplet {
 				pathwayView.updateNodes();
 				pathwayView.updateEdges();
 				pathwayView.popupPathway.setItems();
-				System.out.println("	DONE DONE-------------------pathwayList.size=");
-				
 			 }
 			 
 			 catch (FileNotFoundException e){
@@ -1344,35 +1339,21 @@ public class PathwayViewer_2_5 extends PApplet {
 	}
 	
 	public void processPathway(Pathway aPathway, Pathway2 thisPathway, int f) {
-		/*
-		if (!PopupPathway.pathwayList.contains(aPathway.getDisplayName())){
-			PopupPathway.pathwayList.add(aPathway.getDisplayName());
-			PopupPathway.pathwayListFile.add(f);
-		}*/	
-		 /*
-		if (thisPathway.level==0)
-			System.out.println("  " + aPathway.getDisplayName());
-		else if (thisPathway.level==1)
-			System.out.println("    " + aPathway.getDisplayName());
-		else if (thisPathway.level==2)
-			System.out.println("      " + aPathway.getDisplayName());
-		else if (thisPathway.level==3)
-			System.out.println("        " + aPathway.getDisplayName());
-		*/
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				//System.out.println("		nested pathway = " + aProcess.getDisplayName());
-				
 				Pathway2 newPathway = new Pathway2(this,f,aProcess.getDisplayName(),thisPathway.level+1);
 				thisPathway.subPathwayList.add(newPathway);
 				processPathway((Pathway) aProcess,newPathway,f);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
-				//System.out.println("		---Reaction "+reactId + " " + aProcess.getDisplayName());
 				if (!isContainReaction(aProcess.getDisplayName(),PathwayView.rectList)){
 					PathwayView.rectList.add((BiochemicalReaction) aProcess);
 					pathwayView.rectFileList.add(f);
-				//	thisPathway.reactList.add(aProcess.getDisplayName());
+					//thisPathway.reactList.add(aProcess.getDisplayName());
 				}
+				//else{
+				//	System.out.println("aProcess.getDisplayName()="+aProcess.getDisplayName());
+				//	System.out.println("List="+PathwayView.rectList);
+				//}
 				thisPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
 				 System.out.println("		??? " + aProcess.getDisplayName());
@@ -1385,6 +1366,7 @@ public class PathwayViewer_2_5 extends PApplet {
 		for (int r=0;r<a.size();r++){
 			if (a.get(r)==null || a.get(r).getDisplayName()==null) continue;
 			
+		//	System.out.println("	r="+a.get(r).getDisplayName());
 			if (a.get(r).getDisplayName().equals(s))
 				return true;
 		}
@@ -1509,12 +1491,14 @@ public class PathwayViewer_2_5 extends PApplet {
 	
 	void mouseWheel(int delta) {
 		if (popupView.s==2){
-			PathwayView.isSetIntegrator = true;
 			
 			PathwayView.scale += delta/10f;
-			if (PathwayView.scale<1)
-				PathwayView.scale=1;
+			if (PathwayView.scale<0.1f)
+				PathwayView.scale=0.1f;
 			pathwayView.updateScale();
+			
+			PathwayView.isSetIntegrator = true;
+			
 		}
 		if (PopupComplex.b>=0){
 		//	PopupComplex.y2 -= delta/2;
