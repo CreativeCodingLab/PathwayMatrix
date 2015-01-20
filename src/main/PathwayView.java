@@ -68,7 +68,7 @@ public class PathwayView{
 	public static Pathway2 bPathway;
 	
 	public static float scale=10;
-	boolean isExpanded =true;
+	boolean isExpanded =false;
 	boolean isBrushing =false;
 	public static boolean isSetIntegrator =false;
 	
@@ -163,7 +163,7 @@ public class PathwayView{
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		rCircular = PApplet.sqrt(countReactions)*scale;
+		rCircular = PApplet.pow(countReactions,0.55f)*scale;
 	}
 		
 	public void updatePosistion() {
@@ -311,8 +311,6 @@ public class PathwayView{
 			iTransition.target(1);
 			iTransition.update();
 			
-			
-			
 			//System.out.println("filePathway.length"+filePathway.length);
 			float totalSize=0;
 			for (int i=0;i<filePathway.length;i++){
@@ -332,9 +330,23 @@ public class PathwayView{
 				}
 			}
 			else{
-				
+				// Print all reactions on a circle
+				float beginAl = -PApplet.PI/2;
+				for (int f=0;f<filePathway.length;f++){
+					ArrayList<String> a = filePathway[f].getAllReaction();
+					float sec = (PApplet.sqrt(a.size())/totalSize)*PApplet.PI*1.8f;
+					for (int i=0;i<a.size();i++){
+						String nodeName = a.get(i);
+						Node node = Pathway2.getNodeByName(nodeName);
+						float al2 = beginAl+((float) i/a.size())*sec;
+						if (node==null) return;
+						float xR2 = xCircular + (rCircular+node.size/2)*PApplet.cos(al2);
+						float yR2 = yCircular + (rCircular+node.size/2)*PApplet.sin(al2);
+						Pathway2.setNodePosistion(node, xR2,yR2,al2);	
+					}
+					beginAl += sec + (PApplet.PI*0.2f)/filePathway.length;
+				}
 			}
-			
 			
 			isBrushing =false;
 			float rCenter = rCircular/10;
@@ -343,9 +355,9 @@ public class PathwayView{
 			}
 				
 			parent.noStroke();
-			parent.fill(80);
+			parent.fill(Pathway2.beginDarknessOfPathways);  
 			if (isBrushing)
-				parent.fill(200,200,100,200);
+				parent.fill(100,100,200,100);
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			drawCenter(xCircular, yCircular,rCenter);

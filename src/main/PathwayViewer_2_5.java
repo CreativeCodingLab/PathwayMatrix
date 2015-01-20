@@ -1304,31 +1304,27 @@ public class PathwayViewer_2_5 extends PApplet {
 					 boolean isRedundentPathway = true;
 					 while(isRedundentPathway){
 						 isRedundentPathway = false;
-						// ArrayList<Integer> removeList = new ArrayList<Integer>();
-						 for (int p1=0;p1< pathwayView.filePathway[f].subPathwayList.size();p1++){
-							 Pathway2 path1 = pathwayView.filePathway[f].subPathwayList.get(p1);
+						 for (int p1=0;p1< PathwayView.filePathway[f].subPathwayList.size();p1++){
+							 Pathway2 path1 = PathwayView.filePathway[f].subPathwayList.get(p1);
 							 //System.out.println(p1+"	path1="+path1.displayName);
 							 int redundentPathwayIndex = -1;
-							 for (int p2=0;p2< pathwayView.filePathway[f].subPathwayList.size();p2++){
+							 for (int p2=0;p2< PathwayView.filePathway[f].subPathwayList.size();p2++){
 								 if (p1==p2) continue;
-								 Pathway2 path2 = pathwayView.filePathway[f].subPathwayList.get(p2);
+								 Pathway2 path2 = PathwayView.filePathway[f].subPathwayList.get(p2);
 								 if (path2.isContainPathway(path1.displayName)){
-									// if (!removeList.contains(p1))
-									// removeList.add(p1);
 									 redundentPathwayIndex =p2;
 								 }
 							 }
 							 if (redundentPathwayIndex>=0){
 								 System.out.println("considering="+path1.displayName+"	redundent in ="+ pathwayView.filePathway[f].subPathwayList.get(redundentPathwayIndex).displayName);
-								 pathwayView.filePathway[f].subPathwayList.remove(p1);
+								 PathwayView.filePathway[f].subPathwayList.remove(p1);
 								 isRedundentPathway = true;
 							 }
 						 }
 					 }
 				}
 				for (int f=0;f<pathwayView.files.size();f++){
-					
-					pathwayView.filePathway[f].computeSize();
+					PathwayView.filePathway[f].computeSize();
 				}
 					
 				pathwayView.setItems();
@@ -1376,7 +1372,6 @@ public class PathwayViewer_2_5 extends PApplet {
 					PathwayView.rectList.add((BiochemicalReaction) aProcess);
 					pathwayView.rectFileList.add(f);
 				//	thisPathway.reactList.add(aProcess.getDisplayName());
-				//	thisPathway.nodeIdList.add(PathwayView.rectList.size()-1);
 				}
 				thisPathway.reactList.add(aProcess.getDisplayName());
 			} else { 
@@ -1516,7 +1511,7 @@ public class PathwayViewer_2_5 extends PApplet {
 		if (popupView.s==2){
 			PathwayView.isSetIntegrator = true;
 			
-			PathwayView.scale-= delta/10f;
+			PathwayView.scale += delta/10f;
 			if (PathwayView.scale<1)
 				PathwayView.scale=1;
 			pathwayView.updateScale();

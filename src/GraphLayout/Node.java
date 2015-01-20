@@ -143,7 +143,6 @@ public class Node {
 	
 		
 		if (g.getHoverNode() == this) {
-			/*
 			parent.textAlign(PApplet.CENTER);
 			parent.textSize(size);
 			
@@ -153,7 +152,7 @@ public class Node {
 			// Draw node names
 			parent.textSize(12);
 			parent.text(name, xx, yy-7);
-			parent.ellipse(xx, yy, size, size);*/
+			parent.ellipse(xx, yy, size, size);
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);
@@ -161,7 +160,6 @@ public class Node {
 			parent.ellipse(xx, yy, size, size);
 		}
 		else{
-			
 			//wordWidth = parent.textWidth(name);
 			parent.noStroke();
 			parent.fill(color.getRGB());

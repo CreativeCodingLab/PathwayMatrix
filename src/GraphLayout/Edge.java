@@ -113,13 +113,17 @@ public class Edge {
 			y1=y2;
 		}*/
 		
- 	    	int r1 = from.nodeId;
-			float x1 = from.iX.value-from.difX;
-			float y1 = from.iY.value-from.difY;
+ 	    	float alFrom = from.iAlpha.target;
+			//float x1 = from.iX.value-from.difX;
+			//float y1 = from.iY.value-from.difY;
+			float x1 = from.iX.value;
+			float y1 = from.iY.value;
 			
-			int r2 = to.nodeId;
-			float x2 = to.iX.value-to.difX;
-			float y2 = to.iY.value-to.difY;
+			float alTo = to.iAlpha.target;
+			//float x2 = to.iX.value-to.difX;
+			//float y2 = to.iY.value-to.difY;
+			float x2 = to.iX.value;
+			float y2 = to.iY.value;
 			
 			
 			float alpha = (y2-y1)/(x2-x1);
@@ -127,82 +131,37 @@ public class Edge {
 			float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
 			float dd = PApplet.sqrt(dis);
 			
-			float alCircular =0;
-			float d3, x3=0, y3=0, newR=100;
+			float alCircular = PApplet.PI -PApplet.abs(alTo-alFrom);
+			 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+				 alCircular += PathwayView.iTransition.value;
+			 else if (PathwayView.popupLayout.s==2)
+				 alCircular *= PathwayView.iTransition.value;
+			 else if (PathwayView.popupLayout.s==3)
+				 alCircular *= PathwayView.iTransition.value;
 			
-			if (0<r2-r1 && r2-r1<=PathwayView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r2-r1)*2/PathwayView.rectList.size())*PApplet.PI;
-				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
-					 alCircular += PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==2)
-					 alCircular *= PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==3)
-					 alCircular *= PathwayView.iTransition.value;
-				
-				 if (alCircular<0.01f)
-					 alCircular=0.01f;
-				 else if (alCircular>PApplet.PI-0.01f)
-					 alCircular = PApplet.PI-0.01f;
-				 newR = (dd/2)/PApplet.sin(alCircular/2);
-		    	 d3 = PApplet.dist(x1,y1,x2,y2);
-				 x3 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-				 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			}
-			else if (r2-r1>PathwayView.rectList.size()/2){ // relationship of 2 wordcloud away
-				 alCircular = ((float) (r2-r1)*2/PathwayView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
-					 alCircular += PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==2)
-					 alCircular *= PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==3)
-					 alCircular *= PathwayView.iTransition.value;
-				
-				 if (alCircular<0.01f)
-					 alCircular=0.01f;
-				 else if (alCircular>PApplet.PI-0.01f)
-					 alCircular = PApplet.PI-0.01f;
-				 newR = (dd/2)/PApplet.sin(alCircular/2);
-				 d3 = PApplet.dist(x1,y1,x2,y2);
-				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			}
-			else if (0<r1-r2 && r1-r2<=PathwayView.rectList.size()/2){
-				 alCircular = PApplet.PI-((float) (r1-r2)*2/PathwayView.rectList.size())*PApplet.PI;
-				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
-					 alCircular += PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==2)
-					 alCircular *= PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==3)
-					 alCircular *= PathwayView.iTransition.value;
-				
-				 if (alCircular<0.01f)
-					 alCircular=0.01f;
-				 else if (alCircular>PApplet.PI-0.01f)
-					 alCircular = PApplet.PI-0.01f;
-				 newR = (dd/2)/PApplet.sin(alCircular/2);
-		    	 d3 = PApplet.dist(x1,y1,x2,y2);
-				 x3 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-				 y3 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			}
-			else if (r1-r2>PathwayView.rectList.size()/2){
-				 alCircular = ((float) (r1-r2)*2/PathwayView.rectList.size())*PApplet.PI-PApplet.PI;
-				 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
-					 alCircular += PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==2)
-					 alCircular *= PathwayView.iTransition.value;
-				 else if (PathwayView.popupLayout.s==3)
-					 alCircular *= PathwayView.iTransition.value;
-				
-				 if (alCircular<0.01f)
-					 alCircular=0.01f;
-				 else if (alCircular>PApplet.PI-0.01f)
-					 alCircular = PApplet.PI-0.01f;
-				 newR = (dd/2)/PApplet.sin(alCircular/2);
-		    	 d3 = PApplet.dist(x1,y1,x2,y2);
-				 x3 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-				 y3 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
-			}
-			
+			 if (alCircular<0.01f)
+				 alCircular=0.01f;
+			 else if (alCircular>PApplet.PI-0.01f)
+				 alCircular = PApplet.PI-0.01f;
+			 float newR = (dd/2)/PApplet.sin(alCircular/2);
+	    	 float d3 = PApplet.dist(x1,y1,x2,y2);
+	    	 float x11 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+	    	 float y11 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+	    	 float x22 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+	    	 float y22 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+		
+	    	 float x3 =0, y3=0;
+	    	 float d11 = PApplet.dist(x11, y11, PathwayView.xCircular, PathwayView.yCircular);
+	    	 float d22 = PApplet.dist(x22, y22, PathwayView.xCircular, PathwayView.yCircular);
+	    	 if (d11>d22){
+	    		 x3=x11;
+	    		 y3=y11;
+	    	 }
+	    	 else if (d11<d22){
+	    		 x3=x22;
+	    		 y3=y22;
+	    	 }
+		   
 			float delX1 = (x1-x3);
 			float delY1 = (y1-y3);
 			float delX2 = (x2-x3);

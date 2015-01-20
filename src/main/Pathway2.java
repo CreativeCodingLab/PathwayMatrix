@@ -28,6 +28,7 @@ public class Pathway2{
   public float y = 0;
   public float al = 0;
   private PApplet parent = null;
+  public static float beginDarknessOfPathways = 150;
   
   // Constructor
   Pathway2(PApplet parent_,int f_, String dName, int level_){
@@ -58,42 +59,22 @@ public class Pathway2{
 	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale/2;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
-	  /*
-	  if (level==0){
-		 // parent.fill(0);
-		 // parent.textAlign(PApplet.CENTER);
-		 // parent.text(displayName,x_, y_);
-		  parent.fill(0,150);
-		//  parent.arc(x_, y_, radius*2, radius*2,al_-PApplet.PI/2,al_-PApplet.PI/2+PApplet.PI);
-
-	  }	 
-	  else if (level==1){
-		//  parent.fill(0);
-		//  parent.textAlign(PApplet.CENTER);
-		//  parent.text(displayName,x_, y_);
-		  parent.fill(255,0,0,50);
-	  }	  
-	  else if (level==2)
-		  parent.fill(0,255,0,50);
-	  else if (level==3)
-		  parent.fill(0,0,255,50);
-	  else 
-		  parent.fill(0,50);*/
 	  
 	  	if (isExpanded)
 	  		drawExpanded();
 	  	else 
 	  		drawUnexpanded();
 	  	
-	  	float v = 100+level*20;
-	  	if (v>240)
-	  		v=240;
 	  	
 	  	
 		if (PathwayView.bPathway==null && PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius){
 			PathwayView.bPathway = this;
 		}
 		else{
+			float v = beginDarknessOfPathways+(level+1)*14;  
+		  	if (v>240)
+		  		v=240;
+		  
 			parent.fill(v);
 		  	parent.noStroke();
 			parent.arc(x, y, radius*2, radius*2,al-PApplet.PI/2,al-PApplet.PI/2+PApplet.PI*2);
@@ -216,7 +197,7 @@ public class Pathway2{
 		  }
   }
   
-  public void setNodePosistion(Node node, float xR2, float yR2, float al2){
+  public static void setNodePosistion(Node node, float xR2, float yR2, float al2){
 	  node.iAlpha.target(al2);
 	  node.iX.target(xR2);
 	  node.iY.target(yR2);
@@ -227,7 +208,7 @@ public class Pathway2{
 	  }
   }
   
-  public Node getNodeByName(String name_){
+  public static Node getNodeByName(String name_){
 	  for (int i=0; i<PathwayView.g.nodes.size();i++){
 		  Node node = PathwayView.g.nodes.get(i);
 		  if (node.name.equals(name_))
