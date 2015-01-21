@@ -27,7 +27,7 @@ public class Pathway2{
   public float radius = 0;
   public float radiusCenter = 0;
   public int numReactions = 0;
-  public boolean isExpanded = true;
+  public boolean isExpanded = false;
   
   public float xPathway = 100;
   public float yPathway = 100;
@@ -55,6 +55,20 @@ public class Pathway2{
 	  }
 	   return numReactions;
   }
+  
+  public void expandAll(){
+	  isExpanded = true;
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).expandAll();
+	  }
+  }
+  public void collapseAll(){
+	  isExpanded = false;
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).collapseAll();
+	  }
+  }
+		
 		
   public void draw(float x_, float y_, float al_){
 	  xPathway=x_;

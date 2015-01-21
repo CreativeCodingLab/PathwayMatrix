@@ -67,12 +67,21 @@ public class PathwayView{
 	public static Pathway2 bPathway;
 	
 	public static float scale=1;
-	boolean isExpanded =false;
 	boolean isBrushing =false;
 	public static int setIntegrator =0;
 	
+	// Button to control the map
+	public ButtonMap buttonReset;
+	public ButtonMap buttonExpand;
+	public ButtonMap buttonCollapse;
+	public static boolean isExpandedAll = false;
+	
 	public PathwayView(PApplet p){
 		parent = p;
+		buttonReset = new ButtonMap(parent);
+		buttonExpand = new ButtonMap(parent);
+		buttonCollapse = new ButtonMap(parent);
+		
 		loader5= new ThreadLoader5(parent);
 		slider2 = new Slider2(parent);
 		popupLayout = new PopupLayout(parent);
@@ -152,7 +161,7 @@ public class PathwayView{
 			
 		colorScale = (float) (gradient.colors.size()-0.8f)/ (nFiles) ;
 		isAllowedDrawing = true;
-		updatePosistion();
+		resetPosistion();
 		updateScale();
 	}
 	
@@ -165,7 +174,7 @@ public class PathwayView{
 		rCircular = PApplet.pow(countReactions,0.55f)*10f*scale;
 	}
 		
-	public void updatePosistion() {
+	public void resetPosistion() {
 		xCircular = xRight/2;
 		yCircular = parent.height/2;
 	}
@@ -308,13 +317,12 @@ public class PathwayView{
 			iTransition.target(1);
 			iTransition.update();
 			
-			//System.out.println("filePathway.length"+filePathway.length);
 			float totalSize=0;
 			for (int i=0;i<filePathway.length;i++){
 				totalSize += PApplet.sqrt(filePathway[i].numReactions);
 			}
 			
-			if (isExpanded){
+			if (rootPathway.isExpanded){
 				float currentPos=0;
 				bPathway = null;
 				for (int i=0;i<filePathway.length;i++){
@@ -363,9 +371,14 @@ public class PathwayView{
 			if (bPathway!=null)
 				bPathway.drawWhenBrushing();
 			
-			
 			g.drawNodes();
 		   	g.drawEdges();
+		   	
+		   	// Draw button to control the map
+		   	buttonReset.draw("Reset map",xRight-buttonReset.w-3, 2);
+		   	buttonExpand.draw("Expand all",xRight-buttonExpand.w-3, 24);
+		   	buttonCollapse.draw("Collapse all",xRight-buttonCollapse.w-3, 46);
+		   	
 		}
 		else if (popupLayout.s==3){
 			iTransition.target(0);
@@ -397,7 +410,96 @@ public class PathwayView{
 		popupLayout.draw(parent.width-198);
 		popupPathway.draw(parent.width-298);
 		setIntegrator --;  // Set node to circular layout when dragging or changing scales
+		
+		
+		// Draw brushing reaction
+		if (g.getHoverNode()!=null){
+			System.out.println("getHoverNode	"+g.getHoverNode().reaction.getDisplayName());
+			Node node =g.getHoverNode();
+			drawReactionLink(parent, node, xRight, parent.width-80, 500, 255);
+		}
+		
 	}
+	
+	
+	// draw Reactions links
+	public static void drawReactionLink(PApplet parent, Node node, float xL, float xR,float yReact, float sat) {
+		
+		Object[] sLeft = node.reaction.getLeft().toArray();
+		for (int i3=0;i3<sLeft.length;i3++){
+			  String name = main.PathwayViewer_2_5.getProteinName(sLeft[i3].toString());
+			  if (name==null)
+				  name=sLeft[i3].toString();
+			  
+			  float y2 = yReact+i3*20;
+			  parent.stroke(0);
+			  parent.line(xL, y2, (xL+xR)/2, yReact);
+			
+			  parent.fill(0);
+			  parent.textSize(11);
+			  parent.textAlign(PApplet.RIGHT);
+			  parent.text(name,xL, y2+5);
+			  
+			 /* float al = -PApplet.PI/6;
+			   parent.translate(x2,yL);
+				parent.rotate(al);
+				parent.text(name, 0,0);
+				parent.rotate(-al);
+				parent.translate(-(x2), -(yL));
+			*/
+			  /*
+			  // Complex LEFT
+			  else if (main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+				  int id = main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString());
+				 // isContainedComplexL = drawComplexLeft(i2, id, yReact, sat);
+			  }
+			  else{
+				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
+			  }*/
+		  }
+		Object[] sRight = node.reaction.getRight().toArray();
+		for (int i3=0;i3<sRight.length;i3++){
+			  String name = main.PathwayViewer_2_5.getProteinName(sRight[i3].toString());
+			  if (name==null)
+				  name=sRight[i3].toString();
+			  
+			  float y2 = yReact+i3*20;
+			  parent.stroke(0);
+			  parent.line( xR, y2, (xL+xR)/2, yReact);
+			
+			  parent.fill(0);
+			  parent.textSize(11);
+			  parent.textAlign(PApplet.LEFT);
+			  parent.text(name,xR, y2+5);
+			  
+			  /*
+			  float al = PApplet.PI/6;
+			   parent.translate(x2,yR);
+				parent.rotate(al);
+				parent.text(name, 0,0);
+				parent.rotate(-al);
+				parent.translate(-(x2), -(yR));
+			  */	
+				
+			  /*
+			  // Complex LEFT
+			  else if (main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
+				  int id = main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString());
+				 // isContainedComplexL = drawComplexLeft(i2, id, yReact, sat);
+			  }
+			  else{
+				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
+			  }*/
+		  }
+		
+		parent.fill(node.color.getRGB());
+		parent.noStroke();
+		parent.ellipse((xL+xR)/2, yReact, node.size, node.size);
+		parent.textAlign(PApplet.CENTER);
+		parent.text(node.reaction.getDisplayName(), (xL+xR)/2, yReact-node.size/2-2);
+	 }
+	
+	
 	
 	 public void drawCenter(float x_, float y_, float r_){
 		parent.fill(50);
@@ -406,7 +508,7 @@ public class PathwayView{
 	  	parent.strokeWeight(r_/10);
 		parent.stroke(150);
 		parent.line(x_-(r_*1.6f)/2,y_, x_+(r_*1.6f)/2,y_);
-		if (!isExpanded)
+		if (!rootPathway.isExpanded)
 			parent.line(x_,y_-(r_*1.6f)/2, x_,y_+(r_*1.6f)/2);
 	}
 		
@@ -832,7 +934,22 @@ public class PathwayView{
 		if (g==null) return;
 		
 		if(isBrushing)
-			isExpanded = !isExpanded;
+			rootPathway.isExpanded = !rootPathway.isExpanded;
+		else if (buttonReset.b){
+			resetPosistion();
+			scale = 1f;
+			updateScale();
+			setIntegrator = 4;
+		}
+		else if (buttonExpand.b){
+			rootPathway.expandAll();
+			isExpandedAll = true;
+		}
+		else if (buttonCollapse.b){
+			rootPathway.collapseAll();
+			isExpandedAll=false;
+		}
+			
 		
 		if (popupLayout.b>=0){
 			popupLayout.mouseClicked();

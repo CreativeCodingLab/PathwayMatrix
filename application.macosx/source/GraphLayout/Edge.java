@@ -104,29 +104,35 @@ public class Edge {
 		if (pathwayFrom==null || pathwayTo==null) return;
 		
 			
-		 //if (pathwayFrom.equals(pathwayTo)){
-			 drawArc(sat);
-		 //}
-		 /*
-		 else{
-			 //System.out.println(pathwayFrom+"	"+pathwayTo);
-			 float xFrom = from.iX.value;
-			 float yFrom = from.iY.value;
-			 float xTo = to.iX.value;
-			 float yTo = to.iY.value;
-			
-			 float xPathwayFrom = pathwayFrom.xPathway;
-			 float yPathwayFrom = pathwayFrom.yPathway;
-			 float xPathwayTo = pathwayTo.xPathway;
-			 float yPathwayTo = pathwayTo.yPathway;
+		if (PathwayView.isExpandedAll){
 				
-			 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.BLUE);
-			 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.CYAN);
-			 
-			// while()
-			// System.out.println(pathwayFrom+"	1 pathwayTo="+pathwayTo);
-			  drawPathwayLink(pathwayFrom, pathwayTo);
-		 }*/
+			 if (pathwayFrom.equals(pathwayTo)){
+				 drawArc(sat);
+			 }
+			 else{
+				 if (sat<200) return;
+				 //System.out.println(pathwayFrom+"	"+pathwayTo);
+				 float xFrom = from.iX.value;
+				 float yFrom = from.iY.value;
+				 float xTo = to.iX.value;
+				 float yTo = to.iY.value;
+				
+				 float xPathwayFrom = pathwayFrom.xPathway;
+				 float yPathwayFrom = pathwayFrom.yPathway;
+				 float xPathwayTo = pathwayTo.xPathway;
+				 float yPathwayTo = pathwayTo.yPathway;
+					
+				 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.CYAN);
+				 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLUE);
+				 
+				// while()
+				// System.out.println(pathwayFrom+"	1 pathwayTo="+pathwayTo);
+				  drawPathwayLink(pathwayFrom, pathwayTo);
+		 }
+		}
+		else{
+			 drawArc(sat);
+		}
 	 }
 	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo) {
 		 float xPathwayFrom = pathwayFrom.xPathway;
@@ -134,20 +140,34 @@ public class Edge {
 		 //System.out.println(pathwayFrom+"	2 pathwayTo="+pathwayTo);
 		 float xPathwayTo = pathwayTo.xPathway;
 		 float yPathwayTo = pathwayTo.yPathway;
+		 Pathway2 newPathwayFrom = pathwayFrom;
 		 if (pathwayTo.level>0){
-			 Pathway2 newPathway = pathwayFrom;
-			 while(newPathway.level>pathwayTo.level){
-				 drawGradientLine(newPathway.xPathway, newPathway.yPathway, newPathway.parentPathway.xPathway, newPathway.parentPathway.yPathway,Color.MAGENTA);
-				 newPathway = newPathway.parentPathway;
+			 while(newPathwayFrom.level>pathwayTo.level){
+				 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+						 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,Color.MAGENTA);
+				 newPathwayFrom = newPathwayFrom.parentPathway;
 			 }
 		 }
+		 Pathway2 newPathwayTo = pathwayTo;
 		 if (pathwayFrom.level>0){
-			 Pathway2 newPathway = pathwayTo;
-			 while(newPathway.level>pathwayFrom.level){
-				 drawGradientLine(newPathway.parentPathway.xPathway, newPathway.parentPathway.yPathway, newPathway.xPathway, newPathway.yPathway,Color.RED);
-				 newPathway = newPathway.parentPathway;
+			 while(newPathwayTo.level>pathwayFrom.level){
+				 drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
+						 newPathwayTo.xPathway, newPathwayTo.yPathway,Color.RED);
+				 newPathwayTo = newPathwayTo.parentPathway;
 			 }
 		 }
+		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
+			 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+					 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,new Color(120,0,120));
+			drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
+					 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(100,0,0));
+			 newPathwayFrom = newPathwayFrom.parentPathway;
+			newPathwayTo = newPathwayTo.parentPathway;
+		 }
+		 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+				 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(0,0,0));
+		
+		 
 	 }
 			
 			

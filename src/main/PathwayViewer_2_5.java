@@ -1342,6 +1342,7 @@ public class PathwayViewer_2_5 extends PApplet {
 				// Compute size for 1 time
 				for (int f=0;f<pathwayView.files.size();f++){
 					PathwayView.filePathway[f].computeSize();
+					PathwayView.rootPathway.subPathwayList.add(PathwayView.filePathway[f]);
 				}
 				
 				// Set reactions to pathway view

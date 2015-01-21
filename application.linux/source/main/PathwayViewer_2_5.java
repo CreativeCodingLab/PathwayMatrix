@@ -1261,6 +1261,8 @@ public class PathwayViewer_2_5 extends PApplet {
 				pathwayView.rectFileList = new ArrayList<Integer>();
 				pathwayView.maxSize=0;
 				pathwayView.filePathway = new Pathway2[pathwayView.nFiles];
+				PathwayView.rootPathway = new Pathway2(parent,null,-1,"ROOT",0);
+				 
 				//multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
 				//multipleReaction.popupPathway.pathwayListFile = new ArrayList<Integer>();
 				for (int f=0;f<pathwayView.files.size();f++){
@@ -1304,7 +1306,7 @@ public class PathwayViewer_2_5 extends PApplet {
 					 i2=0;
 					 String[] str = pathwayView.files.get(f).split("/");
 					 String nameFile = str[str.length-1];
-					 PathwayView.filePathway[f] = new Pathway2(parent,null,f,nameFile,1);
+					 PathwayView.filePathway[f] = new Pathway2(parent,PathwayView.rootPathway,f,nameFile,1);
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
 						 Pathway2 newPathway = new Pathway2(parent,PathwayView.filePathway[f],
 								 f,aPathway.getDisplayName(),PathwayView.filePathway[f].level+1);
@@ -1340,6 +1342,7 @@ public class PathwayViewer_2_5 extends PApplet {
 				// Compute size for 1 time
 				for (int f=0;f<pathwayView.files.size();f++){
 					PathwayView.filePathway[f].computeSize();
+					PathwayView.rootPathway.subPathwayList.add(PathwayView.filePathway[f]);
 				}
 				
 				// Set reactions to pathway view
