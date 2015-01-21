@@ -35,7 +35,6 @@ public class PathwayView{
 	public ArrayList<String> complexList = new ArrayList<String>(); 
 	public ArrayList<String> proteinList = new ArrayList<String>();
 	
-	public static ArrayList<BiochemicalReaction> rectList;
 	public ArrayList<Integer> rectSizeList;
 	public ArrayList<Integer> rectFileList;
 	
@@ -70,7 +69,7 @@ public class PathwayView{
 	public static float scale=1;
 	boolean isExpanded =false;
 	boolean isBrushing =false;
-	public static boolean isSetIntegrator =false;
+	public static int setIntegrator =0;
 	
 	public PathwayView(PApplet p){
 		parent = p;
@@ -92,7 +91,7 @@ public class PathwayView{
 		
 	}
 	
-	public void setItems(){
+	public void setItems(ArrayList<BiochemicalReaction> rectList){
 		// Causality integrator
 		iS = new Integrator[rectList.size()][rectList.size()];
 		for (int i=0;i<rectList.size();i++){
@@ -171,16 +170,14 @@ public class PathwayView{
 		yCircular = parent.height/2;
 	}
 	
-	public void updateNodes() {
+	public void updateNodes(ArrayList<BiochemicalReaction> rectList) {
 		g = new Graph();
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
 			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
 			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
 			node.nodeId = i;
-			node.name = rectList.get(i).getDisplayName();
-			if (node.name==null)
-				node.name = "NULL";
+			node.reaction = rectList.get(i);
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
 			g.addNode(node);
 		}	
@@ -209,12 +206,12 @@ public class PathwayView{
 		
 		// Update slider value to synchronize the processes
 		System.out.println();
-		for (int r = 0; r < rectList.size(); r++) {
-			Node node1 = g.nodes.get(r);
+		for (int r = 0; r < Graph.nodes.size(); r++) {
+			Node node1 = Graph.nodes.get(r);
 			ArrayList<Integer> a = getDirectDownstream(r);
 			for (int j = 0; j < a.size(); j++) {
 				int r2 = a.get(j);
-				Node node2 = g.nodes.get(r2);
+				Node node2 = Graph.nodes.get(r2);
 				Edge e = new Edge(node1, node2, 0, parent); //
 				g.addEdge(e);
 				node1.degree++;
@@ -331,13 +328,13 @@ public class PathwayView{
 			}
 			else{
 				// Print all reactions on a circle
+				
 				float beginAl = -PApplet.PI/2;
 				for (int f=0;f<filePathway.length;f++){
-					ArrayList<String> a = filePathway[f].getAllReaction();
+					ArrayList<Integer> a = filePathway[f].getAllNodeId();
 					float sec = (PApplet.sqrt(a.size())/totalSize)*PApplet.PI*1.8f;
 					for (int i=0;i<a.size();i++){
-						String nodeName = a.get(i);
-						Node node = Pathway2.getNodeByName(nodeName);
+						Node node =Graph.nodes.get(a.get(i));
 						float al2 = beginAl+((float) i/a.size())*sec;
 						if (node==null) return;
 						float xR2 = xCircular + (rCircular+node.size/2)*PApplet.cos(al2);
@@ -357,7 +354,7 @@ public class PathwayView{
 			parent.noStroke();
 			parent.fill(Pathway2.beginDarknessOfPathways);  
 			if (isBrushing)
-				parent.fill(100,100,200,100);
+				parent.fill(220,220,255,200);
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			drawCenter(xCircular, yCircular,rCenter);
@@ -399,7 +396,7 @@ public class PathwayView{
 		// Draw popups
 		popupLayout.draw(parent.width-198);
 		popupPathway.draw(parent.width-298);
-		isSetIntegrator = false;  // Set node to circular layout when dragging or changing scales
+		setIntegrator --;  // Set node to circular layout when dragging or changing scales
 	}
 	
 	 public void drawCenter(float x_, float y_, float r_){
@@ -421,7 +418,7 @@ public class PathwayView{
 		parent.text(nFiles+" files", 3, parent.height/2+5);
 		float[] yF = new float[nFiles];
 		float[] nF = new float[nFiles];
-		for (int i=0; i<rectList.size(); i++){
+		for (int i=0; i<Graph.nodes.size(); i++){
 			int f = rectFileList.get(i);
 			yF[f] += g.nodes.get(i).iY.value;
 			nF[f] ++;
@@ -434,7 +431,7 @@ public class PathwayView{
 			parent.line(40,parent.height/2,250,yy);
 			
 		}
-		for (int i=0; i<rectList.size(); i++){
+		for (int i=0; i<Graph.nodes.size(); i++){
 			int f = rectFileList.get(i);
 			float yy = yF[f]/nF[f];
 			Color color = gradient.getGradient(colorScale*(transferID(f)));
@@ -459,7 +456,7 @@ public class PathwayView{
 		
 		int count = 0;
 		int r = getNoneUpstream(doneList);
-		while (count<rectList.size()){
+		while (count<Graph.nodes.size()){
 		//	System.out.println(count+"	doneList="+doneList+"	r="+r);
 			if (r>=0){
 				doneList.add(r);
@@ -484,13 +481,13 @@ public class PathwayView{
 		}
 		
 		float totalH = parent.height-15;
-		float itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()*0.8f+1);
+		float itemH2 = totalH/(Graph.nodes.size()+circleList.size()-nonCausalityList.size()*0.8f+1);
 		float circleGap = itemH2;
 		float circleGapSum = 0;
 		
 		int count2 = 0;
 		int count3 = 0;
-		float yStartCausality = 10 +(rectList.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
+		float yStartCausality = 10 +(Graph.nodes.size()-nonCausalityList.size()+circleList.size()+1)*itemH2;
 		for (int i=0;i<doneList.size();i++){
 			int index = doneList.get(i);
 			// Compute nonCausality reaction
@@ -512,17 +509,17 @@ public class PathwayView{
 	}
 	
 	public void orderTree() {
-		yTree =  new float[rectList.size()];
-		for (int i=0; i<rectList.size();i++){
+		yTree =  new float[Graph.nodes.size()];
+		for (int i=0; i<Graph.nodes.size();i++){
 			float totalH = parent.height-10;
-			float itemH2 = (totalH-10*nFiles)/(rectList.size()-1);
+			float itemH2 = (totalH-10*nFiles)/(Graph.nodes.size()-1);
 			yTree[i] = 10+i*itemH2+10*rectFileList.get(i);
 		}
 	}
 		
 	public int getNoneUpstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		for (int i=0;i<rectList.size();i++){
+		for (int i=0;i<Graph.nodes.size();i++){
 			if (doneList.contains(i)) continue;
 			ArrayList<Integer> up = this.getDirectUpstream(i);
 			if (up.size()==0)  {//No upstream
@@ -534,7 +531,7 @@ public class PathwayView{
 		}
 		else{
 			ArrayList<Integer> b = new ArrayList<Integer>();
-			for (int i=0;i<rectList.size();i++){
+			for (int i=0;i<Graph.nodes.size();i++){
 				if (doneList.contains(i)) continue;
 				ArrayList<Integer> up = this.getDirectUpstream(i);
 				if (isContainedAllUpInDoneList(up,doneList)){  // Upstream are all in the doneList;
@@ -573,7 +570,7 @@ public class PathwayView{
 	
 	public int getReactionMaxDownstream(ArrayList<Integer> doneList){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		for (int i=0;i<rectList.size();i++){
+		for (int i=0;i<Graph.nodes.size();i++){
 			if (doneList.contains(i)) continue;
 			a.add(i);
 		}
@@ -610,11 +607,11 @@ public class PathwayView{
 	
 	public ArrayList<Integer> getReactionWithSameInput(int r){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		BiochemicalReaction rectSelected = rectList.get(r);
+		BiochemicalReaction rectSelected = Graph.nodes.get(r).reaction;
 		Object[] sLeft1 = rectSelected.getLeft().toArray();
-		for (int g=0;g<rectList.size();g++) {
+		for (int g=0;g<Graph.nodes.size();g++) {
 			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
+			BiochemicalReaction rect2 = Graph.nodes.get(g).reaction;
 			Object[] sLeft2 = rect2.getLeft().toArray();
 			ArrayList<String> commonElements = compareInputOutput(sLeft1, sLeft2);
 			if (commonElements.size()>0){
@@ -625,11 +622,11 @@ public class PathwayView{
 	}
 	public ArrayList<Integer> getReactionWithSameOutput(int r){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		BiochemicalReaction rectSelected = rectList.get(r);
+		BiochemicalReaction rectSelected = Graph.nodes.get(r).reaction;
 		Object[] sRight1 = rectSelected.getRight().toArray();
-		for (int g=0;g<rectList.size();g++) {
+		for (int g=0;g<Graph.nodes.size();g++) {
 			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
+			BiochemicalReaction rect2 = Graph.nodes.get(g).reaction;
 			Object[] sRight2 = rect2.getRight().toArray();
 			ArrayList<String> commonElements = compareInputOutput(sRight1, sRight2);
 			if (commonElements.size()>0){
@@ -642,11 +639,11 @@ public class PathwayView{
 	
 	public ArrayList<Integer> getDirectDownstream(int r){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		BiochemicalReaction rectSelected = rectList.get(r);
+		BiochemicalReaction rectSelected = Graph.nodes.get(r).reaction;
 		Object[] sRight1 = rectSelected.getRight().toArray();
-		for (int g=0;g<rectList.size();g++) {
+		for (int g=0;g<Graph.nodes.size();g++) {
 			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
+			BiochemicalReaction rect2 = Graph.nodes.get(g).reaction;
 			Object[] sLeft2 = rect2.getLeft().toArray();
 			ArrayList<String> commonElements = compareInputOutput(sRight1, sLeft2);
 			if (commonElements.size()>0){
@@ -659,13 +656,13 @@ public class PathwayView{
 	
 	public ArrayList<Integer> getDirectUpstream(int r){
 		ArrayList<Integer> a = new ArrayList<Integer>();
-		BiochemicalReaction rectSelected = rectList.get(r);
+		BiochemicalReaction rectSelected = Graph.nodes.get(r).reaction;
 		Object[] sLeft = rectSelected.getLeft().toArray();
 		
 		// List current reaction
-		for (int g=0;g<rectList.size();g++) {
+		for (int g=0;g<Graph.nodes.size();g++) {
 			if(g==r) continue;
-			BiochemicalReaction rect2 = rectList.get(g);
+			BiochemicalReaction rect2 = Graph.nodes.get(g).reaction;
 			Object[] sRight2 = rect2.getRight().toArray();
 			ArrayList<String> commonElements = compareInputOutput(sRight2, sLeft);
 			if (commonElements.size()>0){
@@ -720,10 +717,13 @@ public class PathwayView{
 				}
 			}
 		}
+		
+		float xCenter = xRight/2;
+		float yCenter = parent.height/2;
 		for (int i = 0; i < g.getNodes().size(); i++) {
 			Node a = (Node) g.getNodes().get(i);
-			float dx = xCircular - a.getX();
-			float dy = yCircular - a.getY();
+			float dx = xCenter - a.getX();
+			float dy = yCenter - a.getY();
 			float r2 = dx * dx + dy * dy;
 			float f =  r2/10000000;
 			if (a.degree>0){
@@ -743,7 +743,7 @@ public class PathwayView{
 	
 	
 	public static float computeAlpha(int r){
-		return PApplet.PI -((float)r)/(rectList.size())*2*PApplet.PI;
+		return PApplet.PI -((float)r)/(Graph.nodes.size())*2*PApplet.PI;
 	}
 	
 			
@@ -873,7 +873,7 @@ public class PathwayView{
 
 	public void mouseDragged() {
 		slider2.checkSelectedSlider3();
-		isSetIntegrator = true;
+		setIntegrator = 2;
 		if (g==null) return;
 		if (g.getDragNode() != null) {
 			g.getDragNode()

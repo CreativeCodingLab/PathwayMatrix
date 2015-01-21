@@ -3,12 +3,13 @@ package GraphLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
+
 import main.Integrator;
 import main.PathwayView;
 import main.Pathway2;
 import main.PopupPathway;
 import processing.core.PApplet;
-import processing.core.PImage;
 
 //Copyright 2005 Sean McCullough
 //banksean at yahoo
@@ -18,7 +19,7 @@ public class Node {
 	float mass = 1;
 	public float size = 1;
 	//public float wordWidth = 1;
-	public String name = "";
+	public BiochemicalReaction reaction = null;
 	public PApplet parent;
 	public Color color = null;
 
@@ -33,6 +34,9 @@ public class Node {
 	public Integrator iY = new Integrator(0,0.2f,0.4f);
 	public float difX = 0;
 	public float difY = 0;
+	
+	public Pathway2 parentPathway= null;
+	
 	
 	public Node(Vector3D v, PApplet p) {
 		position = v;
@@ -151,7 +155,7 @@ public class Node {
 			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),55+sat);
 			// Draw node names
 			parent.textSize(12);
-			parent.text(name, xx, yy-7);
+			parent.text(reaction.getDisplayName(), xx, yy-7);
 			parent.ellipse(xx, yy, size, size);
 		} 
 		else if (g.getHoverNode() != null && g.getHoverNode()!=this && !isConnected) {
@@ -178,7 +182,7 @@ public class Node {
 				
 				parent.translate(xx,yy);
 				parent.rotate(PApplet.PI/2-iAlpha.value);
-				parent.text(name, 0, 0);
+				parent.text(reaction.getDisplayName(), 0, 0);
 				parent.rotate(-(PApplet.PI/2-iAlpha.value));
 				parent.translate(-xx,-yy);
 				
@@ -186,7 +190,7 @@ public class Node {
 			else{
 				if(PopupPathway.b>=0){
 					Pathway2 pathway = PopupPathway.pathwayList.get(PopupPathway.b);
-					if (pathway.isContainReaction(name)){
+					if (pathway.isContainReaction(reaction.getDisplayName())){
 						parent.fill(0,15+parent.frameCount*22%240);
 						parent.ellipse(xx, yy, size*2, size*2);
 					}	
@@ -196,7 +200,7 @@ public class Node {
 				ArrayList<Integer> fileList =  new ArrayList<Integer>();
 				for (int i=0;i<PopupPathway.redundantPathway.size();i++){
 					Pathway2 pathway = PopupPathway.redundantPathway.get(i);
-					if (pathway.isContainReaction(name)){
+					if (pathway.isContainReaction(reaction.getDisplayName())){
 						//parent.fill(255,0,255);
 						if (!fileList.contains(pathway.f))
 							fileList.add(pathway.f);

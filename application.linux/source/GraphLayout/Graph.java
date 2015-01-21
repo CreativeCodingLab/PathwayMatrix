@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.biopax.paxtools.model.level3.BiochemicalReaction;
+
 import processing.core.PApplet;
 
 //Copyright 2005 Sean McCullough
 //banksean at yahoo
 
 public class Graph {
-	public ArrayList<Node> nodes;
+	public static ArrayList<Node> nodes;
 	public ArrayList<Edge> edges;
 	public HashMap<Node, ArrayList<Edge>> edgesFrom;
 	public HashMap<Node, ArrayList<Edge>> edgesTo;
@@ -137,6 +139,15 @@ public class Graph {
 	public ArrayList<Node> getNodes() {
 		return nodes;
 	}
+	
+	 public static Node getNodeByReaction(BiochemicalReaction react){
+		  for (int i=0; i<nodes.size();i++){
+			  Node node = nodes.get(i);
+			  if (node.reaction.equals(react))
+				  return node;
+		  }
+		  return null;
+	  }
 
 	public void drawEdges() {
 		// Reset brushing node

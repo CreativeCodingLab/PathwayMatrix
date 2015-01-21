@@ -2,6 +2,7 @@ package GraphLayout;
 
 import java.awt.Color;
 
+import main.Pathway2;
 import main.PathwayView;
 import main.Slider2;
 import processing.core.PApplet;
@@ -82,12 +83,12 @@ public class Edge {
 	    	parent.strokeWeight(1);
 	        if (g.getHoverNode() ==null){
     	    	drawLink(240);
-	    	}
+    	    }
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
 	    		parent.strokeWeight(2);
 		        drawLink(255);
-			    from.isConnected =true;
+		     	from.isConnected =true;
 			    to.isConnected = true;
 	    	}
 	    	else{
@@ -95,7 +96,92 @@ public class Edge {
 	     	}
 	 	}
 	  }
-	  public void drawLink(float sat) {
+	  
+	 
+	 public void drawLink(float sat) {
+		Pathway2 pathwayFrom = from.parentPathway;
+		Pathway2 pathwayTo = to.parentPathway;
+		if (pathwayFrom==null || pathwayTo==null) return;
+		
+			
+		 if (pathwayFrom.equals(pathwayTo)){
+			 drawArc(sat);
+		 }
+		 else{
+			 if (sat<200) return;
+			 //System.out.println(pathwayFrom+"	"+pathwayTo);
+			 float xFrom = from.iX.value;
+			 float yFrom = from.iY.value;
+			 float xTo = to.iX.value;
+			 float yTo = to.iY.value;
+			
+			 float xPathwayFrom = pathwayFrom.xPathway;
+			 float yPathwayFrom = pathwayFrom.yPathway;
+			 float xPathwayTo = pathwayTo.xPathway;
+			 float yPathwayTo = pathwayTo.yPathway;
+				
+			 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.CYAN);
+			 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLUE);
+			 
+			// while()
+			// System.out.println(pathwayFrom+"	1 pathwayTo="+pathwayTo);
+			  drawPathwayLink(pathwayFrom, pathwayTo);
+		 }
+	 }
+	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo) {
+		 float xPathwayFrom = pathwayFrom.xPathway;
+		 float yPathwayFrom = pathwayFrom.yPathway;
+		 //System.out.println(pathwayFrom+"	2 pathwayTo="+pathwayTo);
+		 float xPathwayTo = pathwayTo.xPathway;
+		 float yPathwayTo = pathwayTo.yPathway;
+		 Pathway2 newPathwayFrom = pathwayFrom;
+		 if (pathwayTo.level>0){
+			 while(newPathwayFrom.level>pathwayTo.level){
+				 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+						 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,Color.MAGENTA);
+				 newPathwayFrom = newPathwayFrom.parentPathway;
+			 }
+		 }
+		 Pathway2 newPathwayTo = pathwayTo;
+		 if (pathwayFrom.level>0){
+			 while(newPathwayTo.level>pathwayFrom.level){
+				 drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
+						 newPathwayTo.xPathway, newPathwayTo.yPathway,Color.RED);
+				 newPathwayTo = newPathwayTo.parentPathway;
+			 }
+		 }
+		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
+			 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+					 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,new Color(120,0,120));
+			drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
+					 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(100,0,0));
+			 newPathwayFrom = newPathwayFrom.parentPathway;
+			newPathwayTo = newPathwayTo.parentPathway;
+		 }
+		 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
+				 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(0,0,0));
+		
+		 
+	 }
+			
+			
+	 public void drawGradientLine(float x1, float y1, float x2, float y2, Color color) {
+		 int numSec =6;
+		 for (int i=1;i<=numSec;i++){
+				float sss = (float) i/numSec;
+				float x3 = x1+(x2-x1)*sss;
+				float y3 = y1+(y2-y1)*sss;
+				float r = 200*sss;
+				
+				parent.stroke(color.getRGB());
+				parent.line(x1,y1,x3,y3);
+				x1=x3;
+				y1=y3;
+		 }
+	 }
+			
+			
+	  public void drawArc(float sat) {
 		// Draw gradient lines
 		/*int numSec =6;
 		float x1 = from.iX.value;
