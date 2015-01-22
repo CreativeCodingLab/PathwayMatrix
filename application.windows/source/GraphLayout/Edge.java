@@ -1,6 +1,7 @@
 package GraphLayout;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import main.Pathway2;
 import main.PathwayView;
@@ -18,7 +19,10 @@ public class Edge {
 	int type = -1;  
 	Graph g;
 	PApplet parent;
-
+	public int countFrom=0;
+	public int countTo=0;
+	
+	
 	public Edge(Node from_, Node to_,int type_, PApplet papa) {
 		parent = papa;
 		from = from_;
@@ -101,7 +105,15 @@ public class Edge {
 			
 	 public void drawLink(float sat) {
 		Pathway2 pathwayFrom = from.parentPathway;
+		while (!pathwayFrom.parentPathway.isExpanded){
+			pathwayFrom = pathwayFrom.parentPathway;
+			if (pathwayFrom==null) break;
+		}
 		Pathway2 pathwayTo = to.parentPathway;
+		while (!pathwayTo.parentPathway.isExpanded){
+			pathwayTo = pathwayTo.parentPathway;
+			if (pathwayTo==null) break;
+		}
 		if (pathwayFrom==null || pathwayTo==null) return;
 			 if (PathwayView.popupLayout.s==0 || PathwayView.popupLayout.s==1 ||
 					 PathwayView.popupLayout.s==2 || pathwayFrom.equals(pathwayTo)){
@@ -132,49 +144,107 @@ public class Edge {
 				 float yPathwayFrom = pathwayFrom.y;
 				 float xPathwayTo = pathwayTo.x;
 				 float yPathwayTo = pathwayTo.y;
+				
+				 countFrom=0;
+				 countTo = 0;
+				 ArrayList<Pathway2> a  = drawPathwayFromUpLink(pathwayFrom, pathwayTo, sat);
+				 Pathway2 newPathwayFrom = a.get(0);
+				 ArrayList<Pathway2> b  = drawPathwayToUpLink(pathwayFrom, pathwayTo, sat);
+				 Pathway2 newPathwayTo = b.get(0);
+				 
+				  drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
+				 if (countFrom>0)
+						 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.RED);
+				 else if (pathwayFrom.equals(b.get(1).parentPathway)){
+					//float x1 = from.iX.value-from.difX;
+					 //float y1 = from.iY.value-from.difY;
+					 float x1 = xFrom;
+					 float y1 = yFrom;
+						
+					 //float x2 = to.iX.value-to.difX;
+					 //float y2 = to.iY.value-to.difY;
+					 float x2 = b.get(1).x;    
+					 float y2 = b.get(1).y;
 					
-				 if (pathwayFrom.isExpanded)
-					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.YELLOW);
-				 if (pathwayTo.isExpanded)
-					 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLACK);
-				 
-				 
-				// while()
-				// System.out.println(pathwayFrom+"	1 pathwayTo="+pathwayTo);
-				  drawPathwayLink(pathwayFrom, pathwayTo, sat);
+					 if (countTo==0){
+						 x2 = xTo;
+						 y2 = yTo;
+					 }
+					 
+					 float xCenter = pathwayFrom.x;
+					 float yCenter = pathwayFrom.y;
+				//	 parent.fill(255,0,0);
+				//	 parent.ellipse(xCenter, yCenter,20,20);
+				//	 parent.stroke(Color.GREEN.getRGB());
+				//	 parent.line(x1, y1, x2, y2);
+					 
+					 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
+					 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
+					 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
+				 }
+					 
+				 if (countTo>0)
+						 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLUE);
+					
 		   }
 		
 	 }
-	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
+	 public  ArrayList<Pathway2> drawPathwayFromUpLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
+		 ArrayList<Pathway2> a = new ArrayList<Pathway2>();
 		 Pathway2 newPathwayFrom = pathwayFrom;
+		 Pathway2 currentPathway = pathwayFrom;
 		 if (pathwayTo.level>0){
 			 while(newPathwayFrom.level>pathwayTo.level){
+				 currentPathway = newPathwayFrom;
 				 if (newPathwayFrom.parentPathway.isExpanded){
-						drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
+					 if(!newPathwayFrom.parentPathway.equals(pathwayTo))   // if they have the same parent
+						 drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
 						 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+						countFrom++;
 				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
 			 }
 		 }
+		 a.add(newPathwayFrom);
+		 a.add(currentPathway);
+		 return a;
+	 }
+	 
+	 public ArrayList<Pathway2> drawPathwayToUpLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
+		 ArrayList<Pathway2> a = new ArrayList<Pathway2>();
 		 Pathway2 newPathwayTo = pathwayTo;
+		 Pathway2 currentPathway = pathwayTo;
 		 if (pathwayFrom.level>0){
 			 while(newPathwayTo.level>pathwayFrom.level){
+				 currentPathway = newPathwayTo;
 				 if (newPathwayTo.parentPathway.isExpanded){
-					 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-						 newPathwayTo.x, newPathwayTo.y,Color.BLACK);
+					 if(!newPathwayTo.parentPathway.equals(pathwayFrom))  // if they have the same parent
+						 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+								 newPathwayTo.x, newPathwayTo.y,Color.MAGENTA);
+					 countTo++;
 				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
 			 }
 		 }
+		 a.add(newPathwayTo);
+		 a.add(currentPathway);
+		 return a;
+	 }
+	 
+	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
+		 Pathway2 newPathwayFrom = pathwayFrom;
+		 Pathway2 newPathwayTo = pathwayTo;
 		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
 			 if (newPathwayFrom.parentPathway.isExpanded){
 					drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
 					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+					countFrom++;
 			 }
 			 if (newPathwayTo.parentPathway.isExpanded){
 					
-			 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-					 newPathwayTo.x, newPathwayTo.y,Color.BLACK);
+				 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+					 newPathwayTo.x, newPathwayTo.y,Color.MAGENTA.BLACK);
+				 	countTo++;
 			 }
 			 newPathwayFrom = newPathwayFrom.parentPathway;
 			 newPathwayTo = newPathwayTo.parentPathway;
@@ -203,6 +273,9 @@ public class Edge {
 			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
 			 //drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
 			//	 newPathwayTo.x, newPathwayTo.y,new Color(0,255,0));
+				countFrom++;
+				countTo++;
+				 
 		 }
 		 
 	 }

@@ -16,13 +16,13 @@ import processing.core.PApplet;
 
 import edu.uic.ncdm.venn.Venn_Overview;
 
-import static main.PathwayViewer_2_6.pairs;
-import static main.PathwayViewer_2_6.ggg;
-import static main.PathwayViewer_2_6.geneRelationList;
-import static main.PathwayViewer_2_6.gene_gene_InComplex;
-import static main.PathwayViewer_2_6.maxGeneInComplex;
-import static main.PathwayViewer_2_6.leaderSortedMap;
-import static main.PathwayViewer_2_6.locals;
+import static main.PathwayViewer_2_7.pairs;
+import static main.PathwayViewer_2_7.ggg;
+import static main.PathwayViewer_2_7.geneRelationList;
+import static main.PathwayViewer_2_7.gene_gene_InComplex;
+import static main.PathwayViewer_2_7.maxGeneInComplex;
+import static main.PathwayViewer_2_7.leaderSortedMap;
+import static main.PathwayViewer_2_7.locals;
 import static edu.uic.ncdm.venn.Venn_Overview.numMinerContainData;
 import static edu.uic.ncdm.venn.Venn_Overview.minerGlobalIDof;;
 
@@ -37,8 +37,8 @@ public class Gene {
 	
 	public Gene(String name_, int order_){
 		name = name_;
-		iX = new Integrator(main.PathwayViewer_2_6.marginX,.5f,.1f);
-		iY = new Integrator(main.PathwayViewer_2_6.marginY,.5f,.1f);
+		iX = new Integrator(main.PathwayViewer_2_7.marginX,.5f,.1f);
+		iY = new Integrator(main.PathwayViewer_2_7.marginY,.5f,.1f);
 		iW = new Integrator(0,.5f,.1f);
 		iH = new Integrator(0,.5f,.1f);
 		order = order_;
@@ -46,8 +46,8 @@ public class Gene {
 	
 	public static void compute(){
 		 hGenes = new Hashtable<String,int[]>();
-		 for (int i=0; i<main.PathwayViewer_2_6.ggg.size();i++){
-			 hGenes.put(main.PathwayViewer_2_6.ggg.get(i).name, new int[numMinerContainData]);
+		 for (int i=0; i<main.PathwayViewer_2_7.ggg.size();i++){
+			 hGenes.put(main.PathwayViewer_2_7.ggg.get(i).name, new int[numMinerContainData]);
 		 }
 		 maxRelationOfGenes = -1;
 		 for (int j=0; j<numMinerContainData;j++){
@@ -116,8 +116,8 @@ public class Gene {
 	public static void computeGeneGeneInComplex(){
 		maxGeneInComplex = 0;
 		gene_gene_InComplex = new int[ggg.size()][ggg.size()];
-		for (int c=0;c<main.PathwayViewer_2_6.complexList.size();c++){
-			ArrayList<String> a = main.PathwayViewer_2_6.proteinsInComplex[c];
+		for (int c=0;c<main.PathwayViewer_2_7.complexList.size();c++){
+			ArrayList<String> a = main.PathwayViewer_2_7.proteinsInComplex[c];
 			for (int i=0;i<ggg.size();i++){
 				for (int j=0;j<ggg.size();j++){
 					if (a.indexOf(ggg.get(i).name)>=0 && a.indexOf(ggg.get(j).name)>=0){
@@ -265,7 +265,7 @@ public class Gene {
 		
 		// Find the smallest molecule
 		for (int p=0;p<ggg.size();p++){
-			if (main.PathwayViewer_2_6.isSmallMolecule(ggg.get(p).name)){
+			if (main.PathwayViewer_2_7.isSmallMolecule(ggg.get(p).name)){
 				int count = getNumberRelationOfProtein(p);
 				if (count>maxRelation){
 					maxRelation = count;
@@ -278,7 +278,7 @@ public class Gene {
 		double minRelation = Double.POSITIVE_INFINITY;
 		if (maxminIndex<0){
 			for (int p=0;p<ggg.size();p++){
-				if (main.PathwayViewer_2_6.isSmallMolecule(ggg.get(p).name)){
+				if (main.PathwayViewer_2_7.isSmallMolecule(ggg.get(p).name)){
 					continue;
 				}
 				int count = getNumberRelationOfProtein(p);
@@ -299,7 +299,7 @@ public class Gene {
 		
 		// Eliminate proteins
 		for (int i=0;i<ggg.size();i++){
-			if (!main.PathwayViewer_2_6.isSmallMolecule(ggg.get(i).name)){
+			if (!main.PathwayViewer_2_7.isSmallMolecule(ggg.get(i).name)){
 				processedProteins.add(i);
 			}
 		}	
@@ -317,7 +317,7 @@ public class Gene {
 		
 		// Eliminate small molecules
 		for (int i=0;i<ggg.size();i++){
-			if (main.PathwayViewer_2_6.isSmallMolecule(ggg.get(i).name)){
+			if (main.PathwayViewer_2_7.isSmallMolecule(ggg.get(i).name)){
 				processedGenes.add(i);
 			}
 		}
@@ -473,7 +473,7 @@ public class Gene {
 			int orderReading2 = i;
 			if (orderReading1==orderReading2) continue;
 			if (a.contains(orderReading2)) continue;
-			float dis = computeDis(orderReading1,orderReading2, main.PathwayViewer_2_6.popupOrder.slider.val);
+			float dis = computeDis(orderReading1,orderReading2, main.PathwayViewer_2_7.popupOrder.slider.val);
 			if (dis<minDis){
 				minDis = dis;
 				minIndex = i;

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import main.PathwayViewer_2_6.ThreadLoader4;
+import main.PathwayViewer_2_7.ThreadLoader4;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
@@ -429,7 +429,7 @@ public class PathwayView{
 		
 		Object[] sLeft = node.reaction.getLeft().toArray();
 		for (int i3=0;i3<sLeft.length;i3++){
-			  String name = main.PathwayViewer_2_6.getProteinName(sLeft[i3].toString());
+			  String name = main.PathwayViewer_2_7.getProteinName(sLeft[i3].toString());
 			  if (name==null)
 				  name=sLeft[i3].toString();
 			  
@@ -461,7 +461,7 @@ public class PathwayView{
 		  }
 		Object[] sRight = node.reaction.getRight().toArray();
 		for (int i3=0;i3<sRight.length;i3++){
-			  String name = main.PathwayViewer_2_6.getProteinName(sRight[i3].toString());
+			  String name = main.PathwayViewer_2_7.getProteinName(sRight[i3].toString());
 			  if (name==null)
 				  name=sRight[i3].toString();
 			  
