@@ -14,7 +14,6 @@ import GraphLayout.Node;
 
 
 public class Pathway2{
- // public Pathway2 granpaPathway=null;
   public Pathway2 parentPathway;
   public ArrayList<Pathway2> subPathwayList;
   public ArrayList<BiochemicalReaction> reactList;
@@ -29,8 +28,8 @@ public class Pathway2{
   public int numReactions = 0;
   public boolean isExpanded = false;
   
-  public float xPathway = 100;
-  public float yPathway = 100;
+  public float x = 100;
+  public float y = 100;
   public float al = 0;
   private PApplet parent = null;
   public static float beginDarknessOfPathways = 150;
@@ -71,8 +70,8 @@ public class Pathway2{
 		
 		
   public void draw(float x_, float y_, float al_){
-	  xPathway=x_;
-	  yPathway=y_;
+	  x=x_;
+	  y=y_;
 	  al = al_;
 	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
@@ -84,7 +83,7 @@ public class Pathway2{
 	  	
 	  	
 	  	
-		if (PathwayView.bPathway==null && PApplet.dist(xPathway, yPathway, parent.mouseX, parent.mouseY)<radius){
+		if (PathwayView.bPathway==null && PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius){
 			PathwayView.bPathway = this;
 		}
 		else{
@@ -94,18 +93,18 @@ public class Pathway2{
 		  
 			parent.fill(v);
 		  	parent.noStroke();
-			parent.arc(xPathway, yPathway, radius*2, radius*2,al-PApplet.PI/2,al-PApplet.PI/2+PApplet.PI*2);
+			parent.arc(x, y, radius*2, radius*2,al-PApplet.PI/2,al-PApplet.PI/2+PApplet.PI*2);
 			drawCenter();
 		}
 	}	
   public void drawWhenBrushing(){
 	  parent.fill(255,220,255,230);
 	  parent.noStroke();
-	  parent.ellipse(xPathway, yPathway, radius*2, radius*2);
+	  parent.ellipse(x, y, radius*2, radius*2);
 	  parent.fill(0);
 	  parent.textAlign(PApplet.CENTER);
 	  parent.textSize(12);
-	  parent.text(displayName,xPathway,yPathway-10);
+	  parent.text(displayName,x,y-10);
 	  
 	  drawCenter();
   }
@@ -117,8 +116,8 @@ public class Pathway2{
 	  	if (sat>255)
 	  		sat=255;
 	  	parent.fill(color2.getRed(),color2.getGreen(),color2.getBlue(),sat);
-	  	float xCenter = xPathway-radiusCenter/2*PApplet.cos(al);
-	  	float yCenter = yPathway-radiusCenter/2*PApplet.sin(al);
+	  	float xCenter = x-radiusCenter/2*PApplet.cos(al);
+	  	float yCenter = y-radiusCenter/2*PApplet.sin(al);
 	  	parent.ellipse(xCenter, yCenter, radiusCenter, radiusCenter);
 		
 	  	parent.strokeWeight(radiusCenter/20);
@@ -141,8 +140,8 @@ public class Pathway2{
 		  float al2 = al+PApplet.PI*0.55f -(i+1f)/(numNode+1f)*PApplet.PI*1.1f;  // Right
 		  //System.out.println("node="+node);
 		  if (node==null) return;
-		  float xR2 = xPathway + (radius+node.size/2)*PApplet.cos(al2);
-		  float yR2 = yPathway + (radius+node.size/2)*PApplet.sin(al2);
+		  float xR2 = x + (radius+node.size/2)*PApplet.cos(al2);
+		  float yR2 = y + (radius+node.size/2)*PApplet.sin(al2);
 		  setNodePosistion(node, xR2,yR2,al2);
 	  }
   }
@@ -203,8 +202,8 @@ public class Pathway2{
 			  }
 			  //System.out.println("node="+node);
 			  if (node==null) return;
-			  float xR2 = xPathway + (radius+node.size/2)*PApplet.cos(al2);
-			  float yR2 = yPathway + (radius+node.size/2)*PApplet.sin(al2);
+			  float xR2 = x + (radius+node.size/2)*PApplet.cos(al2);
+			  float yR2 = y + (radius+node.size/2)*PApplet.sin(al2);
 			  setNodePosistion(node, xR2,yR2,al2);
 		  }
 		  
@@ -221,8 +220,8 @@ public class Pathway2{
 			  
 			  float percent = (sum+PApplet.sqrt(pathway.numReactions)/2)/total;
 			  float al = leftAl +percent*dif;
-			  float xR2 = xPathway + (radius+pathway.radiusCenter)*PApplet.cos(al);
-			  float yR2 = yPathway + (radius+pathway.radiusCenter)*PApplet.sin(al);
+			  float xR2 = x + (radius+pathway.radiusCenter)*PApplet.cos(al);
+			  float yR2 = y + (radius+pathway.radiusCenter)*PApplet.sin(al);
 			  pathway.draw(xR2, yR2,al);
 			  sum+=PApplet.sqrt(pathway.numReactions);
 			  //current+=pathway.numReactions/2;

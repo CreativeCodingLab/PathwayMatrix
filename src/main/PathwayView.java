@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import main.PathwayViewer_2_5.ThreadLoader4;
+import main.PathwayViewer_2_6.ThreadLoader4;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
@@ -74,7 +74,6 @@ public class PathwayView{
 	public ButtonMap buttonReset;
 	public ButtonMap buttonExpand;
 	public ButtonMap buttonCollapse;
-	public static boolean isExpandedAll = false;
 	
 	public PathwayView(PApplet p){
 		parent = p;
@@ -314,6 +313,14 @@ public class PathwayView{
 			g.drawEdges();
 		}
 		else if (popupLayout.s==2){
+			iTransition.target(0);
+			iTransition.update();
+			if (g==null) return;
+			doLayout();
+			g.drawEdges();
+			g.drawNodes();
+		}
+		else if (popupLayout.s==3){
 			iTransition.target(1);
 			iTransition.update();
 			
@@ -355,6 +362,8 @@ public class PathwayView{
 			
 			isBrushing =false;
 			float rCenter = rCircular/10;
+			rootPathway.x = xCircular;
+			rootPathway.y = yCircular;
 			if (PApplet.dist(xCircular, yCircular, parent.mouseX, parent.mouseY)<rCenter){
 				isBrushing = true;
 			}
@@ -380,14 +389,7 @@ public class PathwayView{
 		   	buttonCollapse.draw("Collapse all",xRight-buttonCollapse.w-3, 46);
 		   	
 		}
-		else if (popupLayout.s==3){
-			iTransition.target(0);
-			iTransition.update();
-			if (g==null) return;
-			doLayout();
-			g.drawEdges();
-			g.drawNodes();
-		}
+		
 		// Right PANEL
 		float wRight = parent.width-xRight;
 		parent.fill(200,200);
@@ -427,7 +429,7 @@ public class PathwayView{
 		
 		Object[] sLeft = node.reaction.getLeft().toArray();
 		for (int i3=0;i3<sLeft.length;i3++){
-			  String name = main.PathwayViewer_2_5.getProteinName(sLeft[i3].toString());
+			  String name = main.PathwayViewer_2_6.getProteinName(sLeft[i3].toString());
 			  if (name==null)
 				  name=sLeft[i3].toString();
 			  
@@ -459,7 +461,7 @@ public class PathwayView{
 		  }
 		Object[] sRight = node.reaction.getRight().toArray();
 		for (int i3=0;i3<sRight.length;i3++){
-			  String name = main.PathwayViewer_2_5.getProteinName(sRight[i3].toString());
+			  String name = main.PathwayViewer_2_6.getProteinName(sRight[i3].toString());
 			  if (name==null)
 				  name=sRight[i3].toString();
 			  
@@ -933,21 +935,27 @@ public class PathwayView{
 	public void mouseClicked() {
 		if (g==null) return;
 		
-		if(isBrushing)
+		if(isBrushing){
 			rootPathway.isExpanded = !rootPathway.isExpanded;
+			if (!rootPathway.isExpanded)
+				rootPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
+		}
+		else if (bPathway!=null){
+			bPathway.isExpanded=!bPathway.isExpanded;
+			if (!bPathway.isExpanded)
+				bPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
+		}
+		else if (buttonExpand.b){
+			rootPathway.expandAll();
+		}
+		else if (buttonCollapse.b){
+			rootPathway.collapseAll();
+		}
 		else if (buttonReset.b){
 			resetPosistion();
 			scale = 1f;
 			updateScale();
 			setIntegrator = 4;
-		}
-		else if (buttonExpand.b){
-			rootPathway.expandAll();
-			isExpandedAll = true;
-		}
-		else if (buttonCollapse.b){
-			rootPathway.collapseAll();
-			isExpandedAll=false;
 		}
 			
 		
@@ -962,11 +970,12 @@ public class PathwayView{
 				thread5 = new Thread(loader5);
 				thread5.start();
 			}
-			else  if (popupLayout.s==2){
+			else if (popupLayout.s==2)
+				iTransition.target(0);
+			else  if (popupLayout.s==3){
 				iTransition.target(1);
 			}
-			else if (popupLayout.s==3)
-				iTransition.target(0);
+			
 			
 		}
 		else if(popupPathway.bPopup){
@@ -974,10 +983,6 @@ public class PathwayView{
 		}
 		else if (checkName.b)
 			checkName.mouseClicked();
-		else if (bPathway!=null){
-			bPathway.isExpanded=!bPathway.isExpanded;
-			
-		}
 		else{
 			g.setSelectedNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {
