@@ -32,8 +32,6 @@ public class Node {
 	public Integrator iAlpha = new Integrator(0,0.2f,0.4f);
 	public Integrator iX = new Integrator(0,0.2f,0.4f);
 	public Integrator iY = new Integrator(0,0.2f,0.4f);
-	public float difX = 0;
-	public float difY = 0;
 	
 	public Pathway2 parentPathway= null;
 	
@@ -111,18 +109,19 @@ public class Node {
 			iAlpha.target(PApplet.PI/2);
 			iX.target(parent.width/2-50);
 			iY.target(PathwayView.yTree[nodeId]);
-			difX = 0;
-			difY = 0;
 		}
 		else if (PathwayView.popupLayout.s==1){ //Line up
 			iAlpha.target(PApplet.PI/2);
 			float xx = PathwayView.xRight/2;
 			iX.target(xx);
 			iY.target(PathwayView.yTopological[nodeId]);
-			difX = 0;
-			difY = 0;
 		}
-		else if (PathwayView.popupLayout.s==2){ //circular Layout
+		else if (PathwayView.popupLayout.s==2){
+			iAlpha.target(PApplet.PI/2);
+			iX.target(getX());
+			iY.target(getY());
+		}
+		else if (PathwayView.popupLayout.s==3){ //circular Layout
 			/*float al = PathwayView.computeAlpha(nodeId);
 			float xR = PathwayView.xCircular + (PathwayView.rCircular+size/2)*PApplet.sin(al);
 			float yR = PathwayView.yCircular + (PathwayView.rCircular+size/2)*PApplet.cos(al);
@@ -135,13 +134,7 @@ public class Node {
 			iX.target(xR);
 			iY.target(yR);*/
 		}
-		else{
-			iAlpha.target(PApplet.PI/2);
-			iX.target(getX());
-			iY.target(getY());
-			difX = 0;
-			difY = 0;
-		}
+		
 		float xx = iX.value;
 		float yy = iY.value;
 	

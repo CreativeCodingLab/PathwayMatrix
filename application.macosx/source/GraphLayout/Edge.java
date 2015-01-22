@@ -11,7 +11,7 @@ import processing.core.PApplet;
 //banksean at yahoo
 
 public class Edge {
-	float k=0.05f; //stiffness
+	float k=0.1f; //stiffness
 	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;
@@ -97,17 +97,28 @@ public class Edge {
 	 	}
 	  }
 	  
-	 
+	  
+			
 	 public void drawLink(float sat) {
 		Pathway2 pathwayFrom = from.parentPathway;
 		Pathway2 pathwayTo = to.parentPathway;
 		if (pathwayFrom==null || pathwayTo==null) return;
-		
-			
-		if (PathwayView.isExpandedAll){
-				
-			 if (pathwayFrom.equals(pathwayTo)){
-				 drawArc(sat);
+			 if (PathwayView.popupLayout.s==0 || PathwayView.popupLayout.s==1 ||
+					 PathwayView.popupLayout.s==2 || pathwayFrom.equals(pathwayTo)){
+				 float alFrom = from.iAlpha.target;
+				 //float x1 = from.iX.value-from.difX;
+				 //float y1 = from.iY.value-from.difY;
+				 float x1 = from.iX.value;
+				 float y1 = from.iY.value;
+					
+				 float alTo = to.iAlpha.target;
+				 //float x2 = to.iX.value-to.difX;
+				 //float y2 = to.iY.value-to.difY;
+				 float x2 = to.iX.value;
+				 float y2 = to.iY.value;
+					
+				 //float xCenter, float yCenter
+				 drawArc(x1,y1, alFrom, x2, y2, alTo, pathwayFrom.x, pathwayFrom.y, sat);
 			 }
 			 else{
 				 if (sat<200) return;
@@ -117,56 +128,82 @@ public class Edge {
 				 float xTo = to.iX.value;
 				 float yTo = to.iY.value;
 				
-				 float xPathwayFrom = pathwayFrom.xPathway;
-				 float yPathwayFrom = pathwayFrom.yPathway;
-				 float xPathwayTo = pathwayTo.xPathway;
-				 float yPathwayTo = pathwayTo.yPathway;
+				 float xPathwayFrom = pathwayFrom.x;
+				 float yPathwayFrom = pathwayFrom.y;
+				 float xPathwayTo = pathwayTo.x;
+				 float yPathwayTo = pathwayTo.y;
 					
-				 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.CYAN);
-				 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLUE);
+				 if (pathwayFrom.isExpanded)
+					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.YELLOW);
+				 if (pathwayTo.isExpanded)
+					 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLACK);
+				 
 				 
 				// while()
 				// System.out.println(pathwayFrom+"	1 pathwayTo="+pathwayTo);
-				  drawPathwayLink(pathwayFrom, pathwayTo);
-		 }
-		}
-		else{
-			 drawArc(sat);
-		}
+				  drawPathwayLink(pathwayFrom, pathwayTo, sat);
+		   }
+		
 	 }
-	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo) {
-		 float xPathwayFrom = pathwayFrom.xPathway;
-		 float yPathwayFrom = pathwayFrom.yPathway;
-		 //System.out.println(pathwayFrom+"	2 pathwayTo="+pathwayTo);
-		 float xPathwayTo = pathwayTo.xPathway;
-		 float yPathwayTo = pathwayTo.yPathway;
+	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
 		 Pathway2 newPathwayFrom = pathwayFrom;
 		 if (pathwayTo.level>0){
 			 while(newPathwayFrom.level>pathwayTo.level){
-				 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
-						 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,Color.MAGENTA);
+				 if (newPathwayFrom.parentPathway.isExpanded){
+						drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
+						 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
 			 }
 		 }
 		 Pathway2 newPathwayTo = pathwayTo;
 		 if (pathwayFrom.level>0){
 			 while(newPathwayTo.level>pathwayFrom.level){
-				 drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
-						 newPathwayTo.xPathway, newPathwayTo.yPathway,Color.RED);
+				 if (newPathwayTo.parentPathway.isExpanded){
+					 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+						 newPathwayTo.x, newPathwayTo.y,Color.BLACK);
+				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
 			 }
 		 }
 		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
-			 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
-					 newPathwayFrom.parentPathway.xPathway, newPathwayFrom.parentPathway.yPathway,new Color(120,0,120));
-			drawGradientLine(newPathwayTo.parentPathway.xPathway, newPathwayTo.parentPathway.yPathway, 
-					 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(100,0,0));
+			 if (newPathwayFrom.parentPathway.isExpanded){
+					drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
+					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+			 }
+			 if (newPathwayTo.parentPathway.isExpanded){
+					
+			 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+					 newPathwayTo.x, newPathwayTo.y,Color.BLACK);
+			 }
 			 newPathwayFrom = newPathwayFrom.parentPathway;
-			newPathwayTo = newPathwayTo.parentPathway;
+			 newPathwayTo = newPathwayTo.parentPathway;
 		 }
-		 drawGradientLine(newPathwayFrom.xPathway, newPathwayFrom.yPathway, 
-				 newPathwayTo.xPathway, newPathwayTo.yPathway,new Color(0,0,0));
-		
+		 
+		 if (!newPathwayFrom.equals(newPathwayTo) && newPathwayFrom.isExpanded){
+			 //float x1 = from.iX.value-from.difX;
+			 //float y1 = from.iY.value-from.difY;
+			 float x1 = newPathwayFrom.x;
+			 float y1 = newPathwayFrom.y;
+				
+			 //float x2 = to.iX.value-to.difX;
+			 //float y2 = to.iY.value-to.difY;
+			 float x2 = newPathwayTo.x;
+			 float y2 = newPathwayTo.y;
+			
+			 float xCenter = newPathwayFrom.parentPathway.x;
+			 float yCenter = newPathwayFrom.parentPathway.y;
+		//	 parent.fill(255,0,0);
+		//	 parent.ellipse(xCenter, yCenter,20,20);
+			 
+			 
+			 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
+			 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
+			 
+			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
+			 //drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
+			//	 newPathwayTo.x, newPathwayTo.y,new Color(0,255,0));
+		 }
 		 
 	 }
 			
@@ -187,7 +224,7 @@ public class Edge {
 	 }
 			
 			
-	  public void drawArc(float sat) {
+	  public void drawArc(float x1, float y1, float alFrom, float x2, float y2, float alTo, float xCenter, float yCenter, float sat) {
 		// Draw gradient lines
 		/*int numSec =6;
 		float x1 = from.iX.value;
@@ -205,17 +242,7 @@ public class Edge {
 			y1=y2;
 		}*/
 		
- 	    	float alFrom = from.iAlpha.target;
-			//float x1 = from.iX.value-from.difX;
-			//float y1 = from.iY.value-from.difY;
-			float x1 = from.iX.value;
-			float y1 = from.iY.value;
-			
-			float alTo = to.iAlpha.target;
-			//float x2 = to.iX.value-to.difX;
-			//float y2 = to.iY.value-to.difY;
-			float x2 = to.iX.value;
-			float y2 = to.iY.value;
+ 	    	
 			
 			
 			float alpha = (y2-y1)/(x2-x1);
@@ -224,13 +251,18 @@ public class Edge {
 			float dd = PApplet.sqrt(dis);
 			
 			float alCircular = PApplet.PI -PApplet.abs(alTo-alFrom);
-			 if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
+			/*if (alCircular<0){
+				System.out.println("alCircular="+alCircular);
+				return;
+			}*/
+				
+			if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
 				 alCircular += PathwayView.iTransition.value;
-			 else if (PathwayView.popupLayout.s==2)
+			  else if (PathwayView.popupLayout.s==2)
 				 alCircular *= PathwayView.iTransition.value;
-			 else if (PathwayView.popupLayout.s==3)
-				 alCircular *= PathwayView.iTransition.value;
-			
+			  else if (PathwayView.popupLayout.s==3)
+					 alCircular *= PathwayView.iTransition.value;
+				
 			 if (alCircular<0.01f)
 				 alCircular=0.01f;
 			 else if (alCircular>PApplet.PI-0.01f)
@@ -243,8 +275,8 @@ public class Edge {
 	    	 float y22 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
 		
 	    	 float x3 =0, y3=0;
-	    	 float d11 = PApplet.dist(x11, y11, PathwayView.xCircular, PathwayView.yCircular);
-	    	 float d22 = PApplet.dist(x22, y22, PathwayView.xCircular, PathwayView.yCircular);
+	    	 float d11 = PApplet.dist(x11, y11, xCenter, yCenter);
+	    	 float d22 = PApplet.dist(x22, y22, xCenter, yCenter);
 	    	 if (d11>d22){
 	    		 x3=x11;
 	    		 y3=y11;
@@ -293,15 +325,15 @@ public class Edge {
 			float x1 = x3+d3/2*PApplet.cos(al1);
 			float y1 = y3+d3/2*PApplet.sin(al1);
 			boolean down = true;
-			if (PApplet.dist(x1, y1, from.iX.value-from.difX, from.iY.value-from.difY)
-					>PApplet.dist(x1, y1, to.iX.value-to.difX, to.iY.value-to.difY))
+			if (PApplet.dist(x1, y1, from.iX.value, from.iY.value)
+					>PApplet.dist(x1, y1, to.iX.value, to.iY.value))
 				down = false;
 			
 			if (PathwayView.popupLayout.s==0 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
-				float x11 = from.iX.value-from.difX;
-				float y11 = from.iY.value-from.difY;
-				float x22 = to.iX.value-to.difX;
-				float y22 = to.iY.value-to.difY;
+				float x11 = from.iX.value;
+				float y11 = from.iY.value;
+				float x22 = to.iX.value;
+				float y22 = to.iY.value;
 				x3 = (x11+x22)/2;
 				y3 = (y11+y22)/2;
 				al1 = -PApplet.PI/2;
@@ -312,10 +344,10 @@ public class Edge {
 					down = false;
 			}
 			if (PathwayView.popupLayout.s==1 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){
-				float x11 = from.iX.value-from.difX;
-				float y11 = from.iY.value-from.difY;
-				float x22 = to.iX.value-to.difX;
-				float y22 = to.iY.value-to.difY;
+				float x11 = from.iX.value;
+				float y11 = from.iY.value;
+				float x22 = to.iX.value;
+				float y22 = to.iY.value;
 				x3 = (x11+x22)/2;
 				y3 = (y11+y22)/2;
 				

@@ -1,3 +1,3 @@
 -Xmx10g
-main.PathwayViewer_2_5
-PathwayViewer_2_5.jar
+main.PathwayViewer_2_6
+PathwayViewer_2_6.jar
