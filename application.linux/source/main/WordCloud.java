@@ -79,13 +79,13 @@ public class WordCloud{
 				s=-100;
 				main.ReactionView.textbox1.searchText = "";
 				ReactionView.textbox1.updateReactions();
-				main.PathwayViewer_2_7.popupReaction.mouseMoved();  // to update protein names in current reactions
+				main.PathwayViewer_2_8.popupReaction.mouseMoved();  // to update protein names in current reactions
 			}
 			else{
 				s=b;
 				main.ReactionView.textbox1.searchText = words[b].word.toLowerCase();
 				ReactionView.textbox1.updateReactions();
-				main.PathwayViewer_2_7.popupReaction.mouseMoved();	// to update protein names in current reactions
+				main.PathwayViewer_2_8.popupReaction.mouseMoved();	// to update protein names in current reactions
 			}	
 		}
 		else{

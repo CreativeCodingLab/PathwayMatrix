@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import main.PathwayViewer_2_7.ThreadLoader4;
+import main.PathwayViewer_2_8.ThreadLoader4;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
@@ -26,13 +26,13 @@ public class PathwayView{
 	public boolean isAllowedDrawing = false;
 	
 	// Read data 
-	public Map<String,String> mapProteinRDFId;
+	public static Map<String,String> mapProteinRDFId;
 	public Map<String,String> mapSmallMoleculeRDFId;
-	public Map<String,String> mapComplexRDFId;
-	public Map<String,Complex> mapComplexRDFId_Complex;
+	public static Map<String,String> mapComplexRDFId;
+	public static Map<String,Complex> mapComplexRDFId_Complex;
 	public Set<SmallMolecule> smallMoleculeSet;
 	
-	public ArrayList<String> complexList = new ArrayList<String>(); 
+	public static  ArrayList<String> complexList = new ArrayList<String>(); 
 	public ArrayList<String> proteinList = new ArrayList<String>();
 	
 	public ArrayList<Integer> rectSizeList;
@@ -74,6 +74,8 @@ public class PathwayView{
 	public ButtonMap buttonReset;
 	public ButtonMap buttonExpand;
 	public ButtonMap buttonCollapse;
+	
+	
 	
 	public PathwayView(PApplet p){
 		parent = p;
@@ -401,7 +403,7 @@ public class PathwayView{
 		parent.textSize(12);
 		parent.textAlign(PApplet.LEFT);
 		for (int f=0; f<nFiles; f++){
-			float yy = 200+f*18;
+			float yy = 150+f*18;
 			String[] str = files.get(f).split("/");
 			String nameFile = str[str.length-1];
 			Color color = gradient.getGradient(colorScale*(transferID(f)));
@@ -417,82 +419,137 @@ public class PathwayView{
 		
 		// Draw brushing reaction
 		if (g.getHoverNode()!=null){
-			System.out.println("getHoverNode	"+g.getHoverNode().reaction.getDisplayName());
 			Node node =g.getHoverNode();
-			drawReactionLink(parent, node, xRight, parent.width-80, 500, 255);
+			drawReactionLink(parent, node, xRight+50, parent.width-50, 400, 255);
 		}
 		
 	}
 	
 	
 	// draw Reactions links
-	public static void drawReactionLink(PApplet parent, Node node, float xL, float xR,float yReact, float sat) {
+	public void drawReactionLink(PApplet parent, Node node, float xL, float xR,float yReact, float sat) {
 		
 		Object[] sLeft = node.reaction.getLeft().toArray();
+		int proteinCountL=0;
 		for (int i3=0;i3<sLeft.length;i3++){
-			  String name = main.PathwayViewer_2_7.getProteinName(sLeft[i3].toString());
-			  if (name==null)
-				  name=sLeft[i3].toString();
-			  
-			  float y2 = yReact+i3*20;
-			  parent.stroke(0);
-			  parent.line(xL, y2, (xL+xR)/2, yReact);
-			
-			  parent.fill(0);
-			  parent.textSize(11);
-			  parent.textAlign(PApplet.RIGHT);
-			  parent.text(name,xL, y2+5);
-			  
-			 /* float al = -PApplet.PI/6;
-			   parent.translate(x2,yL);
-				parent.rotate(al);
-				parent.text(name, 0,0);
-				parent.rotate(-al);
-				parent.translate(-(x2), -(yL));
-			*/
-			  /*
+			String name = mapProteinRDFId.get(sLeft[i3].toString());
+			  if (name!=null){
+				  float y2 = yReact+proteinCountL*19;
+				  parent.stroke(0);
+				  parent.line(xL, y2, (xL+xR)/2, yReact);
+				
+				  parent.fill(0);
+				  parent.textSize(11);
+				  parent.textAlign(PApplet.RIGHT);
+				  if (name.length()>10)
+					  name = name.substring(name.length()-10, name.length()-1);
+				  parent.text(name,xL, y2+5);
+				  proteinCountL++;
+			  }
 			  // Complex LEFT
-			  else if (main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
-				  int id = main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString());
-				 // isContainedComplexL = drawComplexLeft(i2, id, yReact, sat);
+			  else if (mapComplexRDFId_Complex.get(sLeft[i3].toString())!=null){
+				  Complex complex = mapComplexRDFId_Complex.get(sLeft[i3].toString());
+				  ArrayList<String> components = getProteinsInComplex(complex);
+				  float sumY = 0;
+				  for (int i=0;i<components.size();i++){
+					  float y2 = yReact+(proteinCountL+i)*19;
+					  sumY+=y2;
+				  }
+				  
+				  float comY = yReact+proteinCountL*19;
+				  if (components.size()>0)
+					  comY = sumY/components.size();
+				   
+				  for (int i=0;i<components.size();i++){
+					  float y2 = yReact+proteinCountL*19;
+					  sumY+=y2;
+					  parent.stroke(0,100,0);
+				      parent.line(xL, y2, xL+(xR-xL)/4, comY);
+						
+					  parent.fill(0);
+					  parent.textSize(11);
+					  parent.textAlign(PApplet.RIGHT);
+					  
+					  String name2 = components.get(i);
+					  if (name2.length()>10)
+						  name2 = name2.substring(name2.length()-10, name2.length()-1);
+					  parent.text(name2,xL, y2+5);
+			 
+					  proteinCountL++;
+				  }
+				  parent.stroke(0,0,200);
+				  parent.line(xL+(xR-xL)/4, comY, xL+(xR-xL)/2, yReact);
+				  
+				  parent.noStroke();
+				  parent.fill(0,0,150);
+				  polygon(xL+(xR-xL)/4,comY,6,4);
+				
+				 
 			  }
 			  else{
 				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
-			  }*/
+			  }
 		  }
 		Object[] sRight = node.reaction.getRight().toArray();
+		int proteinCountR = 0;
 		for (int i3=0;i3<sRight.length;i3++){
-			  String name = main.PathwayViewer_2_7.getProteinName(sRight[i3].toString());
-			  if (name==null)
-				  name=sRight[i3].toString();
+			  String name = mapProteinRDFId.get(sRight[i3].toString());
 			  
-			  float y2 = yReact+i3*20;
-			  parent.stroke(0);
-			  parent.line( xR, y2, (xL+xR)/2, yReact);
-			
-			  parent.fill(0);
-			  parent.textSize(11);
-			  parent.textAlign(PApplet.LEFT);
-			  parent.text(name,xR, y2+5);
-			  
-			  /*
-			  float al = PApplet.PI/6;
-			   parent.translate(x2,yR);
-				parent.rotate(al);
-				parent.text(name, 0,0);
-				parent.rotate(-al);
-				parent.translate(-(x2), -(yR));
-			  */	
+			  if (name!=null){
+				  float y2 = yReact+proteinCountR*20;
+				  parent.stroke(0);
+				  parent.line( xR, y2, (xL+xR)/2, yReact);
 				
-			  /*
+				  parent.fill(0);
+				  parent.textSize(11);
+				  parent.textAlign(PApplet.LEFT);
+				  parent.text(name,xR, y2+5);
+				  proteinCountR++;
+			  }
 			  // Complex LEFT
-			  else if (main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString())!=null){
-				  int id = main.PathwayViewer_2_5.mapComplexRDFId_index.get(sLeft[i3].toString());
-				 // isContainedComplexL = drawComplexLeft(i2, id, yReact, sat);
+			  else if (mapComplexRDFId_Complex.get(sRight[i3].toString())!=null){
+				  Complex complex = mapComplexRDFId_Complex.get(sRight[i3].toString());
+				  ArrayList<String> components = getProteinsInComplex(complex);
+				 
+				  float sumY = 0;
+				  for (int i=0;i<components.size();i++){
+					  float y2 = yReact+(proteinCountR+i)*19;
+					  sumY+=y2;
+				  }
+				  
+				  float comY = yReact+proteinCountR*19;
+				  if (components.size()>0)
+					  comY = sumY/components.size();
+				   
+				  for (int i=0;i<components.size();i++){
+					  float y2 = yReact+proteinCountR*19;
+					  sumY+=y2;
+					  parent.stroke(0,100,0);
+				      parent.line(xL+(xR-xL)*3/4, comY, xR, y2);
+						
+					  parent.fill(0);
+					  parent.textSize(11);
+					  parent.textAlign(PApplet.LEFT);
+					  
+					  String name2 = components.get(i);
+					  if (name2.length()>10)
+						  name2 = name2.substring(name2.length()-10, name2.length()-1);
+					  parent.text(name2,xR, y2+5);
+			 		  proteinCountR++;
+				  }
+				  
+				  parent.stroke(0,0,200);
+				  parent.line(xL+(xR-xL)/2, yReact, xL+(xR-xL)*3/4, comY);
+				  
+				  parent.noStroke();
+				  parent.fill(0,0,150);
+				  polygon(xL+(xR-xL)*3/4,comY,6,4);
+				
+				 
 			  }
 			  else{
 				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
-			  }*/
+			  }
 		  }
 		
 		parent.fill(node.color.getRGB());
@@ -503,7 +560,41 @@ public class PathwayView{
 	 }
 	
 	
+	public static ArrayList<String> getProteinsInComplex(Complex complex){	
+		  ArrayList<String> components = new ArrayList<String>(); 
+		  Object[] s2 = complex.getComponent().toArray();
+		  for (int i=0;i<s2.length;i++){
+			  String name = mapProteinRDFId.get(s2[i].toString());
+			  if (name!=null)
+				  components.add(name);
+			  else {
+				  if (mapComplexRDFId_Complex.get(s2[i].toString())==null){
+					  String name2 = s2[i].toString();
+					  components.add(name2);
+				  }
+				  else{
+					  Complex subcomplex = mapComplexRDFId_Complex.get(s2[i].toString());
+					  ArrayList<String> s4 = getProteinsInComplex(subcomplex);
+					  for (int k=0;k<s4.size();k++){
+						  components.add(s4.get(k));
+					  }
+				  }
+			  }
+		 }
+		 return components;
+	}
 	
+	
+	public void polygon(float x, float y, float radius, int npoints) {
+		  float angle = 2*PApplet.PI / npoints;
+		  parent.beginShape();
+		  for (float a = 0; a <  2*PApplet.PI; a += angle) {
+		    float sx = x +  PApplet.cos(a) * radius;
+		    float sy = y + PApplet.sin(a) * radius;
+		    parent.vertex(sx, sy);
+		  }
+		  parent.endShape(PApplet.CLOSE);
+	}
 	 public void drawCenter(float x_, float y_, float r_){
 		parent.fill(50);
 	  	parent.ellipse(x_, y_, r_*2, r_*2);
