@@ -12,7 +12,7 @@ import processing.core.PApplet;
 //banksean at yahoo
 
 public class Edge {
-	float k=0.1f; //stiffness
+	float k=0.08f; //stiffness
 	public float naturalLength=1; //natural length.  ehmm uh, huh huh stiffness. natural length ;-)
 	Node to;
 	Node from;

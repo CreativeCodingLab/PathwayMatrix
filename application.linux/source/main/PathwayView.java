@@ -830,7 +830,7 @@ public class PathwayView{
 			float dx = xCenter - a.getX();
 			float dy = yCenter - a.getY();
 			float r2 = dx * dx + dy * dy;
-			float f =  r2/10000000;
+			float f =  r2/5000000;
 			if (a.degree>0){
 				Vector3D vf = new Vector3D(dx * f, dy * f, 0);
 				a.applyForce(vf);
