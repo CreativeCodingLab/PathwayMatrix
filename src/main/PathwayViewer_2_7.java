@@ -1535,7 +1535,7 @@ public class PathwayViewer_2_7 extends PApplet {
 	void mouseWheel(int delta) {
 		if (popupView.s==2){
 			
-			PathwayView.scale += delta/10f;
+			PathwayView.scale += delta/20f;
 			if (PathwayView.scale<0.1f)
 				PathwayView.scale=0.1f;
 			pathwayView.updateScale();
