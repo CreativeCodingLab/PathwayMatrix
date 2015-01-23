@@ -83,7 +83,7 @@ public class Edge {
 	  }
 
 	  public void draw() {
-	    if (parent!=null && g!=null){
+		if (parent!=null && g!=null){
 	    	parent.strokeWeight(1);
 	        if (g.getHoverNode() ==null){
     	    	drawLink(240);
@@ -96,7 +96,8 @@ public class Edge {
 			    to.isConnected = true;
 	    	}
 	    	else{
-	    		drawLink(15);
+	    		parent.strokeWeight(1);
+		        drawLink(15);
 	     	}
 	 	}
 	  }
@@ -177,9 +178,10 @@ public class Edge {
 			 ArrayList<Pathway2> b  = drawPathwayToUpLink(pathwayFrom, pathwayTo, sat);
 			 Pathway2 newPathwayTo = b.get(0);
 			 
+			 	
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0)
-					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, Color.RED);
+					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, new Color(200,200,0,100));
 			 else if (pathwayFrom.equals(b.get(1).parentPathway)){
 				//float x1 = from.iX.value-from.difX;
 				 //float y1 = from.iY.value-from.difY;
@@ -205,7 +207,7 @@ public class Edge {
 			 }
 				 
 			 if (countTo>0)
-					 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, Color.BLUE);
+					 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, new Color(0,0,0,150));
 			 else if (pathwayTo.equals(a.get(1).parentPathway)){
 				//float x1 = from.iX.value-from.difX;
 				 //float y1 = from.iY.value-from.difY;
@@ -251,7 +253,7 @@ public class Edge {
 				 if (newPathwayFrom.parentPathway.isExpanded){
 					 if(!newPathwayFrom.parentPathway.equals(pathwayTo))   // if they have the same parent
 						 drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
-						 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+						 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,new Color(200,200,0,100));
 						countFrom++;
 				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
@@ -272,7 +274,7 @@ public class Edge {
 				 if (newPathwayTo.parentPathway.isExpanded){
 					 if(!newPathwayTo.parentPathway.equals(pathwayFrom))  // if they have the same parent
 						 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-								 newPathwayTo.x, newPathwayTo.y,Color.MAGENTA);
+								 newPathwayTo.x, newPathwayTo.y, new Color(0,0,0,150));
 					 countTo++;
 				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
@@ -289,20 +291,24 @@ public class Edge {
 		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
 			 if (newPathwayFrom.parentPathway.isExpanded){
 					drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
-					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,Color.YELLOW);
+					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y, new Color(200,200,0,100));
 					countFrom++;
 			 }
 			 if (newPathwayTo.parentPathway.isExpanded){
 					
 				 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-					 newPathwayTo.x, newPathwayTo.y,Color.MAGENTA.BLACK);
+					 newPathwayTo.x, newPathwayTo.y, new Color(0,0,0,150));
 				 	countTo++;
 			 }
 			 newPathwayFrom = newPathwayFrom.parentPathway;
 			 newPathwayTo = newPathwayTo.parentPathway;
 		 }
 		 
-		 if (!newPathwayFrom.equals(newPathwayTo) && newPathwayFrom.isExpanded){
+		 
+		// System.out.println(newPathwayFrom.displayName+"	newPathwayTo="+newPathwayTo.displayName);
+			
+		 if (!newPathwayFrom.equals(newPathwayTo) && newPathwayFrom.parentPathway.isExpanded){
+			 	
 			 //float x1 = from.iX.value-from.difX;
 			 //float y1 = from.iY.value-from.difY;
 			 float x1 = newPathwayFrom.x;
@@ -339,7 +345,7 @@ public class Edge {
 				float sss = (float) i/numSec;
 				float x3 = x1+(x2-x1)*sss;
 				float y3 = y1+(y2-y1)*sss;
-				float r = 200*sss;
+				//float r = 200*sss;
 				
 				parent.stroke(color.getRGB());
 				parent.line(x1,y1,x3,y3);

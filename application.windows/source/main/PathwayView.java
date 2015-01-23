@@ -408,6 +408,7 @@ public class PathwayView{
 			parent.fill(color.getRGB());
 			parent.text(nameFile, xRight+20,yy); 
 		}	
+		
 		// Draw popups
 		popupLayout.draw(parent.width-198);
 		popupPathway.draw(parent.width-298);
