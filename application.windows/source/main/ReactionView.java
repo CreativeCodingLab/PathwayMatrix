@@ -748,7 +748,7 @@ public class ReactionView{
 					nonCausalityList.add(index);
 			}
 			
-			itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()/2+1);
+			itemH2 = totalH/(rectList.size()+circleList.size()-nonCausalityList.size()*2/3f+1);
 			float circleGap = itemH2;
 			float circleGapSum = 0;
 			
@@ -759,7 +759,7 @@ public class ReactionView{
 				int index = doneList.get(i);
 				// Compute nonCausality reaction
 				if (getDirectUpstream(index).size()==0 && getDirectDownstream(index).size()==0){
-					iY[index].target(yStartCausality +count3*itemH2/2);
+					iY[index].target(yStartCausality +count3*itemH2/3);
 					count3++;
 				}	
 				else{
@@ -2251,7 +2251,7 @@ public class ReactionView{
 	
 	public void drawProteinLeft(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSize = PApplet.map(hProtein, 0, maxH, 2, 12);
+		float textSize = PApplet.map(hProtein, 0, maxH, 4, 12);
 		parent.textSize(textSize);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);
@@ -2330,7 +2330,7 @@ public class ReactionView{
 	
 	public void drawProteinRight(int p, float sat) {
 		float y3 = iP[p].value;
-		float textSize = PApplet.map(hProtein, 0, maxH, 2, 12);
+		float textSize = PApplet.map(hProtein, 0, maxH, 4, 12);
 		parent.textSize(textSize);
 		String name = proteins[p];
 		Color c =  new Color(0,0,0);

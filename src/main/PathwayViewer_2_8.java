@@ -350,7 +350,7 @@ public class PathwayViewer_2_8 extends PApplet {
 			        String nameFile = str[str.length-1];
 			  	    this.text("File: "+nameFile, 80, 16);
 					
-					popupReaction.drawReactions(120);
+					popupReaction.drawReactions(150);
 				}
 				else if (popupView.s==2){
 					if (pathwayView!=null)

@@ -339,13 +339,14 @@ public class PathwayView{
 					float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
 					float xR2 = PathwayView.xCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.cos(al);
 					float yR2 = PathwayView.yCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.sin(al);
-					filePathway[i].draw(xR2, yR2,al);
+					float xR3 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.cos(al);
+					float yR3 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.sin(al);
+					filePathway[i].draw(xR2, yR2, xR3, yR3, al);
 					currentPos += PApplet.sqrt(filePathway[i].numReactions);
 				}
 			}
 			else{
 				// Print all reactions on a circle
-				
 				float beginAl = -PApplet.PI/2;
 				for (int f=0;f<filePathway.length;f++){
 					ArrayList<Integer> a = filePathway[f].getAllNodeId();

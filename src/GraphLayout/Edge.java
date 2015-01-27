@@ -290,14 +290,15 @@ public class Edge {
 		 Pathway2 newPathwayTo = pathwayTo;
 		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
 			 if (newPathwayFrom.parentPathway.isExpanded){
-					drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
-					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y, new Color(200,200,0,100));
+				 parent.stroke(200,200,0,100);
+				 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
+					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
 					countFrom++;
 			 }
 			 if (newPathwayTo.parentPathway.isExpanded){
-					
-				 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-					 newPathwayTo.x, newPathwayTo.y, new Color(0,0,0,150));
+				parent.stroke(0,150);
+				parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+					 newPathwayTo.xEntry, newPathwayTo.yEntry);
 				 	countTo++;
 			 }
 			 newPathwayFrom = newPathwayFrom.parentPathway;
@@ -308,25 +309,24 @@ public class Edge {
 		// System.out.println(newPathwayFrom.displayName+"	newPathwayTo="+newPathwayTo.displayName);
 			
 		 if (!newPathwayFrom.equals(newPathwayTo) && newPathwayFrom.parentPathway.isExpanded){
-			 	
-			 //float x1 = from.iX.value-from.difX;
-			 //float y1 = from.iY.value-from.difY;
-			 float x1 = newPathwayFrom.x;
-			 float y1 = newPathwayFrom.y;
-				
-			 //float x2 = to.iX.value-to.difX;
-			 //float y2 = to.iY.value-to.difY;
-			 float x2 = newPathwayTo.x;
-			 float y2 = newPathwayTo.y;
-			
+			 float x1 = newPathwayFrom.xEntry;
+			 float y1 = newPathwayFrom.yEntry;
+			 float x2 = newPathwayTo.xEntry;
+			 float y2 = newPathwayTo.yEntry;
 			 float xCenter = newPathwayFrom.parentPathway.x;
 			 float yCenter = newPathwayFrom.parentPathway.y;
-		//	 parent.fill(255,0,0);
-		//	 parent.ellipse(xCenter, yCenter,20,20);
-			 
-			 
 			 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
 			 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
+			 if (newPathwayFrom.parentPathway.displayName.equals("Signalling to ERKs")
+					 && newPathwayFrom.displayName.equals("Signalling to RAS")
+					 && newPathwayTo.displayName.equals("Signalling to p38 via RIT and RIN")){
+				 System.out.println("newPathwayFrom.parentPathway.displayName"+newPathwayFrom.parentPathway.displayName);
+				 System.out.println("newPathwayTo.parentPathway.displayName"+newPathwayTo.parentPathway.displayName);
+				 System.out.println("newPathwayFrom="+newPathwayFrom.displayName+" al1="+al1/PApplet.PI);
+				 System.out.println("newPathwayTo="+newPathwayTo.displayName+"	al2="+al2/PApplet.PI);
+				 System.out.println(xCenter+"	"+yCenter);
+				// al1 = al1+PApplet.PI;
+			 }
 			 
 			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
 			 //drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 

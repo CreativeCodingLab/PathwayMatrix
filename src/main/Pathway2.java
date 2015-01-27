@@ -30,6 +30,8 @@ public class Pathway2{
   
   public float x = 100;
   public float y = 100;
+  public float xEntry = 500;
+  public float yEntry = 500;
   public float al = 0;
   private PApplet parent = null;
   public static float beginDarknessOfPathways = 150;
@@ -69,9 +71,12 @@ public class Pathway2{
   }
 		
 		
-  public void draw(float x_, float y_, float al_){
+  public void draw(float x_, float y_, float xEntry_, float yEntry_, float al_){
 	  x=x_;
 	  y=y_;
+	  xEntry = xEntry_;
+	  yEntry = yEntry_;
+	  
 	  al = al_;
 	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
@@ -222,7 +227,9 @@ public class Pathway2{
 			  float al = leftAl +percent*dif;
 			  float xR2 = x + (radius+pathway.radiusCenter)*PApplet.cos(al);
 			  float yR2 = y + (radius+pathway.radiusCenter)*PApplet.sin(al);
-			  pathway.draw(xR2, yR2,al);
+			  float xR3 = x + (radius)*PApplet.cos(al);
+			  float yR3 = y + (radius)*PApplet.sin(al);
+			  pathway.draw(xR2, yR2, xR3, yR3, al);
 			  sum+=PApplet.sqrt(pathway.numReactions);
 			  //current+=pathway.numReactions/2;
 		  }
