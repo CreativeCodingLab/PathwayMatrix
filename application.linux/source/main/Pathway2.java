@@ -110,7 +110,6 @@ public class Pathway2{
 	  parent.textAlign(PApplet.CENTER);
 	  parent.textSize(12);
 	  parent.text(displayName,x,y-10);
-	  
 	  drawCenter();
   }
   

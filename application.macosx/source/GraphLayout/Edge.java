@@ -104,20 +104,23 @@ public class Edge {
 	  
 	 public void drawLink(float sat) {
 		 if (!PathwayView.rootPathway.isExpanded){
-			 float alFrom = from.iAlpha.target;
-			 //float x1 = from.iX.value-from.difX;
-			 //float y1 = from.iY.value-from.difY;
 			 float x1 = from.iX.value;
 			 float y1 = from.iY.value;
 				
-			 float alTo = to.iAlpha.target;
-			 //float x2 = to.iX.value-to.difX;
-			 //float y2 = to.iY.value-to.difY;
 			 float x2 = to.iX.value;
 			 float y2 = to.iY.value;
 				
+			 	
+			 
+			 
+			 float xCenter = PathwayView.rootPathway.x;
+			 float yCenter = PathwayView.rootPathway.y;
+			 
+			 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
+			 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
+			 
 			 //float xCenter, float yCenter
-			 drawArc(x1,y1, alFrom, x2, y2, alTo, PathwayView.rootPathway.x, PathwayView.rootPathway.y, sat);
+			 drawArc(x1,y1, al1, x2, y2, al2, PathwayView.rootPathway.x, PathwayView.rootPathway.y, sat, false);
 		 }
 		 else{
 			 drawLink2(sat);
@@ -156,7 +159,7 @@ public class Edge {
 			 float y2 = to.iY.value;
 				
 			 //float xCenter, float yCenter
-			 drawArc(x1,y1, alFrom, x2, y2, alTo, pathwayFrom.x, pathwayFrom.y, sat);
+			 drawArc(x1,y1, alFrom, x2, y2, alTo, pathwayFrom.x, pathwayFrom.y, sat, true);
 		 }
 		 else{
 			 if (sat<200) return;
@@ -203,7 +206,7 @@ public class Edge {
 				 
 				 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
 				 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
-				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
+				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat,false);
 			 }
 				 
 			 if (countTo>0)
@@ -235,7 +238,7 @@ public class Edge {
 				 
 				 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
 				 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
-				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
+				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat,false);
 			 }
 			 
 	//		 System.out.println(pathwayTo.displayName+"	countTo"+countTo);
@@ -322,13 +325,12 @@ public class Edge {
 					 && newPathwayTo.displayName.equals("Signalling to p38 via RIT and RIN")){
 				 System.out.println("newPathwayFrom.parentPathway.displayName"+newPathwayFrom.parentPathway.displayName);
 				 System.out.println("newPathwayTo.parentPathway.displayName"+newPathwayTo.parentPathway.displayName);
-				 System.out.println("newPathwayFrom="+newPathwayFrom.displayName+" al1="+al1/PApplet.PI);
-				 System.out.println("newPathwayTo="+newPathwayTo.displayName+"	al2="+al2/PApplet.PI);
+				 System.out.println("newPathwayFrom="+newPathwayFrom.displayName+" al1="+al1);
+				 System.out.println("newPathwayTo="+newPathwayTo.displayName+"	al2="+al2);
 				 System.out.println(xCenter+"	"+yCenter);
-				// al1 = al1+PApplet.PI;
-			 }
-			 
-			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat);
+			}
+			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat, false);
+				 
 			 //drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
 			//	 newPathwayTo.x, newPathwayTo.y,new Color(0,255,0));
 				countFrom++;
@@ -355,7 +357,7 @@ public class Edge {
 	 }
 			
 			
-	  public void drawArc(float x1, float y1, float alFrom, float x2, float y2, float alTo, float xCenter, float yCenter, float sat) {
+	  public void drawArc(float x1, float y1, float alFrom, float x2, float y2, float alTo, float xCenter, float yCenter, float sat, boolean isLinkedTwoReaction) {
 		// Draw gradient lines
 		/*int numSec =6;
 		float x1 = from.iX.value;
@@ -376,17 +378,17 @@ public class Edge {
  	    	
 			
 			
-			float alpha = (y2-y1)/(x2-x1);
-			alpha = PApplet.atan(alpha);
 			float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
 			float dd = PApplet.sqrt(dis);
 			
 			float alCircular = PApplet.PI -PApplet.abs(alTo-alFrom);
-			/*if (alCircular<0){
-				System.out.println("alCircular="+alCircular);
-				return;
-			}*/
-				
+			// the atan formular is wrong because it gives values from -PI/2 tp PI/2
+			// In other words if two points are distributed on two side of the vertical center, the atan is wrong 
+			// Alpha of reactions are computed separately (not use atan) so it does not need correction 
+			if (!isLinkedTwoReaction && ((x1<=xCenter && xCenter<=x2) || (x2<=xCenter && xCenter<=x1))){
+				alCircular = PApplet.abs(alTo-alFrom);
+			}
+			
 			if (PathwayView.popupLayout.s==1 || PathwayView.popupLayout.s==0)
 				 alCircular += PathwayView.iTransition.value;
 			  else if (PathwayView.popupLayout.s==2)
