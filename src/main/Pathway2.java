@@ -78,7 +78,7 @@ public class Pathway2{
 	  yEntry = yEntry_;
 	  
 	  al = al_;
-	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale*5;
+	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
 	  	if (isExpanded)

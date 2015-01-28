@@ -172,7 +172,7 @@ public class PathwayView{
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		rCircular = PApplet.pow(countReactions,0.55f)*10f*scale;
+		rCircular = PApplet.pow(countReactions,0.6f)*5f*scale;
 	}
 		
 	public void resetPosistion() {
@@ -184,8 +184,8 @@ public class PathwayView{
 		g = new Graph();
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
-			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
+			Node node = new Node(new Vector3D(20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
+			node.setMass(5+PApplet.pow(rectSizeList.get(i),0.6f));
 			node.nodeId = i;
 			node.reaction = rectList.get(i);
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
