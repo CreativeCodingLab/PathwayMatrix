@@ -94,7 +94,7 @@ public class PathwayView{
 		gradient.addColor(new Color(0,0,v));
 		gradient.addColor(new Color(0,v,v));
 		gradient.addColor(new Color(0,v,0));
-		gradient.addColor(new Color(v,v,0));
+		//gradient.addColor(new Color(v,v,0));
 		gradient.addColor(new Color(v,0,0));
 		gradient.addColor(new Color(v,0,v));
 		gradient.addColor(new Color(0,0,v));
@@ -172,7 +172,7 @@ public class PathwayView{
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		rCircular = PApplet.pow(countReactions,0.55f)*10f*scale;
+		rCircular = PApplet.pow(countReactions,0.6f)*5f*scale;
 	}
 		
 	public void resetPosistion() {
@@ -184,17 +184,13 @@ public class PathwayView{
 		g = new Graph();
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
-			Node node = new Node(new Vector3D( 20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(6+PApplet.pow(rectSizeList.get(i),0.7f));
+			Node node = new Node(new Vector3D(20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
+			node.setMass(5+PApplet.pow(rectSizeList.get(i),0.6f));
 			node.nodeId = i;
 			node.reaction = rectList.get(i);
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
 			g.addNode(node);
 		}	
-		// Initialize topological ordering
-		orderTree();
-		yTopological =  new float[rectList.size()];
-		orderTopological();
 	}
 	public static Color getColor(int fileId) {
 		return gradient.getGradient(colorScale*(transferID(fileId)));
@@ -245,6 +241,13 @@ public class PathwayView{
 			}*/
 		}	
 	}
+	public void order(ArrayList<BiochemicalReaction> rectList) {
+		// Initialize topological ordering
+		orderTree();
+		yTopological =  new float[rectList.size()];
+		orderTopological();
+	}
+		
 	
 	public ArrayList<Integer> getProteinsInOneSideOfReaction(Object[] s) {
 		ArrayList<Integer> a = new ArrayList<Integer>();
@@ -289,7 +292,7 @@ public class PathwayView{
 	}
 	
 	public void draw(){
-		if (!isAllowedDrawing || g==null || g.nodes==null) return;
+		if (g==null || g.nodes==null) return;
 		xRight = parent.width*7.5f/10;
 		
 		for (int i=0;i<g.nodes.size();i++){
@@ -364,7 +367,7 @@ public class PathwayView{
 			}
 			
 			isBrushing =false;
-			float rCenter = rCircular/10;
+			float rCenter = rCircular/13;
 			rootPathway.x = xCircular;
 			rootPathway.y = yCircular;
 			if (PApplet.dist(xCircular, yCircular, parent.mouseX, parent.mouseY)<rCenter){
@@ -597,7 +600,7 @@ public class PathwayView{
 		  parent.endShape(PApplet.CLOSE);
 	}
 	 public void drawCenter(float x_, float y_, float r_){
-		parent.fill(50);
+		parent.fill(20);
 	  	parent.ellipse(x_, y_, r_*2, r_*2);
 		
 	  	parent.strokeWeight(r_/10);
@@ -1028,17 +1031,7 @@ public class PathwayView{
 	public void mouseClicked() {
 		if (g==null) return;
 		
-		if(isBrushing){
-			rootPathway.isExpanded = !rootPathway.isExpanded;
-			if (!rootPathway.isExpanded)
-				rootPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
-		}
-		else if (bPathway!=null){
-			bPathway.isExpanded=!bPathway.isExpanded;
-			if (!bPathway.isExpanded)
-				bPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
-		}
-		else if (buttonExpand.b){
+		if (buttonExpand.b){
 			rootPathway.expandAll();
 		}
 		else if (buttonCollapse.b){
@@ -1049,6 +1042,16 @@ public class PathwayView{
 			scale = 1f;
 			updateScale();
 			setIntegrator = 4;
+		}
+		else if(isBrushing){
+			rootPathway.isExpanded = !rootPathway.isExpanded;
+			if (!rootPathway.isExpanded)
+				rootPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
+		}
+		else if (bPathway!=null){
+			bPathway.isExpanded=!bPathway.isExpanded;
+			if (!bPathway.isExpanded)
+				bPathway.collapseAll();   // When we close a pathway, close all sub-pathway recursively
 		}
 			
 		

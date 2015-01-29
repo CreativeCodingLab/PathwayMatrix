@@ -37,13 +37,13 @@ public class Pathway2{
   public static float beginDarknessOfPathways = 150;
   
   // Constructor
-  Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_){
+  Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
 	  parent = parent_;
 	  parentPathway = parentPathway_;
 	  f=f_;
 	  level = level_;
 	  displayName = dName;
-	  
+	  isExpanded = isExpande_;
 	  subPathwayList =  new ArrayList<Pathway2>();
 	  reactList = new ArrayList<BiochemicalReaction>();
 	  nodeIdList = new ArrayList<Integer>();
@@ -78,15 +78,13 @@ public class Pathway2{
 	  yEntry = yEntry_;
 	  
 	  al = al_;
-	  radius = PApplet.pow(numReactions,0.65f)*PathwayView.scale*5;
+	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
 	  	if (isExpanded)
 	  		drawExpanded();
 	  	else 
 	  		drawUnexpanded();
-	  	
-	  	
 	  	
 		if (PathwayView.bPathway==null && PApplet.dist(x, y, parent.mouseX, parent.mouseY)<radius){
 			PathwayView.bPathway = this;
@@ -129,6 +127,32 @@ public class Pathway2{
 		parent.line(xCenter-(radiusCenter*0.8f)/2,yCenter, xCenter+(radiusCenter*0.8f)/2,yCenter);
 		if (!isExpanded)
 			parent.line(xCenter,yCenter-(radiusCenter*0.8f)/2, xCenter,yCenter+(radiusCenter*0.8f)/2);
+		
+		// draw file pathway name in the first level
+		if (level==1 && !isExpanded){
+			if (-PApplet.PI/2<=al && al<PApplet.PI/2){
+				parent.textAlign(PApplet.LEFT);
+				parent.translate(x,y);
+				parent.rotate(al);
+				parent.fill(255);
+				parent.text(displayName, 4, 5);
+				parent.fill(PathwayView.getColor(f).getRGB());
+				parent.text(displayName, 3, 4);
+				parent.rotate(-al);
+				parent.translate(-x,-y);
+			}
+			else{
+				parent.textAlign(PApplet.RIGHT);
+				parent.translate(x,y);
+				parent.rotate(al-PApplet.PI);
+				parent.fill(255);
+				parent.text(displayName, -2, 4);
+				parent.fill(PathwayView.getColor(f).getRGB());
+				parent.text(displayName, -3, 3);
+				parent.rotate(-(al-PApplet.PI));
+				parent.translate(-x,-y);
+			}
+		}
 		
   }
 		

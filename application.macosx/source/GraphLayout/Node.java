@@ -133,6 +133,16 @@ public class Node {
 			iAlpha.target(al);
 			iX.target(xR);
 			iY.target(yR);*/
+			if (PathwayView.rootPathway.isExpanded){
+				Pathway2 filePathway = parentPathway;
+				if (filePathway==null)  return; // avoid problem of threads
+				while (filePathway.level>1){
+					filePathway = filePathway.parentPathway;
+				}
+				if (!filePathway.isExpanded){
+					return;
+				}
+			}	
 		}
 		
 		float xx = iX.value;
