@@ -1261,7 +1261,7 @@ public class PathwayViewer_2_8 extends PApplet {
 				pathwayView.rectFileList = new ArrayList<Integer>();
 				pathwayView.maxSize=0;
 				pathwayView.filePathway = new Pathway2[pathwayView.nFiles];
-				PathwayView.rootPathway = new Pathway2(parent,null,-1,"ROOT",0);
+				PathwayView.rootPathway = new Pathway2(parent,null,-1,"ROOT",0, true);
 				
 
 				//multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
@@ -1309,10 +1309,10 @@ public class PathwayViewer_2_8 extends PApplet {
 					 i2=0;
 					 String[] str = pathwayView.files.get(f).split("/");
 					 String nameFile = str[str.length-1];
-					 PathwayView.filePathway[f] = new Pathway2(parent,PathwayView.rootPathway,f,nameFile,1);
+					 PathwayView.filePathway[f] = new Pathway2(parent,PathwayView.rootPathway,f,nameFile,1, false);
 					 for (Pathway aPathway : model.getObjects(Pathway.class)){
 						 Pathway2 newPathway = new Pathway2(parent,PathwayView.filePathway[f],
-								 f,aPathway.getDisplayName(),PathwayView.filePathway[f].level+1);
+								 f,aPathway.getDisplayName(),PathwayView.filePathway[f].level+1,false);
 						 PathwayView.filePathway[f].subPathwayList.add(newPathway);
 						 processPathway(aPathway, newPathway, f);
 				    	 i2++;
@@ -1370,8 +1370,11 @@ public class PathwayViewer_2_8 extends PApplet {
 				
 				pathwayView.setItems(rectList);
 				pathwayView.updateNodes(rectList);
+				System.out.println("Done pathwayView.updateNodes");
 				pathwayView.updateEdges();
+				System.out.println("Done pathwayView.updateEdges");
 				pathwayView.popupPathway.setItems();
+				System.out.println("Done setItems");
 				
 				// Node id to each reaction in pathway hierarchy
 				// This is done after pathwayView.updateNodes(rectList);
@@ -1379,21 +1382,23 @@ public class PathwayViewer_2_8 extends PApplet {
 					Pathway2 pathway = PathwayView.filePathway[f];
 					pathway.setNodePathway();
 				}
+				System.out.println("setNodePathway");
+				pathwayView.order(rectList);
+				System.out.println("Done order");
 				
 			 }
-			 
 			 catch (FileNotFoundException e){
 					e.printStackTrace();
 					javax.swing.JOptionPane.showMessageDialog(parent, "Exception in multi pathways reading");
 					return;
-				}
+			 }
 		}	 
 	}
 	
 	public void processPathway(Pathway aPathway, Pathway2 thisPathway, int f) {
 		for (Process aProcess : aPathway.getPathwayComponent()) {
 			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				Pathway2 newPathway = new Pathway2(this, thisPathway,f,aProcess.getDisplayName(),thisPathway.level+1);
+				Pathway2 newPathway = new Pathway2(this, thisPathway,f,aProcess.getDisplayName(),thisPathway.level+1,false);
 				thisPathway.subPathwayList.add(newPathway);
 				processPathway((Pathway) aProcess,newPathway,f);
 			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
@@ -1537,7 +1542,7 @@ public class PathwayViewer_2_8 extends PApplet {
 	
 	void mouseWheel(int delta) {
 		if (popupView.s==2){
-			PathwayView.scale += delta/20f;
+			PathwayView.scale += delta/50f;
 			if (PathwayView.scale<0.1f)
 				PathwayView.scale=0.1f;
 			pathwayView.updateScale();
