@@ -175,11 +175,7 @@ public class Edge {
 		 else{
 			 if (sat<200) return;
 			 //System.out.println(pathwayFrom+"	"+pathwayTo);
-			 float xFrom = from.iX.value;
-			 float yFrom = from.iY.value;
-			 float xTo = to.iX.value;
-			 float yTo = to.iY.value;
-			
+			 
 			 float xPathwayFrom = pathwayFrom.x;
 			 float yPathwayFrom = pathwayFrom.y;
 			 float xPathwayTo = pathwayTo.x;
@@ -192,31 +188,47 @@ public class Edge {
 			 ArrayList<Pathway2> b  = drawPathwayToUpLink(pathwayFrom, pathwayTo, sat);
 			 Pathway2 newPathwayTo = b.get(0);
 			 
-			 	
+			 
+			 float xFrom = from.iX.value;
+			 float yFrom = from.iY.value;
+			 float xTo = to.iX.value;
+			 float yTo = to.iY.value;
+			
+			 float dx1 = xFrom-xPathwayFrom;
+			 float dy1 = yFrom-yPathwayFrom;
+			 float d1 = PApplet.sqrt(dx1*dx1+dy1*dy1);
+			 float portion1 = 1-from.size*0.5f/d1; 
+			 xFrom = xPathwayFrom+portion1*dx1;
+			 yFrom = yPathwayFrom+portion1*dy1;
+			
+			 
+			 float dx2 = xTo-xPathwayTo;
+			 float dy2 = yTo-yPathwayTo;
+			 float d2 = PApplet.sqrt(dx2*dx2+dy2*dy2);
+			 float portion2 = 1-to.size*0.5f/d2; 
+			 xTo = xPathwayTo+portion2*dx2;
+			 yTo = yPathwayTo+portion2*dy2;
+			
+			 
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0){
-				 if (newPathwayFrom.level!=1)
-						drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, new Color(200,200,0,100));
+				 if (newPathwayFrom.level!=1){
+					
+					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, new Color(200,200,0,100));
+				 }		
 			 }
 			 else if (pathwayFrom.equals(b.get(1).parentPathway)){
-				//float x1 = from.iX.value-from.difX;
-				 //float y1 = from.iY.value-from.difY;
 				 float x1 = xFrom;
 				 float y1 = yFrom;
-					
-				 //float x2 = to.iX.value-to.difX;
-				 //float y2 = to.iY.value-to.difY;
-				 float x2 = b.get(1).x;    
-				 float y2 = b.get(1).y;
+				 float x2 = b.get(1).xEntry;    
+				 float y2 = b.get(1).yEntry;
+				 float xCenter = pathwayFrom.x;
+				 float yCenter = pathwayFrom.y;
 				
 				 if (countTo==0){
 					 x2 = xTo;
 					 y2 = yTo;
 				 }
-				 
-				 float xCenter = pathwayFrom.x;
-				 float yCenter = pathwayFrom.y;
-				 
 				 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
 				 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
 				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat,false);
@@ -228,16 +240,11 @@ public class Edge {
 				 }	 
 			 }	 
 			 else if (pathwayTo.equals(a.get(1).parentPathway)){
-				//float x1 = from.iX.value-from.difX;
-				 //float y1 = from.iY.value-from.difY;
 				 float x2 = xTo;
 				 float y2 = yTo;
 				 
-				 	
-				 //float x2 = to.iX.value-to.difX;
-				 //float y2 = to.iY.value-to.difY;
-				 float x1 = a.get(1).x;    
-				 float y1 = a.get(1).y;
+				 float x1 = a.get(1).xEntry;    
+				 float y1 = a.get(1).yEntry;
 				
 				 if (countFrom==0){
 					 x1 = xFrom;
@@ -246,19 +253,12 @@ public class Edge {
 				 
 				 float xCenter = pathwayTo.x;
 				 float yCenter = pathwayTo.y;
-				 /*parent.fill(Color.RED.getRGB());
-				 parent.ellipse(xCenter,yCenter, 5,5);
-				 System.out.println(xCenter+"	yCenter="+yCenter);
-				 parent.stroke(Color.RED.getRGB());
-				 parent.line(x1, y1, x2, y2);*/
 				 
 				 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
 				 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
 				 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat,false);
 			 }
 			 
-	//		 System.out.println(pathwayTo.displayName+"	countTo"+countTo);
-				
 		 }
 		
 	 }
