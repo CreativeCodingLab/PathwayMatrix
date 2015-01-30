@@ -213,7 +213,6 @@ public class Edge {
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0){
 				 if (newPathwayFrom.level!=1){
-					
 					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, new Color(200,200,0,100));
 				 }		
 			 }
@@ -450,9 +449,9 @@ public class Edge {
 			
 			if (type==0){
 				if (al1<al2)
-					drawArc(x3, y3, newR*2,  al1, al2, sat);
+					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al1, al2, sat);
 				else
-					drawArc(x3, y3, newR*2,  al2, al1, sat);
+					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al2, al1, sat);
 			}
 			else if (type==1){
 				parent.stroke(255,0,255);
@@ -471,12 +470,12 @@ public class Edge {
 	  }
 
 	  
-	  public void drawArc(float x3, float y3, float d3, float al1, float al2, float sat){
-			float x1 = x3+d3/2*PApplet.cos(al1);
-			float y1 = y3+d3/2*PApplet.sin(al1);
+	  public void drawArc(float x1, float y1, float x2, float y2 ,float x3, float y3, float d3, float al1, float al2, float sat){
+		    float x5 = x3+d3/2*PApplet.cos(al1);
+			float y5 = y3+d3/2*PApplet.sin(al1);
 			boolean down = true;
-			if (PApplet.dist(x1, y1, from.iX.value, from.iY.value)
-					>PApplet.dist(x1, y1, to.iX.value, to.iY.value))
+			if (PApplet.dist(x5, y5, x1, y1)
+					>PApplet.dist(x5, y5, x2, y2))
 				down = false;
 			
 			if (PathwayView.popupLayout.s==0 && PApplet.dist(from.iX.value,from.iY.value,from.iX.target,from.iY.target)<2){

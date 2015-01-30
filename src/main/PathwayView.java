@@ -47,7 +47,7 @@ public class PathwayView{
 	
 	
 	public static Graph g;
-	public static float xRight =0;
+	public static float xRight=0;
 	public Slider2 slider2;
 	public static PopupLayout popupLayout;
 	public static CheckBox checkName;
@@ -75,6 +75,9 @@ public class PathwayView{
 	public ButtonMap buttonExpand;
 	public ButtonMap buttonCollapse;
 	
+	// Depict a selected reaction
+	public Integrator iX2; 
+	public Integrator iY2; 
 	
 	
 	public PathwayView(PApplet p){
@@ -89,7 +92,6 @@ public class PathwayView{
 		checkName = new CheckBox(parent,"Reactions names");
 		popupPathway = new PopupPathway(parent);
 		
-		xRight = parent.width*7.5f/10;
 		float v=0.5f;
 		gradient.addColor(new Color(0,0,v));
 		gradient.addColor(new Color(0,v,v));
@@ -99,6 +101,9 @@ public class PathwayView{
 		gradient.addColor(new Color(v,0,v));
 		gradient.addColor(new Color(0,0,v));
 		
+		xRight = parent.width-298;
+		iX2 = new Integrator(xRight,0.2f,0.5f);
+		iY2 = new Integrator(parent.height,0.2f,0.5f); 
 	}
 	
 	public void setItems(ArrayList<BiochemicalReaction> rectList){
@@ -292,11 +297,10 @@ public class PathwayView{
 	}
 	
 	public void draw(){
-		if (g==null || g.nodes==null) return;
-		xRight = parent.width*7.5f/10;
+		if (g==null || Graph.nodes==null || g.edges==null) return;
 		
-		for (int i=0;i<g.nodes.size();i++){
-			Node node = g.nodes.get(i);
+		for (int i=0;i<Graph.nodes.size();i++){
+			Node node = Graph.nodes.get(i);
 			node.iX.update();
 			node.iY.update();
 			node.iAlpha.update();
@@ -389,25 +393,35 @@ public class PathwayView{
 			g.drawNodes();
 		   	g.drawEdges();
 		   	
-		   	// Draw button to control the map
-		   	buttonReset.draw("Reset map",xRight-buttonReset.w-3, 2);
-		   	buttonExpand.draw("Expand all",xRight-buttonExpand.w-3, 24);
-		   	buttonCollapse.draw("Collapse all",xRight-buttonCollapse.w-3, 46);
+		   
 		   	
 		}
 		
 		// Right PANEL
 		float wRight = parent.width-xRight;
-		parent.fill(200,200);
 		parent.noStroke();
-		parent.rect(xRight, 25, wRight, parent.height-25);
-		slider2.draw("Edge length",xRight+100, 50);
-		checkName.draw(xRight+30, 80);
+		if (popupLayout.s==2){
+			parent.fill(200,200);
+			parent.rect(xRight, 25, wRight, 180);
+			slider2.draw("Edge length",xRight+90, 182);
+		}	
+		else{
+			if (popupLayout.s==3){
+				// Draw button to control the map
+			   	buttonReset.draw("Reset map",0, 25);
+			   	buttonExpand.draw("Expand all",0, 45);
+			   	buttonCollapse.draw("Collapse all",0, 65);
+			}
+			parent.fill(200,200);
+			parent.rect(xRight, 25, wRight, 160);
+		}	
+		//checkName.draw(xRight+30, 80);
+		
 		// File names
-		parent.textSize(12);
+		parent.textSize(11);
 		parent.textAlign(PApplet.LEFT);
 		for (int f=0; f<nFiles; f++){
-			float yy = 150+f*18;
+			float yy = 50+f*16;
 			String[] str = files.get(f).split("/");
 			String nameFile = str[str.length-1];
 			Color color = gradient.getGradient(colorScale*(transferID(f)));
@@ -423,136 +437,116 @@ public class PathwayView{
 		
 		// Draw brushing reaction
 		if (g.getHoverNode()!=null){
+			parent.fill(255,200);
+			parent.noStroke();
+			parent.rect(xRight, 400, 301, 200);
+			
 			Node node =g.getHoverNode();
-			drawReactionLink(parent, node, xRight+50, parent.width-50, 400, 255);
+			drawReactionLink(parent, node, xRight, parent.width-50, 400, 255);
+			iY2.target(parent.height);
 		}
-		
 	}
 	
 	
 	// draw Reactions links
 	public void drawReactionLink(PApplet parent, Node node, float xL, float xR,float yReact, float sat) {
-		
 		Object[] sLeft = node.reaction.getLeft().toArray();
-		int proteinCountL=0;
-		for (int i3=0;i3<sLeft.length;i3++){
+		float yL=yReact;
+		float yR=yReact;
+		float gapY = 17;
+		float gapYInComplex = 15;
+		 parent.strokeWeight(1);
+		 for (int i3=0;i3<sLeft.length;i3++){
 			String name = mapProteinRDFId.get(sLeft[i3].toString());
 			  if (name!=null){
-				  float y2 = yReact+proteinCountL*19;
 				  parent.stroke(0);
-				  parent.line(xL, y2, (xL+xR)/2, yReact);
-				
+				  parent.line(xL, yL, (xL+xR)/2, yReact);
 				  parent.fill(0);
 				  parent.textSize(11);
 				  parent.textAlign(PApplet.RIGHT);
-				  if (name.length()>10)
-					  name = name.substring(name.length()-10, name.length()-1);
-				  parent.text(name,xL, y2+5);
-				  proteinCountL++;
+				  parent.text(name,xL, yL+5);
+				  yL+=gapY;
 			  }
 			  // Complex LEFT
 			  else if (mapComplexRDFId_Complex.get(sLeft[i3].toString())!=null){
 				  Complex complex = mapComplexRDFId_Complex.get(sLeft[i3].toString());
 				  ArrayList<String> components = getProteinsInComplex(complex);
-				  float sumY = 0;
+				  yL +=gapY/2;
+				  float beginY = yL;
+				  float sizeYComplex = (components.size()-1)*gapYInComplex;
 				  for (int i=0;i<components.size();i++){
-					  float y2 = yReact+(proteinCountL+i)*19;
-					  sumY+=y2;
-				  }
-				  
-				  float comY = yReact+proteinCountL*19;
-				  if (components.size()>0)
-					  comY = sumY/components.size();
-				   
-				  for (int i=0;i<components.size();i++){
-					  float y2 = yReact+proteinCountL*19;
-					  sumY+=y2;
+					  float y2 = beginY+i*gapYInComplex;
 					  parent.stroke(0,100,0);
-				      parent.line(xL, y2, xL+(xR-xL)/4, comY);
-						
+				      parent.line(xL, y2, xL+(xR-xL)/4,beginY+sizeYComplex/2);
 					  parent.fill(0);
 					  parent.textSize(11);
 					  parent.textAlign(PApplet.RIGHT);
 					  
 					  String name2 = components.get(i);
-					  if (name2.length()>10)
-						  name2 = name2.substring(name2.length()-10, name2.length()-1);
 					  parent.text(name2,xL, y2+5);
-			 
-					  proteinCountL++;
-				  }
+			 	  }
+				  
 				  parent.stroke(0,0,200);
-				  parent.line(xL+(xR-xL)/4, comY, xL+(xR-xL)/2, yReact);
+				  parent.line(xL+(xR-xL)/4, beginY+sizeYComplex/2, xL+(xR-xL)/2, yReact);
 				  
 				  parent.noStroke();
 				  parent.fill(0,0,150);
-				  polygon(xL+(xR-xL)/4,comY,6,4);
+				  polygon(xL+(xR-xL)/4,beginY+sizeYComplex/2,6,4);
 				
-				 
+				  yL+=components.size()*gapYInComplex+gapY;
 			  }
 			  else{
+				  yL+=gapY;
 				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
 			  }
 		  }
 		Object[] sRight = node.reaction.getRight().toArray();
-		int proteinCountR = 0;
 		for (int i3=0;i3<sRight.length;i3++){
 			  String name = mapProteinRDFId.get(sRight[i3].toString());
 			  
 			  if (name!=null){
-				  float y2 = yReact+proteinCountR*20;
 				  parent.stroke(0);
-				  parent.line( xR, y2, (xL+xR)/2, yReact);
+				  parent.line( xR, yR, (xL+xR)/2, yReact);
 				
 				  parent.fill(0);
 				  parent.textSize(11);
 				  parent.textAlign(PApplet.LEFT);
-				  parent.text(name,xR, y2+5);
-				  proteinCountR++;
+				  parent.text(name,xR, yR+5);
+				  yR+=gapY;
 			  }
 			  // Complex LEFT
 			  else if (mapComplexRDFId_Complex.get(sRight[i3].toString())!=null){
 				  Complex complex = mapComplexRDFId_Complex.get(sRight[i3].toString());
 				  ArrayList<String> components = getProteinsInComplex(complex);
-				 
-				  float sumY = 0;
+				  yR +=gapY/2;
+					 
+				  float beginY = yR;
+				  float sizeYComplex = (components.size()-1)*gapYInComplex;
 				  for (int i=0;i<components.size();i++){
-					  float y2 = yReact+(proteinCountR+i)*19;
-					  sumY+=y2;
-				  }
-				  
-				  float comY = yReact+proteinCountR*19;
-				  if (components.size()>0)
-					  comY = sumY/components.size();
-				   
-				  for (int i=0;i<components.size();i++){
-					  float y2 = yReact+proteinCountR*19;
-					  sumY+=y2;
+					  float y2 = beginY+i*gapYInComplex;
 					  parent.stroke(0,100,0);
-				      parent.line(xL+(xR-xL)*3/4, comY, xR, y2);
+				      parent.line(xL+(xR-xL)*3/4, beginY+sizeYComplex/2, xR, y2);
 						
 					  parent.fill(0);
 					  parent.textSize(11);
 					  parent.textAlign(PApplet.LEFT);
 					  
 					  String name2 = components.get(i);
-					  if (name2.length()>10)
-						  name2 = name2.substring(name2.length()-10, name2.length()-1);
 					  parent.text(name2,xR, y2+5);
-			 		  proteinCountR++;
 				  }
 				  
 				  parent.stroke(0,0,200);
-				  parent.line(xL+(xR-xL)/2, yReact, xL+(xR-xL)*3/4, comY);
+				  parent.line(xL+(xR-xL)/2, yReact, xL+(xR-xL)*3/4, beginY+sizeYComplex/2);
 				  
 				  parent.noStroke();
 				  parent.fill(0,0,150);
-				  polygon(xL+(xR-xL)*3/4,comY,6,4);
+				  polygon(xL+(xR-xL)*3/4, beginY+sizeYComplex/2,6,4);
 				
-				 
+				  yR+=components.size()*gapYInComplex+gapY;
 			  }
 			  else{
-				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
+				  yR+=gapY;
+				  //System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
 			  }
 		  }
 		
@@ -647,7 +641,6 @@ public class PathwayView{
 			parent.fill(color.getRGB());
 			parent.text(nameFile, 250,yy); 
 		}
-	
 	}
 		
 	public void orderTopological() {
@@ -657,7 +650,6 @@ public class PathwayView{
 		int count = 0;
 		int r = getNoneUpstream(doneList);
 		while (count<Graph.nodes.size()){
-		//	System.out.println(count+"	doneList="+doneList+"	r="+r);
 			if (r>=0){
 				doneList.add(r);
 				r = getNoneUpstream(doneList);
@@ -735,7 +727,6 @@ public class PathwayView{
 				if (doneList.contains(i)) continue;
 				ArrayList<Integer> up = this.getDirectUpstream(i);
 				if (isContainedAllUpInDoneList(up,doneList)){  // Upstream are all in the doneList;
-				//	return i;
 					b.add(i);
 				}	
 			}
