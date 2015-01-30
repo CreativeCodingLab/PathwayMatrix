@@ -213,7 +213,8 @@ public class Edge {
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0){
 				 if (newPathwayFrom.level!=1){
-					 drawGradientLine(xFrom, yFrom, xPathwayFrom, yPathwayFrom, new Color(200,200,0,100));
+					parent.stroke(200,200,0,100);
+					parent.line(xFrom, yFrom, xPathwayFrom, yPathwayFrom);
 				 }		
 			 }
 			 else if (pathwayFrom.equals(b.get(1).parentPathway)){
@@ -235,7 +236,8 @@ public class Edge {
 				 
 			 if (countTo>0){
 				 if (newPathwayTo.level!=1){
-					 drawGradientLine(xPathwayTo, yPathwayTo, xTo, yTo, new Color(0,0,0,150));
+					 parent.stroke(0,0,0,150);
+					 parent.line(xPathwayTo, yPathwayTo, xTo, yTo);
 				 }	 
 			 }	 
 			 else if (pathwayTo.equals(a.get(1).parentPathway)){
@@ -269,10 +271,12 @@ public class Edge {
 			 while(newPathwayFrom.level>pathwayTo.level){
 				 currentPathway = newPathwayFrom;
 				 if (newPathwayFrom.parentPathway.isExpanded){
-					 if(!newPathwayFrom.parentPathway.equals(pathwayTo))   // if they have the same parent
-						 drawGradientLine(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
-						 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y,new Color(200,200,0,100));
-						countFrom++;
+					 if(!newPathwayFrom.parentPathway.equals(pathwayTo)){   // if they have the same parent
+						 parent.stroke(200,200,0,100);
+						 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
+								 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
+					 }	 
+					 countFrom++;
 				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
 			 }
@@ -290,9 +294,11 @@ public class Edge {
 			 while(newPathwayTo.level>pathwayFrom.level){
 				 currentPathway = newPathwayTo;
 				 if (newPathwayTo.parentPathway.isExpanded){
-					 if(!newPathwayTo.parentPathway.equals(pathwayFrom))  // if they have the same parent
-						 drawGradientLine(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-								 newPathwayTo.xEntry, newPathwayTo.yEntry, new Color(0,0,0,150));
+					 if(!newPathwayTo.parentPathway.equals(pathwayFrom)) { // if they have the same parent
+						 parent.stroke(0,0,0,150);
+						 parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+								 newPathwayTo.xEntry, newPathwayTo.yEntry);
+					 }	 
 					 countTo++;
 				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
@@ -303,58 +309,50 @@ public class Edge {
 		 return a;
 	 }
 	 
-	 public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo, float sat ) {
-		 Pathway2 newPathwayFrom = pathwayFrom;
-		 Pathway2 newPathwayTo = pathwayTo;
-		 while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)){
-			 if (newPathwayFrom.parentPathway.isExpanded){
-				 parent.stroke(200,200,0,100);
-				 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
-					 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
-					countFrom++;
-			 }
-			 if (newPathwayTo.parentPathway.isExpanded){
-				parent.stroke(0,150);
-				parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-					 newPathwayTo.xEntry, newPathwayTo.yEntry);
-				 	countTo++;
-			 }
-			 newPathwayFrom = newPathwayFrom.parentPathway;
-			 newPathwayTo = newPathwayTo.parentPathway;
-		 }
-		 
-		 if (!newPathwayFrom.equals(newPathwayTo) && newPathwayFrom.parentPathway.isExpanded){
-			 float x1 = newPathwayFrom.xEntry;
-			 float y1 = newPathwayFrom.yEntry;
-			 float x2 = newPathwayTo.xEntry;
-			 float y2 = newPathwayTo.yEntry;
-			 float xCenter = newPathwayFrom.parentPathway.x;
-			 float yCenter = newPathwayFrom.parentPathway.y;
-			 float al1 = PApplet.atan((y1-yCenter)/(x1-xCenter));
-			 float al2 = PApplet.atan((y2-yCenter)/(x2-xCenter));
-			 drawArc(x1,y1, al1, x2, y2, al2, xCenter, yCenter, sat, false);
-				 
-			 //drawGradientLine(newPathwayFrom.x, newPathwayFrom.y, 
-			//	 newPathwayTo.x, newPathwayTo.y,new Color(0,255,0));
+	public void drawPathwayLink(Pathway2 pathwayFrom, Pathway2 pathwayTo,float sat) {
+	Pathway2 newPathwayFrom = pathwayFrom;
+		Pathway2 newPathwayTo = pathwayTo;
+		while (!newPathwayFrom.parentPathway.equals(newPathwayTo.parentPathway)) {
+			if (newPathwayFrom.parentPathway.isExpanded) {
+				/*parent.stroke(200, 200, 0, 100);
+				parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry,
+						newPathwayFrom.parentPathway.x,
+						newPathwayFrom.parentPathway.y);*/
+				newPathwayFrom.linkToParent++;
+				countFrom++;
+			}
+			if (newPathwayTo.parentPathway.isExpanded) {
+				/*parent.stroke(0, 150);
+				parent.line(newPathwayTo.parentPathway.x,
+						newPathwayTo.parentPathway.y, newPathwayTo.xEntry,
+						newPathwayTo.yEntry);*/
+				newPathwayTo.linkFromParent++;
+				//System.out.println(newPathwayTo.displayName+" "+newPathwayTo.linkToParent);
+				countTo++;
+			}
+			newPathwayFrom = newPathwayFrom.parentPathway;
+			newPathwayTo = newPathwayTo.parentPathway;
+		}
+
+		if (!newPathwayFrom.equals(newPathwayTo)
+				&& newPathwayFrom.parentPathway.isExpanded) {
+			float x1 = newPathwayFrom.xEntry;
+			float y1 = newPathwayFrom.yEntry;
+			float x2 = newPathwayTo.xEntry;
+			float y2 = newPathwayTo.yEntry;
+			float xCenter = newPathwayFrom.parentPathway.x;
+			float yCenter = newPathwayFrom.parentPathway.y;
+			float al1 = PApplet.atan((y1 - yCenter) / (x1 - xCenter));
+			float al2 = PApplet.atan((y2 - yCenter) / (x2 - xCenter));
+			drawArc(x1, y1, al1, x2, y2, al2, xCenter, yCenter, sat, false);
+
 			countFrom++;
 			countTo++;
 		 }
 		 
 	 }
 	
-	 public void drawGradientLine(float x1, float y1, float x2, float y2, Color color) {
-		 int numSec =6;
-		 for (int i=1;i<=numSec;i++){
-				float sss = (float) i/numSec;
-				float x3 = x1+(x2-x1)*sss;
-				float y3 = y1+(y2-y1)*sss;
-				//float r = 200*sss;
-				parent.stroke(color.getRGB());
-				parent.line(x1,y1,x3,y3);
-				x1=x3;
-				y1=y3;
-		 }
-	 }
+	
 	 
 	/*		
 	 public void drawGradientLine(float x1, float y1, float x2, float y2, Color color) {
@@ -374,26 +372,6 @@ public class Edge {
 			
 			
 	  public void drawArc(float x1, float y1, float alFrom, float x2, float y2, float alTo, float xCenter, float yCenter, float sat, boolean isLinkedTwoReaction) {
-		// Draw gradient lines
-		/*int numSec =6;
-		float x1 = from.iX.value;
-		float y1 = from.iY.value;
-		for (int i=1;i<=numSec;i++){
-			float sss = (float) i/numSec;
-			float x2 = from.iX.value+(to.iX.value-from.iX.value)*sss;
-			float y2 = from.iY.value+(to.iY.value-from.iY.value)*sss;
-			float sat2 = 255*sss;
-			float r = 255-sat2;
-			
-			parent.stroke(r,r,0,sat2);
-			parent.line(x1,y1,x2,y2);
-			x1=x2;
-			y1=y2;
-		}*/
-		
- 	    	
-			
-			
 			float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
 			float dd = PApplet.sqrt(dis);
 			

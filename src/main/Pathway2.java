@@ -36,6 +36,11 @@ public class Pathway2{
   private PApplet parent = null;
   public static float beginDarknessOfPathways = 150;
   
+  // Draw the button threading
+  public int linkToParent = 0;
+  public int linkFromParent = 0;
+   
+  
   // Constructor
   Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
 	  parent = parent_;
@@ -337,8 +342,111 @@ public class Pathway2{
 	  return a;
   }
   
+  public void resetLinkParent(){
+	  linkToParent=0;
+	  linkFromParent=0;
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).resetLinkParent();
+	  }
+  }
    
+  public void drawLinkParent(){
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).drawLinkParent();
+	  }
+	  
+	  if (parentPathway==null)
+		  return;
+	 	//  System.out.println("drawLinkParent="+displayName);
+		//  System.out.println("linkToParent="+linkToParent);
+		//  System.out.println("linkFromParent="+linkFromParent);
+		  
+		 
+	  if (linkToParent>0){
+		  parent.stroke(255,0,0);
+		  float wei = PApplet.pow(linkToParent, 0.3f);
+		  parent.strokeWeight(wei);
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
+		 // parent.line(xEntry, yEntry, parentPathway.x, parentPathway.y);
+	  }
+	  if (linkFromParent>0){
+		  parent.stroke(0,255,0);
+		  float wei = PApplet.pow(linkFromParent, 0.3f);
+		  parent.strokeWeight(wei);
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei,false);
+		 // parent.line(xEntry, yEntry, parentPathway.x, parentPathway.y);
+	  }
+  }
   
+  public void drawArc(float x1, float y1, float x2, float y2, float weight,boolean isToParent){
+		float xCenter = (x1+x2)/2;
+		float yCenter = (y1+y2)/2;
+		/*float al1 = PApplet.atan((y1 - yCenter) / (x1 - xCenter));
+		float rr = (x1-xCenter)*(x1-xCenter)+(y1-yCenter)*(y1-yCenter);
+		rr=PApplet.sqrt(rr);
+		parent.noFill();
+		System.out.println("rr="+rr+"	al1="+al1);
+		 parent.arc(xCenter, yCenter, 2*rr, 2*rr, al1-PApplet.PI, al1);
+		*/
+		 
+		 float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
+		 float dd = PApplet.sqrt(dis);
+		 float alCircular = PApplet.PI/50;
+		
+		 float newR = (dd/2)/PApplet.sin(alCircular);
+    	 float d3 = PApplet.dist(x1,y1,x2,y2);
+    	 float x11 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float y11 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float x22 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float y22 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 
+    	 float x3 =0, y3=0;
+    	 float d11 = PApplet.dist(x11, y11, xCenter, yCenter);
+    	 float d22 = PApplet.dist(x22, y22, xCenter, yCenter);
+    	 if (d11>d22){
+    		
+    	 }
+    	 else if (d11<d22){
+    		
+    	 }
+    	 x3=x22;
+		 y3=y22;
+    	 
+		float delX1 = (x1-x3);
+		float delY1 = (y1-y3);
+		float delX2 = (x2-x3);
+		float delY2 = (y2-y3);
+		float al1 = PApplet.atan2(delY1,delX1);
+		float al2 = PApplet.atan2(delY2,delX2);
+		parent.noFill();
+		
+		// Adding weight
+		newR+=weight/2;
+		if (isToParent){
+			if (al1<al2){
+				 x3=x22;
+	    		 y3=y22;
+				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+			}	
+			else{
+				 x3=x22;
+	    		 y3=y22;
+				parent.arc(x3, y3, newR*2, newR*2, al1, al2+2*PApplet.PI);
+			}	
+		}
+		else{
+			if (al1<al2){
+				 x3=x11;
+	    		 y3=y11;
+				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2-PApplet.PI);
+			}	
+			else{
+				 x3=x11;
+	    		 y3=y11;
+				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2+PApplet.PI);
+			}	
+		}
+  }	  
   
   Color getGradient(float value){
    return Color.RED;

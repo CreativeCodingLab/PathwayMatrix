@@ -332,6 +332,7 @@ public class PathwayView{
 		else if (popupLayout.s==3){
 			iTransition.target(1);
 			iTransition.update();
+			rootPathway.resetLinkParent();
 			
 			float totalSize=0;
 			for (int i=0;i<filePathway.length;i++){
@@ -384,17 +385,19 @@ public class PathwayView{
 				parent.fill(220,220,255,200);
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
-			drawCenter(xCircular, yCircular,rCenter);
 			
 			// Draw brushing pathway
 			if (bPathway!=null)
 				bPathway.drawWhenBrushing();
 			
-			g.drawNodes();
+			
+		   	drawCenter(xCircular, yCircular,rCenter);
+			
+			
+		   	g.drawNodes();
 		   	g.drawEdges();
-		   	
-		   
-		   	
+		   	rootPathway.drawLinkParent();
+		
 		}
 		
 		// Right PANEL
@@ -483,7 +486,7 @@ public class PathwayView{
 				  for (int i=0;i<components.size();i++){
 					  float y2 = beginY+i*gapYInComplex;
 					  parent.stroke(0,100,0);
-				      parent.line(xL, y2, xL+(xR-xL)/4,beginY+sizeYComplex/2);
+				      parent.line(xL, y2, xL+(xR-xL)/6f,beginY+sizeYComplex/2);
 					  parent.fill(0);
 					  parent.textSize(11);
 					  parent.textAlign(PApplet.RIGHT);
@@ -497,11 +500,11 @@ public class PathwayView{
 			 	  }
 				  
 				  parent.stroke(0,0,200);
-				  parent.line(xL+(xR-xL)/4, beginY+sizeYComplex/2, xL+(xR-xL)/2, yReact);
+				  parent.line(xL+(xR-xL)/6f, beginY+sizeYComplex/2, xL+(xR-xL)/2, yReact);
 				  
 				  parent.noStroke();
 				  parent.fill(0,0,150);
-				  polygon(xL+(xR-xL)/4,beginY+sizeYComplex/2,6,4);
+				  polygon(xL+(xR-xL)/6f,beginY+sizeYComplex/2,6,4);
 				
 				  yL+=components.size()*gapYInComplex+gapY;
 			  }
@@ -538,7 +541,7 @@ public class PathwayView{
 				  for (int i=0;i<components.size();i++){
 					  float y2 = beginY+i*gapYInComplex;
 					  parent.stroke(0,100,0);
-				      parent.line(xL+(xR-xL)*3/4, beginY+sizeYComplex/2, xR, y2);
+				      parent.line(xL+(xR-xL)*5/6f, beginY+sizeYComplex/2, xR, y2);
 						
 					  parent.fill(0);
 					  parent.textSize(11);
@@ -552,11 +555,11 @@ public class PathwayView{
 				  }
 				  
 				  parent.stroke(0,0,200);
-				  parent.line(xL+(xR-xL)/2, yReact, xL+(xR-xL)*3/4, beginY+sizeYComplex/2);
+				  parent.line(xL+(xR-xL)/2, yReact, xL+(xR-xL)*5/6f, beginY+sizeYComplex/2);
 				  
 				  parent.noStroke();
 				  parent.fill(0,0,150);
-				  polygon(xL+(xR-xL)*3/4, beginY+sizeYComplex/2,6,4);
+				  polygon(xL+(xR-xL)*5/6f, beginY+sizeYComplex/2,6,4);
 				
 				  yR+=components.size()*gapYInComplex+gapY;
 			  }
