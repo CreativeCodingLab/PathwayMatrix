@@ -102,8 +102,8 @@ public class PathwayView{
 		gradient.addColor(new Color(0,0,v));
 		
 		xRight = parent.width-298;
-		iX2 = new Integrator(xRight,0.2f,0.5f);
-		iY2 = new Integrator(parent.height,0.2f,0.5f); 
+		iX2 = new Integrator(xRight,0.25f,0.75f);
+		iY2 = new Integrator(parent.height,0.25f,0.75f); 
 	}
 	
 	public void setItems(ArrayList<BiochemicalReaction> rectList){
@@ -402,8 +402,8 @@ public class PathwayView{
 		parent.noStroke();
 		if (popupLayout.s==2){
 			parent.fill(200,200);
-			parent.rect(xRight, 25, wRight, 180);
-			slider2.draw("Edge length",xRight+90, 182);
+			parent.rect(xRight, 28, wRight, 165);
+			slider2.draw("Edge length",xRight+90, 175);
 		}	
 		else{
 			if (popupLayout.s==3){
@@ -413,7 +413,7 @@ public class PathwayView{
 			   	buttonCollapse.draw("Collapse all",0, 65);
 			}
 			parent.fill(200,200);
-			parent.rect(xRight, 25, wRight, 160);
+			parent.rect(xRight, 28, wRight, 140);
 		}	
 		//checkName.draw(xRight+30, 80);
 		
@@ -421,7 +421,7 @@ public class PathwayView{
 		parent.textSize(11);
 		parent.textAlign(PApplet.LEFT);
 		for (int f=0; f<nFiles; f++){
-			float yy = 50+f*16;
+			float yy = 45+f*16;
 			String[] str = files.get(f).split("/");
 			String nameFile = str[str.length-1];
 			Color color = gradient.getGradient(colorScale*(transferID(f)));
@@ -437,26 +437,29 @@ public class PathwayView{
 		
 		// Draw brushing reaction
 		if (g.getHoverNode()!=null){
-			parent.fill(255,200);
+			parent.fill(240,220,220,220);
 			parent.noStroke();
-			parent.rect(xRight, 400, 301, 200);
+			parent.rect(iX2.value, iY2.value-30, parent.width-iX2.value, parent.height-iY2.value+40);
 			
 			Node node =g.getHoverNode();
-			drawReactionLink(parent, node, xRight, parent.width-50, 400, 255);
-			iY2.target(parent.height);
+			drawReactionLink(parent, node, 250);
 		}
 	}
 	
 	
 	// draw Reactions links
-	public void drawReactionLink(PApplet parent, Node node, float xL, float xR,float yReact, float sat) {
+	public void drawReactionLink(PApplet parent, Node node, float ww) {
 		Object[] sLeft = node.reaction.getLeft().toArray();
+		float yReact = 	iY2.value;
 		float yL=yReact;
 		float yR=yReact;
+		float xL = iX2.value+(parent.width-iX2.value-ww)/2;
+		float xR = xL+ww;
 		float gapY = 17;
 		float gapYInComplex = 15;
-		 parent.strokeWeight(1);
-		 for (int i3=0;i3<sLeft.length;i3++){
+		parent.strokeWeight(1);
+		float maxTextWidth = 0;
+		for (int i3=0;i3<sLeft.length;i3++){
 			String name = mapProteinRDFId.get(sLeft[i3].toString());
 			  if (name!=null){
 				  parent.stroke(0);
@@ -465,6 +468,9 @@ public class PathwayView{
 				  parent.textSize(11);
 				  parent.textAlign(PApplet.RIGHT);
 				  parent.text(name,xL, yL+5);
+				  float tWidth = parent.textWidth(name);
+				  if (tWidth>maxTextWidth)
+					  maxTextWidth = tWidth;
 				  yL+=gapY;
 			  }
 			  // Complex LEFT
@@ -484,6 +490,10 @@ public class PathwayView{
 					  
 					  String name2 = components.get(i);
 					  parent.text(name2,xL, y2+5);
+					  float tWidth = parent.textWidth(name2);
+					  if (tWidth>maxTextWidth)
+						  maxTextWidth = tWidth;
+					  
 			 	  }
 				  
 				  parent.stroke(0,0,200);
@@ -496,7 +506,6 @@ public class PathwayView{
 				  yL+=components.size()*gapYInComplex+gapY;
 			  }
 			  else{
-				  yL+=gapY;
 				//System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
 			  }
 		  }
@@ -512,6 +521,10 @@ public class PathwayView{
 				  parent.textSize(11);
 				  parent.textAlign(PApplet.LEFT);
 				  parent.text(name,xR, yR+5);
+				  float tWidth = parent.textWidth(name);
+				  if (tWidth>maxTextWidth)
+					  maxTextWidth = tWidth;
+				  
 				  yR+=gapY;
 			  }
 			  // Complex LEFT
@@ -533,6 +546,9 @@ public class PathwayView{
 					  
 					  String name2 = components.get(i);
 					  parent.text(name2,xR, y2+5);
+					  float tWidth = parent.textWidth(name2);
+					  if (tWidth>maxTextWidth)
+						  maxTextWidth = tWidth;
 				  }
 				  
 				  parent.stroke(0,0,200);
@@ -545,16 +561,27 @@ public class PathwayView{
 				  yR+=components.size()*gapYInComplex+gapY;
 			  }
 			  else{
-				  yR+=gapY;
-				  //System.out.println("drawReactionLink Left: CAN NOT FIND ="+sLeft[i3]);
 			  }
 		  }
 		
-		parent.fill(node.color.getRGB());
+		int sat =(155+parent.frameCount*11%100);
+		parent.fill(node.color.getRed(), node.color.getGreen(), node.color.getBlue(), sat);
 		parent.noStroke();
 		parent.ellipse((xL+xR)/2, yReact, node.size, node.size);
 		parent.textAlign(PApplet.CENTER);
-		parent.text(node.reaction.getDisplayName(), (xL+xR)/2, yReact-node.size/2-2);
+		parent.text(node.reaction.getDisplayName(), (xL+xR)/2, yReact-node.size/2-5);
+		
+		float reactionNameWidth = (parent.textWidth(node.reaction.getDisplayName())-ww)/2;
+		if (reactionNameWidth>maxTextWidth)
+			maxTextWidth = reactionNameWidth;
+		
+		
+		
+		float gap=PApplet.max(yL,yR)-yReact;
+		iY2.target(parent.height-gap);
+		iY2.update();
+		iX2.target(parent.width-ww-2*maxTextWidth-50);
+		iX2.update();
 	 }
 	
 	
