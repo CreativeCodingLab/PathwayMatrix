@@ -34,7 +34,7 @@ public class Pathway2{
   public float yEntry = 500;
   public float al = 0;
   private PApplet parent = null;
-  public static float beginDarknessOfPathways = 150;
+  public static float beginDarknessOfPathways = 120;
   
   // Draw the button threading
   public int linkToParent = 0;
@@ -104,7 +104,6 @@ public class Pathway2{
 			parent.fill(v);
 		  	parent.noStroke();
 			parent.arc(x, y, radius*2, radius*2,al-PApplet.PI/2,al-PApplet.PI/2+PApplet.PI*2);
-			drawCenter();
 		}
 	}	
   public void drawWhenBrushing(){
@@ -115,11 +114,12 @@ public class Pathway2{
 	  parent.textAlign(PApplet.CENTER);
 	  parent.textSize(12);
 	  parent.text(displayName,x,y-10);
-	  drawCenter();
+	  drawCenter(false);
   }
   
   //Draw center
-	public void drawCenter(){
+	public void drawCenter(boolean isRecursive){
+		if (!parentPathway.isExpanded) return;
 		Color color2 = PathwayView.getColor(f).darker().darker();
 		float sat = 200+level*10;
 	  	if (sat>255)
@@ -127,6 +127,7 @@ public class Pathway2{
 	  	parent.fill(color2.getRed(),color2.getGreen(),color2.getBlue(),sat);
 	  	float xCenter = x-radiusCenter/2*PApplet.cos(al);
 	  	float yCenter = y-radiusCenter/2*PApplet.sin(al);
+	  	parent.noStroke();
 	  	parent.ellipse(xCenter, yCenter, radiusCenter, radiusCenter);
 		
 	  	parent.strokeWeight(radiusCenter/20);
@@ -160,7 +161,11 @@ public class Pathway2{
 				parent.translate(-x,-y);
 			}
 		}
-		
+		if (isRecursive){
+			for (int p=0;p<subPathwayList.size();p++){
+				subPathwayList.get(p).drawCenter(isRecursive);
+			}
+		}
   }
 		
 		
@@ -516,7 +521,7 @@ public class Pathway2{
 				>PApplet.dist(x5, y5, x2, y2))
 			down = false;
 		
-		int numSec = 25;
+		int numSec = 50;
 		float beginAngle = al1;
 		if (al2<al1)
 			beginAngle = al2;

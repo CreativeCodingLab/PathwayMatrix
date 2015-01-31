@@ -509,7 +509,7 @@ public class Edge {
 				down = false;
 			}
 			
-			int numSec = 25;
+			int numSec = 50;
 			float beginAngle = al1;
 			if (al2<al1)
 				beginAngle = al2;

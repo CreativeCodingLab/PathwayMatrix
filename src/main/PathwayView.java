@@ -387,18 +387,26 @@ public class PathwayView{
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			
-			// Draw brushing pathway
-			if (bPathway!=null)
-				bPathway.drawWhenBrushing();
-			
-			
-		   	drawCenter(xCircular, yCircular,rCenter);
 			
 			
 		   	g.drawNodes();
 		   	g.drawEdges();
 		   	rootPathway.drawLinkParent();
 			rootPathway.drawSubpathwayLinks(); // This only done at root level, no recursive
+			
+			// Draw brushing pathway
+			parent.noStroke();
+			if (bPathway!=null)
+				bPathway.drawWhenBrushing();
+			
+			// Draw center buttons
+			drawCenter(xCircular, yCircular,rCenter);
+			parent.noStroke();
+			for (int f=0;f<filePathway.length;f++){
+				filePathway[f].drawCenter(true);
+			}		
+			
+			
 		}
 		
 		// Right PANEL
@@ -410,12 +418,14 @@ public class PathwayView{
 			slider2.draw("Edge length",xRight+90, 175);
 		}	
 		else{
+			parent.strokeWeight(1);
 			if (popupLayout.s==3){
 				// Draw button to control the map
 			   	buttonReset.draw("Reset map",0, 25);
 			   	buttonExpand.draw("Expand all",0, 45);
 			   	buttonCollapse.draw("Collapse all",0, 65);
 			}
+			parent.noStroke();
 			parent.fill(200,200);
 			parent.rect(xRight, 28, wRight, 140);
 		}	
