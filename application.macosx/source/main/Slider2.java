@@ -70,11 +70,11 @@ public class Slider2{
 		parent.triangle(xx2-5, y+10, xx2+5, y+10, xx2, y);
 		
 		parent.textAlign(PApplet.CENTER);
-		parent.textSize(12);
+		parent.textSize(11);
 		parent.text(df.format(val), xx2,y-2);
 		parent.textAlign(PApplet.LEFT);
 		
-		parent.textSize(12);
+		parent.textSize(11);
 		parent.noStroke();
 		parent.textAlign(PApplet.RIGHT);
 		parent.fill(0);

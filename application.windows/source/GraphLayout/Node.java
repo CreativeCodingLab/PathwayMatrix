@@ -153,11 +153,11 @@ public class Node {
 			parent.textAlign(PApplet.CENTER);
 			parent.textSize(size);
 			
-			int sat =( parent.frameCount*22%200);
-			parent.noStroke();
-			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),55+sat);
-			// Draw node names
+			int sat =(55 + parent.frameCount*22%200);
 			parent.textSize(12);
+			parent.noStroke();
+			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),sat);
+			// Draw node names
 			parent.text(reaction.getDisplayName(), xx, yy-7);
 			parent.ellipse(xx, yy, size, size);
 		} 

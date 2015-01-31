@@ -34,7 +34,18 @@ public class Pathway2{
   public float yEntry = 500;
   public float al = 0;
   private PApplet parent = null;
-  public static float beginDarknessOfPathways = 150;
+  public static float beginDarknessOfPathways = 120;
+  
+  // Draw the button threading
+  public int linkToParent = 0;
+  public int linkFromParent = 0;
+  public int[][] linkSubpathway = null;
+  public int[] linkReactionFromThisPathway = null;
+  public int[] linkReactionToThisPathway = null;
+ // public int[] linkReaction = null;
+  public ArrayList<Integer> nodeListAll;
+  public ArrayList<BiochemicalReaction> reactionListAll;
+  public boolean isDrawn = false;
   
   // Constructor
   Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
@@ -76,7 +87,6 @@ public class Pathway2{
 	  y=y_;
 	  xEntry = xEntry_;
 	  yEntry = yEntry_;
-	  
 	  al = al_;
 	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*5;
 	  radiusCenter = radius/4;
@@ -97,7 +107,6 @@ public class Pathway2{
 			parent.fill(v);
 		  	parent.noStroke();
 			parent.arc(x, y, radius*2, radius*2,al-PApplet.PI/2,al-PApplet.PI/2+PApplet.PI*2);
-			drawCenter();
 		}
 	}	
   public void drawWhenBrushing(){
@@ -108,11 +117,20 @@ public class Pathway2{
 	  parent.textAlign(PApplet.CENTER);
 	  parent.textSize(12);
 	  parent.text(displayName,x,y-10);
-	  drawCenter();
+	  drawCenter(false);
   }
   
-  //Draw center
-	public void drawCenter(){
+  	//Draw center
+	public void drawCenter(boolean isRecursive){
+		if (isRecursive){
+			for (int p=0;p<subPathwayList.size();p++){
+				subPathwayList.get(p).drawCenter(isRecursive);
+			}
+		}
+		
+		if ((PathwayView.g.getHoverNode()!=null && !isDrawn) || ( PathwayView.g.getHoverNode()==null&& !parentPathway.isExpanded)) {
+			return;
+		}
 		Color color2 = PathwayView.getColor(f).darker().darker();
 		float sat = 200+level*10;
 	  	if (sat>255)
@@ -120,6 +138,7 @@ public class Pathway2{
 	  	parent.fill(color2.getRed(),color2.getGreen(),color2.getBlue(),sat);
 	  	float xCenter = x-radiusCenter/2*PApplet.cos(al);
 	  	float yCenter = y-radiusCenter/2*PApplet.sin(al);
+	  	parent.noStroke();
 	  	parent.ellipse(xCenter, yCenter, radiusCenter, radiusCenter);
 		
 	  	parent.strokeWeight(radiusCenter/20);
@@ -129,6 +148,7 @@ public class Pathway2{
 			parent.line(xCenter,yCenter-(radiusCenter*0.8f)/2, xCenter,yCenter+(radiusCenter*0.8f)/2);
 		
 		// draw file pathway name in the first level
+		parent.textSize(12);
 		if (level==1 && !isExpanded){
 			if (-PApplet.PI/2<=al && al<PApplet.PI/2){
 				parent.textAlign(PApplet.LEFT);
@@ -337,8 +357,262 @@ public class Pathway2{
 	  return a;
   }
   
+  public void resetLinkParent(){
+	  linkToParent=0;
+	  linkFromParent=0;
+	  linkSubpathway =  new int[subPathwayList.size()][subPathwayList.size()];
+	  nodeListAll = getAllNodeId();
+	  reactionListAll = getAllReaction();
+	  linkReactionFromThisPathway = new int[nodeListAll.size()];
+	  linkReactionToThisPathway = new int[nodeListAll.size()];
+	  isDrawn = false;
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).resetLinkParent();
+	  }
+  }
    
+  public void drawLinkParent(){
+	  for (int p=0;p<subPathwayList.size();p++){
+		  subPathwayList.get(p).drawLinkParent();
+	  }
+	  
+	  if (parentPathway==null)
+		  return;
+	 	//  System.out.println("drawLinkParent="+displayName);
+		//  System.out.println("linkToParent="+linkToParent);
+		//  System.out.println("linkFromParent="+linkFromParent);
+		  
+	  drawSubpathwayLinks();
+	  
+	  if (linkToParent>0){
+		  parent.stroke(PathwayView.sat,PathwayView.sat,0);
+		  float wei = PApplet.pow(linkToParent, 0.3f);
+		  parent.strokeWeight(wei);
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
+		  parentPathway.isDrawn = true; // to draw the center button
+		  this.isDrawn = true; // to draw the center button
+			
+	  }
+	  if (linkFromParent>0){
+		  parent.stroke(0);
+		  float wei = PApplet.pow(linkFromParent, 0.3f);
+		  parent.strokeWeight(wei);
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei,false);
+		  parentPathway.isDrawn = true; // to draw the center button
+		  this.isDrawn = true; // to draw the center button
+		//  if (displayName.contains("Cytochrome c-mediated apoptotic response"))
+		//	  System.out.println("displayName="+displayName+"	"+isDrawn);
+			
+	  }
+	  
+	  for (int i=0;i<nodeListAll.size();i++){
+		  if (linkReactionToThisPathway[i]>0 && level!=1){  // disable when level =1 to simplify the view
+			  parent.stroke(0,0,0);
+			  float wei = PApplet.pow(linkReactionToThisPathway[i], 0.3f);
+			  parent.strokeWeight(wei);
+			  Node node = Graph.nodes.get(nodeListAll.get(i));
+			  
+			  float x2 = node.iX.value;
+			  float y2 = node.iY.value;
+			  float dx2 = x2-x;
+			  float dy2 = y2-y;
+			  float d2 = PApplet.sqrt(dx2*dx2+dy2*dy2);
+			  float portion2 = 1-node.size*0.5f/d2; 
+			  x2 = x+portion2*dx2;
+			  y2 = y+portion2*dy2;
+			  
+			  drawArc(x, y, x2, y2,wei,true);
+			  //parent.stroke(255,0,150);
+			 // parent.line(x, y, node.iX.value, node.iY.value);
+			  isDrawn = true; // to draw the center button
+		  }
+		  if (linkReactionFromThisPathway[i]>0 && level!=1){// disable when level =1 to simplify the view
+			  parent.stroke(PathwayView.sat,PathwayView.sat,0);
+			  float wei = PApplet.pow(linkReactionFromThisPathway[i], 0.3f);
+			  parent.strokeWeight(wei);
+			  Node node = Graph.nodes.get(nodeListAll.get(i));
+			  
+			  float x1 = node.iX.value;
+			  float y1 = node.iY.value;
+			  float dx1 = x1-x;
+			  float dy1 = y1-y;
+			  float d2 = PApplet.sqrt(dx1*dx1+dy1*dy1);
+			  float portion2 = 1-node.size*0.5f/d2; 
+			  x1 = x+portion2*dx1;
+			  y1 = y+portion2*dy1;
+			  
+		      drawArc(x, y, x1, y1,wei,false);
+			//  parent.stroke(155,255,0);
+			//  parent.line(x, y, node.iX.value, node.iY.value);
+		      isDrawn = true; // to draw the center button
+		  }
+	  }
+  }
   
+  public void drawSubpathwayLinks(){
+	  for (int p1=0;p1<subPathwayList.size();p1++){
+		  for (int p2=0;p2<subPathwayList.size();p2++){
+			  if (linkSubpathway[p1][p2]>0){
+				//  System.out.println(linkSubpathway[p1][p2]);
+				  Pathway2 path1 = subPathwayList.get(p1);
+				  Pathway2 path2 = subPathwayList.get(p2);
+				  float wei = PApplet.pow(linkSubpathway[p1][p2], 0.3f);
+				  parent.strokeWeight(wei);
+				  if (p1<p2)
+					  drawArc2(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry,x,y, wei, true);
+				  else
+					  drawArc2(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry,x,y, wei, false);
+				  path1.isDrawn = true;
+				  path2.isDrawn = true;
+			  }
+		  }
+	  }
+  }
+		
+  
+  
+  public void drawArc2(float x1, float y1, float x2, float y2, float xCenter, float yCenter, float weight,boolean isDown){
+		float dis = (y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1);
+		float dd = PApplet.sqrt(dis);
+		
+		float alFrom = PApplet.atan((y1 - yCenter) / (x1 - xCenter));
+		float alTo = PApplet.atan((y2 - yCenter) / (x2 - xCenter));
+		
+		float alCircular = PApplet.PI-PApplet.abs(alTo-alFrom);
+		// the atan formular is wrong because it gives values from -PI/2 tp PI/2
+		// In other words if two points are distributed on two side of the vertical center, the atan is wrong 
+		// Alpha of reactions are computed separately (not use atan) so it does not need correction 
+		if (((x1<=xCenter && xCenter<=x2) || (x2<=xCenter && xCenter<=x1))){
+			alCircular = PApplet.abs(alTo-alFrom);
+		}
+		
+		if (!isDown)
+			if (alCircular>PApplet.PI/4)
+				alCircular+=0.1f+weight/(40);
+		else	
+			if (alCircular<PApplet.PI/4)
+				alCircular-=0.1f+weight/(40);
+		
+		float newR = (dd / 2) / PApplet.sin(alCircular/2);
+		float d3 = PApplet.dist(x1, y1, x2, y2);
+		float x11 = (x1 + x2) / 2 - ((y1 - y2) / 2)
+				* PApplet.sqrt(PApplet.pow(newR * 2 / d3, 2) - 1);
+		float y11 = (y1 + y2) / 2 + ((x1 - x2) / 2)
+				* PApplet.sqrt(PApplet.pow(newR * 2 / d3, 2) - 1);
+		float x22 = (x1 + x2) / 2 + ((y1 - y2) / 2)
+				* PApplet.sqrt(PApplet.pow(newR * 2 / d3, 2) - 1);
+		float y22 = (y1 + y2) / 2 - ((x1 - x2) / 2)
+				* PApplet.sqrt(PApplet.pow(newR * 2 / d3, 2) - 1);
+
+		float x3 = 0, y3 = 0;
+		float d11 = PApplet.dist(x11, y11, xCenter, yCenter);
+		float d22 = PApplet.dist(x22, y22, xCenter, yCenter);
+		if (d11 > d22) {
+			x3 = x11;
+			y3 = y11;
+		} else if (d11 < d22) {
+			x3 = x22;
+			y3 = y22;
+		}
+
+		float delX1 = (x1 - x3);
+		float delY1 = (y1 - y3);
+		float delX2 = (x2 - x3);
+		float delY2 = (y2 - y3);
+		float al1 = PApplet.atan2(delY1, delX1);
+		float al2 = PApplet.atan2(delY2, delX2);
+		if (al1 - al2 > PApplet.PI)
+			al1 = al1 - 2 * PApplet.PI;
+		else if (al2 - al1 > PApplet.PI)
+			al2 = al2 - 2 * PApplet.PI;
+		parent.noFill();
+
+		// Adding weight
+		if (al1 < al2)
+			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al1, al2, weight);
+		else
+			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
+
+  }
+  
+  public void drawArc22(float x1, float y1, float x2, float y2 ,float x3, float y3, float d3, float al1, float al2, float weight){
+	    float x5 = x3+d3/2*PApplet.cos(al1);
+		float y5 = y3+d3/2*PApplet.sin(al1);
+		boolean down = true;
+		if (PApplet.dist(x5, y5, x1, y1)
+				>PApplet.dist(x5, y5, x2, y2))
+			down = false;
+		
+		int numSec = 30;
+		float beginAngle = al1;
+		if (al2<al1)
+			beginAngle = al2;
+		for (int k=0;k<=numSec;k++){
+			float endAngle = al1+k*(al2-al1)/numSec;
+			parent.noFill();
+			float sss = (float) k/numSec;
+			if (!down)
+				sss = (float) (numSec-k)/numSec;
+			float r = PathwayView.sat -  PathwayView.sat*sss;
+			parent.stroke(r,r,0);
+			parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
+			beginAngle = endAngle;
+		}
+		
+		
+}	  
+  
+  public void drawArc(float x1, float y1, float x2, float y2, float weight,boolean isToParent){
+		 float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
+		 float dd = PApplet.sqrt(dis);
+		 float alCircular = PApplet.PI/25;
+		
+		 float newR = (dd/2)/PApplet.sin(alCircular);
+    	 float d3 = PApplet.dist(x1,y1,x2,y2);
+    	 float x11 = (x1+x2)/2 - ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float y11 = (y1+y2)/2 + ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float x22 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 float y22 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
+    	 
+    	 float x3 =0, y3=0;
+    	 x3=x22;
+		 y3=y22;
+    	 
+		float delX1 = (x1-x3);
+		float delY1 = (y1-y3);
+		float delX2 = (x2-x3);
+		float delY2 = (y2-y3);
+		float al1 = PApplet.atan2(delY1,delX1);
+		float al2 = PApplet.atan2(delY2,delX2);
+		parent.noFill();
+		
+		// Adding weight
+		//newR+=weight/2;
+		if (isToParent){
+			if (al1<al2){
+				 x3=x22;
+	    		 y3=y22;
+				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+			}	
+			else{
+				 x3=x22;
+	    		 y3=y22;
+				parent.arc(x3, y3, newR*2, newR*2, al1, al2+2*PApplet.PI);
+			}	
+		}
+		else{
+			if (al1<al2){
+				 x3=x11;
+	    		 y3=y11;
+				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2-PApplet.PI);
+			}	
+			else{
+				 x3=x11;
+	    		 y3=y11;
+				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2+PApplet.PI);
+			}	
+		}
+  }	  
   
   Color getGradient(float value){
    return Color.RED;

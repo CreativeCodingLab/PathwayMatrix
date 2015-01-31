@@ -1360,6 +1360,10 @@ public class PathwayViewer_2_8 extends PApplet {
 					}
 				}
 				
+				
+				
+				pathwayView.setItems(rectList);
+				pathwayView.updateNodes(rectList);
 				int newId = 0;
 				// Node id to each reaction in pathway hierarchy
 				// This is done after pathwayView.updateNodes(rectList);
@@ -1368,8 +1372,6 @@ public class PathwayViewer_2_8 extends PApplet {
 					newId = pathway.setNodeId(newId);
 				}
 				
-				pathwayView.setItems(rectList);
-				pathwayView.updateNodes(rectList);
 				System.out.println("Done pathwayView.updateNodes");
 				pathwayView.updateEdges();
 				System.out.println("Done pathwayView.updateEdges");

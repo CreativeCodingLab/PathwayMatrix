@@ -9,8 +9,8 @@ public class ButtonMap{
 	public PApplet parent;
 	public float x = 0;
 	public float y = 0;
-	public int w = 70;
-	public int h = 19;
+	public int w = 64;
+	public int h = 18;
 	public int itemNum = 9;
 	public Color cGray  = new Color(240,240,240);
 	public ButtonMap(PApplet parent_){
@@ -22,7 +22,7 @@ public class ButtonMap{
 		x = x_;
 		y = y_;
 		checkBrushing();
-		parent.textSize(11);
+		parent.textSize(10);
 		if (b){
 			parent.fill(255);
 			parent.stroke(255,0,0);
@@ -30,13 +30,12 @@ public class ButtonMap{
 		}	
 		else{
 			parent.fill(0,60);
-			parent.strokeWeight(1);
-			parent.stroke(0,60);
+			parent.noStroke();
 			parent.rect(x, y, w, h);
 		}
 		parent.textAlign(PApplet.CENTER);
 		parent.fill(0);
-		parent.text(text_,x+w/2,y+14);
+		parent.text(text_,x+w/2,y+13);
 	}
 	
 	 
