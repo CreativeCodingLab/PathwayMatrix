@@ -43,6 +43,9 @@ public class Pathway2{
   public int[] linkReactionFromThisPathway = null;
   public int[] linkReactionToThisPathway = null;
  // public int[] linkReaction = null;
+  public ArrayList<Integer> nodeListAll;
+  public ArrayList<BiochemicalReaction> reactionListAll;
+  public boolean isDrawn = false;
   
   // Constructor
   Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
@@ -117,9 +120,17 @@ public class Pathway2{
 	  drawCenter(false);
   }
   
-  //Draw center
+  	//Draw center
 	public void drawCenter(boolean isRecursive){
-		if (!parentPathway.isExpanded) return;
+		if (isRecursive){
+			for (int p=0;p<subPathwayList.size();p++){
+				subPathwayList.get(p).drawCenter(isRecursive);
+			}
+		}
+		
+		if ((PathwayView.g.getHoverNode()!=null && !isDrawn) || ( PathwayView.g.getHoverNode()==null&& !parentPathway.isExpanded)) {
+			return;
+		}
 		Color color2 = PathwayView.getColor(f).darker().darker();
 		float sat = 200+level*10;
 	  	if (sat>255)
@@ -137,6 +148,7 @@ public class Pathway2{
 			parent.line(xCenter,yCenter-(radiusCenter*0.8f)/2, xCenter,yCenter+(radiusCenter*0.8f)/2);
 		
 		// draw file pathway name in the first level
+		parent.textSize(12);
 		if (level==1 && !isExpanded){
 			if (-PApplet.PI/2<=al && al<PApplet.PI/2){
 				parent.textAlign(PApplet.LEFT);
@@ -161,11 +173,7 @@ public class Pathway2{
 				parent.translate(-x,-y);
 			}
 		}
-		if (isRecursive){
-			for (int p=0;p<subPathwayList.size();p++){
-				subPathwayList.get(p).drawCenter(isRecursive);
-			}
-		}
+		
   }
 		
 		
@@ -353,8 +361,11 @@ public class Pathway2{
 	  linkToParent=0;
 	  linkFromParent=0;
 	  linkSubpathway =  new int[subPathwayList.size()][subPathwayList.size()];
-	  linkReactionFromThisPathway = new int[reactList.size()];
-	  linkReactionToThisPathway = new int[reactList.size()];
+	  nodeListAll = getAllNodeId();
+	  reactionListAll = getAllReaction();
+	  linkReactionFromThisPathway = new int[nodeListAll.size()];
+	  linkReactionToThisPathway = new int[nodeListAll.size()];
+	  isDrawn = false;
 	  for (int p=0;p<subPathwayList.size();p++){
 		  subPathwayList.get(p).resetLinkParent();
 	  }
@@ -378,20 +389,28 @@ public class Pathway2{
 		  float wei = PApplet.pow(linkToParent, 0.3f);
 		  parent.strokeWeight(wei);
 		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
+		  parentPathway.isDrawn = true; // to draw the center button
+		  this.isDrawn = true; // to draw the center button
+			
 	  }
 	  if (linkFromParent>0){
 		  parent.stroke(0);
 		  float wei = PApplet.pow(linkFromParent, 0.3f);
 		  parent.strokeWeight(wei);
 		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei,false);
+		  parentPathway.isDrawn = true; // to draw the center button
+		  this.isDrawn = true; // to draw the center button
+		//  if (displayName.contains("Cytochrome c-mediated apoptotic response"))
+		//	  System.out.println("displayName="+displayName+"	"+isDrawn);
+			
 	  }
 	  
-	  for (int i=0;i<nodeIdList.size();i++){
-		  if (linkReactionToThisPathway[i]>0){
+	  for (int i=0;i<nodeListAll.size();i++){
+		  if (linkReactionToThisPathway[i]>0 && level!=1){  // disable when level =1 to simplify the view
 			  parent.stroke(0,0,0);
 			  float wei = PApplet.pow(linkReactionToThisPathway[i], 0.3f);
 			  parent.strokeWeight(wei);
-			  Node node = Graph.nodes.get(nodeIdList.get(i));
+			  Node node = Graph.nodes.get(nodeListAll.get(i));
 			  
 			  float x2 = node.iX.value;
 			  float y2 = node.iY.value;
@@ -405,12 +424,13 @@ public class Pathway2{
 			  drawArc(x, y, x2, y2,wei,true);
 			  //parent.stroke(255,0,150);
 			 // parent.line(x, y, node.iX.value, node.iY.value);
+			  isDrawn = true; // to draw the center button
 		  }
-		  if (linkReactionFromThisPathway[i]>0){
+		  if (linkReactionFromThisPathway[i]>0 && level!=1){// disable when level =1 to simplify the view
 			  parent.stroke(PathwayView.sat,PathwayView.sat,0);
 			  float wei = PApplet.pow(linkReactionFromThisPathway[i], 0.3f);
 			  parent.strokeWeight(wei);
-			  Node node = Graph.nodes.get(nodeIdList.get(i));
+			  Node node = Graph.nodes.get(nodeListAll.get(i));
 			  
 			  float x1 = node.iX.value;
 			  float y1 = node.iY.value;
@@ -424,6 +444,7 @@ public class Pathway2{
 		      drawArc(x, y, x1, y1,wei,false);
 			//  parent.stroke(155,255,0);
 			//  parent.line(x, y, node.iX.value, node.iY.value);
+		      isDrawn = true; // to draw the center button
 		  }
 	  }
   }
@@ -441,7 +462,8 @@ public class Pathway2{
 					  drawArc2(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry,x,y, wei, true);
 				  else
 					  drawArc2(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry,x,y, wei, false);
-				//  parent.line(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry);
+				  path1.isDrawn = true;
+				  path2.isDrawn = true;
 			  }
 		  }
 	  }
@@ -464,12 +486,12 @@ public class Pathway2{
 			alCircular = PApplet.abs(alTo-alFrom);
 		}
 		
-		if (isDown)
+		if (!isDown)
 			if (alCircular>PApplet.PI/4)
-				alCircular-=weight/(15);
+				alCircular+=0.1f+weight/(40);
 		else	
 			if (alCircular<PApplet.PI/4)
-				alCircular+=weight/(15);
+				alCircular-=0.1f+weight/(40);
 		
 		float newR = (dd / 2) / PApplet.sin(alCircular/2);
 		float d3 = PApplet.dist(x1, y1, x2, y2);
@@ -521,7 +543,7 @@ public class Pathway2{
 				>PApplet.dist(x5, y5, x2, y2))
 			down = false;
 		
-		int numSec = 50;
+		int numSec = 30;
 		float beginAngle = al1;
 		if (al2<al1)
 			beginAngle = al2;

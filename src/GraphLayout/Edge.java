@@ -211,15 +211,11 @@ public class Edge {
 			 
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0){
-				 if (newPathwayFrom.level!=1){
-					//parent.stroke(200,200,0,100);
-					//parent.line(xFrom, yFrom, xPathwayFrom, yPathwayFrom);
-					
-					int reactionIndex = pathwayFrom.reactList.indexOf(from.reaction);
-					if (reactionIndex>=0){
-						pathwayFrom.linkReactionFromThisPathway[reactionIndex]++;
-					}
-				 }		
+			 	int reactionIndex = pathwayFrom.reactionListAll.indexOf(from.reaction);
+				if (reactionIndex>=0){
+					pathwayFrom.linkReactionFromThisPathway[reactionIndex]++;
+				}
+				 	
 			 }
 			 else if (pathwayFrom.equals(b.get(1).parentPathway)){
 				 float x1 = xFrom;
@@ -239,15 +235,11 @@ public class Edge {
 			 }
 				 
 			 if (countTo>0){
-				 if (newPathwayTo.level!=1){
-					// parent.stroke(0,0,0,150);
-					// parent.line(xPathwayTo, yPathwayTo, xTo, yTo);
-					 int reactionIndex = pathwayTo.reactList.indexOf(to.reaction);
-					 if (reactionIndex>=0){
-						 pathwayTo.linkReactionToThisPathway[reactionIndex]++;
-					 }
-					
-				 }	 
+			 	 int reactionIndex = pathwayTo.reactionListAll.indexOf(to.reaction);
+				 if (reactionIndex>=0){
+					 pathwayTo.linkReactionToThisPathway[reactionIndex]++;
+				 }
+				 
 			 }	 
 			 else if (pathwayTo.equals(a.get(1).parentPathway)){
 				 float x2 = xTo;
@@ -280,12 +272,13 @@ public class Edge {
 			 while(newPathwayFrom.level>pathwayTo.level){
 				 currentPathway = newPathwayFrom;
 				 if (newPathwayFrom.parentPathway.isExpanded){
-					 /*if(!newPathwayFrom.parentPathway.equals(pathwayTo)){   // if they have the same parent
-						 parent.stroke(200,200,0,100);
-						 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
-								 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
-					 }*/	 
-					 newPathwayFrom.linkToParent++;
+					 if(!newPathwayFrom.parentPathway.equals(pathwayTo)){   // if they have the same parent
+					//	 parent.stroke(200,200,0,100);
+					//	 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
+					//			 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
+						 newPathwayFrom.linkToParent++;
+						 
+					 }	 
 					 countFrom++;
 				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
@@ -304,12 +297,13 @@ public class Edge {
 			 while(newPathwayTo.level>pathwayFrom.level){
 				 currentPathway = newPathwayTo;
 				 if (newPathwayTo.parentPathway.isExpanded){
-					 /*if(!newPathwayTo.parentPathway.equals(pathwayFrom)) { // if they have the same parent
-						 parent.stroke(0,0,0,150);
-						 parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
-								 newPathwayTo.xEntry, newPathwayTo.yEntry);
-					 }	*/ 
-					 newPathwayTo.linkFromParent++;
+					 if(!newPathwayTo.parentPathway.equals(pathwayFrom)) { // if they have the same parent
+						// parent.stroke(255,0,0,150);
+						// parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
+						//		 newPathwayTo.xEntry, newPathwayTo.yEntry);
+						 newPathwayTo.linkFromParent++;
+							
+					 }	
 					 countTo++;
 				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
@@ -509,7 +503,7 @@ public class Edge {
 				down = false;
 			}
 			
-			int numSec = 50;
+			int numSec = 30;
 			float beginAngle = al1;
 			if (al2<al1)
 				beginAngle = al2;

@@ -387,27 +387,25 @@ public class PathwayView{
 			parent.ellipse(xCircular, yCircular, rCircular*2, rCircular*2);
 			
 			
-			
+			// Draw brushing pathway
+			parent.noStroke();
+			if (bPathway!=null)
+				bPathway.drawWhenBrushing();
+
 			
 		   	g.drawNodes();
 		   	g.drawEdges();
 		   	rootPathway.drawLinkParent();
 			rootPathway.drawSubpathwayLinks(); // This only done at root level, no recursive
 			
-			// Draw brushing pathway
-			parent.noStroke();
-			if (bPathway!=null)
-				bPathway.drawWhenBrushing();
-			
-			// Draw center buttons
+
+			 // Draw center buttons
 			drawCenter(xCircular, yCircular,rCenter);
 			parent.noStroke();
 			for (int f=0;f<filePathway.length;f++){
 				filePathway[f].drawCenter(true);
 			}		
-			
-			
-		}
+ 		}
 		
 		// Right PANEL
 		float wRight = parent.width-xRight;
@@ -636,6 +634,7 @@ public class PathwayView{
 	}
 	 public void drawCenter(float x_, float y_, float r_){
 		parent.fill(20);
+		parent.noStroke();
 	  	parent.ellipse(x_, y_, r_*2, r_*2);
 		
 	  	parent.strokeWeight(r_/10);
