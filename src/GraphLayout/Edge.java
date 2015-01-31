@@ -90,8 +90,7 @@ public class Edge {
     	    }
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
-	    		parent.strokeWeight(2);
-		        drawLink(255);
+	    		drawLink(255);
 		     	from.isConnected =true;
 			    to.isConnected = true;
 	    	}
@@ -213,8 +212,13 @@ public class Edge {
 			 drawPathwayLink(newPathwayFrom, newPathwayTo, sat);
 			 if (countFrom>0){
 				 if (newPathwayFrom.level!=1){
-					parent.stroke(200,200,0,100);
-					parent.line(xFrom, yFrom, xPathwayFrom, yPathwayFrom);
+					//parent.stroke(200,200,0,100);
+					//parent.line(xFrom, yFrom, xPathwayFrom, yPathwayFrom);
+					
+					int reactionIndex = pathwayFrom.reactList.indexOf(from.reaction);
+					if (reactionIndex>=0){
+						pathwayFrom.linkReactionFromThisPathway[reactionIndex]++;
+					}
 				 }		
 			 }
 			 else if (pathwayFrom.equals(b.get(1).parentPathway)){
@@ -236,8 +240,13 @@ public class Edge {
 				 
 			 if (countTo>0){
 				 if (newPathwayTo.level!=1){
-					 parent.stroke(0,0,0,150);
-					 parent.line(xPathwayTo, yPathwayTo, xTo, yTo);
+					// parent.stroke(0,0,0,150);
+					// parent.line(xPathwayTo, yPathwayTo, xTo, yTo);
+					 int reactionIndex = pathwayTo.reactList.indexOf(to.reaction);
+					 if (reactionIndex>=0){
+						 pathwayTo.linkReactionToThisPathway[reactionIndex]++;
+					 }
+					
 				 }	 
 			 }	 
 			 else if (pathwayTo.equals(a.get(1).parentPathway)){
@@ -271,11 +280,12 @@ public class Edge {
 			 while(newPathwayFrom.level>pathwayTo.level){
 				 currentPathway = newPathwayFrom;
 				 if (newPathwayFrom.parentPathway.isExpanded){
-					 if(!newPathwayFrom.parentPathway.equals(pathwayTo)){   // if they have the same parent
+					 /*if(!newPathwayFrom.parentPathway.equals(pathwayTo)){   // if they have the same parent
 						 parent.stroke(200,200,0,100);
 						 parent.line(newPathwayFrom.xEntry, newPathwayFrom.yEntry, 
 								 newPathwayFrom.parentPathway.x, newPathwayFrom.parentPathway.y);
-					 }	 
+					 }*/	 
+					 newPathwayFrom.linkToParent++;
 					 countFrom++;
 				 }		
 				 newPathwayFrom = newPathwayFrom.parentPathway;
@@ -294,11 +304,12 @@ public class Edge {
 			 while(newPathwayTo.level>pathwayFrom.level){
 				 currentPathway = newPathwayTo;
 				 if (newPathwayTo.parentPathway.isExpanded){
-					 if(!newPathwayTo.parentPathway.equals(pathwayFrom)) { // if they have the same parent
+					 /*if(!newPathwayTo.parentPathway.equals(pathwayFrom)) { // if they have the same parent
 						 parent.stroke(0,0,0,150);
 						 parent.line(newPathwayTo.parentPathway.x, newPathwayTo.parentPathway.y, 
 								 newPathwayTo.xEntry, newPathwayTo.yEntry);
-					 }	 
+					 }	*/ 
+					 newPathwayTo.linkFromParent++;
 					 countTo++;
 				 }
 				 newPathwayTo = newPathwayTo.parentPathway;
@@ -344,8 +355,17 @@ public class Edge {
 			float yCenter = newPathwayFrom.parentPathway.y;
 			float al1 = PApplet.atan((y1 - yCenter) / (x1 - xCenter));
 			float al2 = PApplet.atan((y2 - yCenter) / (x2 - xCenter));
-			drawArc(x1, y1, al1, x2, y2, al2, xCenter, yCenter, sat, false);
+			//drawArc(x1, y1, al1, x2, y2, al2, xCenter, yCenter, sat, false);
 
+			//if (newPathwayFrom.parentPathway.subPathwayList.indexOf(newPathwayFrom)<0)
+			//System.out.println("newPathwayFrom.parentPathway = "+newPathwayFrom.parentPathway.subPathwayList.indexOf(newPathwayTo));
+			
+			int index1 = newPathwayFrom.parentPathway.subPathwayList.indexOf(newPathwayFrom);
+			int index2 = newPathwayFrom.parentPathway.subPathwayList.indexOf(newPathwayTo);
+			newPathwayFrom.parentPathway.linkSubpathway[index1][index2]++;
+			
+			//System.out.println("newPathwayFrom.parentPathway = "+newPathwayFrom.parentPathway.displayName +"	"+newPathwayFrom.parentPathway.linkSubpathway[index1][index2]);
+			
 			countFrom++;
 			countTo++;
 		 }
@@ -489,24 +509,18 @@ public class Edge {
 				down = false;
 			}
 			
-			int numSec = 15;
+			int numSec = 25;
 			float beginAngle = al1;
 			if (al2<al1)
 				beginAngle = al2;
-			for (int k=1;k<=numSec;k++){
+			for (int k=0;k<=numSec;k++){
 				float endAngle = al1+k*(al2-al1)/numSec;
 				parent.noFill();
 				float sss = (float) k/numSec;
 				if (!down)
 					sss = (float) (numSec-k)/numSec;
-				float sat2 = sat*sss;
-				float r = sat-sat2;
-				
-				float minSat = PApplet.min(50, sat);
-				if(sat2<minSat)
-					sat2=minSat;
-				
-				parent.stroke(r,r,0,sat2);
+				float r = PathwayView.sat - PathwayView.sat*sss;
+				parent.stroke(r,r,0,sat);
 				parent.arc(x3, y3, d3,d3, beginAngle, endAngle);
 				beginAngle = endAngle;
 			}

@@ -79,6 +79,7 @@ public class PathwayView{
 	public Integrator iX2; 
 	public Integrator iY2; 
 	
+	public static float sat =220;
 	
 	public PathwayView(PApplet p){
 		parent = p;
@@ -397,7 +398,7 @@ public class PathwayView{
 		   	g.drawNodes();
 		   	g.drawEdges();
 		   	rootPathway.drawLinkParent();
-		
+			rootPathway.drawSubpathwayLinks(); // This only done at root level, no recursive
 		}
 		
 		// Right PANEL
