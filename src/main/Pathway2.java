@@ -385,7 +385,7 @@ public class Pathway2{
 	  drawSubpathwayLinks();
 	  
 	  if (linkToParent>0){
-		  parent.stroke(PathwayView.sat,0,0);
+		  parent.stroke(PathwayView.sat,PathwayView.sat,0);
 		  float wei = PApplet.pow(linkToParent, 0.3f);
 		  parent.strokeWeight(wei);
 		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
@@ -574,50 +574,65 @@ public class Pathway2{
     	 float x22 = (x1+x2)/2 + ((y1-y2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
     	 float y22 = (y1+y2)/2 - ((x1-x2)/2)*PApplet.sqrt(PApplet.pow(newR*2/d3,2)-1);
     	 
-    	 float x3 =0, y3=0;
-    	 x3=x22;
-		 y3=y22;
-    	 
-		float delX1 = (x1-x3);
-		float delY1 = (y1-y3);
-		float delX2 = (x2-x3);
-		float delY2 = (y2-y3);
-		float al1 = PApplet.atan2(delY1,delX1);
-		float al2 = PApplet.atan2(delY2,delX2);
-		parent.noFill();
 		
 		// Adding weight
 		//newR+=weight/2;
 		if (isToParent){
-			if (al1<al2){
-				 x3=x22;
-	    		 y3=y22;
-	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
-	 				parent.stroke(0,255,0);
-				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+			 float x3=x22;
+			 float y3=y22;
+			 float delX1 = (x1-x3);
+			float delY1 = (y1-y3);
+			float delX2 = (x2-x3);
+			float delY2 = (y2-y3);
+			float al1 = PApplet.atan2(delY1,delX1);
+			float al2 = PApplet.atan2(delY2,delX2);
+			parent.noFill();
+				
+    		 if (al1<al2){
+				 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+	 				parent.stroke(255,0,0);
+				 parent.arc(x3, y3, newR*2, newR*2, al1, al2);
 			}	
 			else{
-				 x3=x22;
-	    		 y3=y22;
-	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
-	 					parent.stroke(0,0,255);
-				parent.arc(x3, y3, newR*2, newR*2, al1, al2+2*PApplet.PI);
-			}	
+				 if(isBrushingArc(x3, y3, newR, weight, al1-2*PApplet.PI, al2, parent.mouseX, parent.mouseY)){
+	 					parent.stroke(255,0,0);
+	    	     }	
+	    		 parent.arc(x3, y3, newR*2, newR*2, al1-2*PApplet.PI, al2);
+	       }	
 		}
 		else{
-			if (al1<al2){
-				 x3=x11;
-	    		 y3=y11;
-	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
-	 				parent.stroke(255,0,255);
-				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2-PApplet.PI);
+			float  x3=x11;
+			float  y3=y11;
+			float delX1 = (x1-x3);
+			float delY1 = (y1-y3);
+			float delX2 = (x2-x3);
+			float delY2 = (y2-y3);
+			float al1 = PApplet.atan2(delY1,delX1);
+			float al2 = PApplet.atan2(delY2,delX2);
+			parent.noFill();
+			
+    		 if (al1<al2){
+				 if(isBrushingArc(x3, y3, newR, weight, al2-2*PApplet.PI, al1, parent.mouseX, parent.mouseY))
+	 				parent.stroke(255,0,0);
+					/*
+	    			 else{
+	    				parent.noStroke();
+	    				parent.fill(255,0,0);
+	    				parent.ellipse(x1, y1, 15, 15);
+	    				parent.text((al1),x1,y1);
+	    				parent.fill(200,0,0);
+	    				parent.ellipse(x2, y2, 15, 15);
+	    				parent.text((al2),x2,y2);
+	    				parent.fill(0,100);
+	    				parent.stroke(0,0,255);
+	    		 }*/
+				 parent.arc(x3, y3, newR*2, newR*2, al2-2*PApplet.PI, al1);
 			}	
+    		 
 			else{
-				 x3=x11;
-	    		 y3=y11;
-    			if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
-					parent.stroke(0,255,255);
-				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2+PApplet.PI);
+				if(isBrushingArc(x3, y3, newR, weight, al2, al1, parent.mouseX, parent.mouseY))
+					parent.stroke(255,0,0);
+				parent.arc(x3, y3, newR*2, newR*2, al2, al1);
 			}	
 		}
   }	  
@@ -626,13 +641,11 @@ public class Pathway2{
 	    float delX1 = (mouseX-xCenter);
 		float delY1 = (mouseY-yCenter);
 		float al = PApplet.atan2(delY1,delX1);
+		//parent.text(al,xCenter,yCenter);
 		
-		if (al1-al>PApplet.PI*2){
-			System.out.println("displayName="+displayName);
-		}
-		if (al1<al && al<al2){
+		if ((al1<al && al<al2) || (al1<al-2*PApplet.PI && al-2*PApplet.PI<al2)){
 			float dis =PApplet.dist(xCenter, yCenter, mouseX, mouseY);
-			if (radius-weight<dis && dis <radius+weight){
+			if (radius-weight<=dis && dis<=radius+weight){
 				return true;
 			}
 		}

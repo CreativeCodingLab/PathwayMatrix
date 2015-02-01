@@ -168,7 +168,7 @@ public class Edge {
 				 x2 = pathwayTo.x+portion2*dx2;
 				 y2 = pathwayTo.y+portion2*dy2;
 				
-				// drawArc(x1,y1, alFrom, x2, y2, alTo, pathwayFrom.x, pathwayFrom.y, sat, true);
+				 drawArc(x1,y1, alFrom, x2, y2, alTo, pathwayFrom.x, pathwayFrom.y, sat, true);
 			 }	 
 		 }
 		 else{
