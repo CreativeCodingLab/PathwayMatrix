@@ -592,11 +592,15 @@ public class Pathway2{
 			if (al1<al2){
 				 x3=x22;
 	    		 y3=y22;
+	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+	 				parent.stroke(0,255,0);
 				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
 			}	
 			else{
 				 x3=x22;
 	    		 y3=y22;
+	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+	 					parent.stroke(0,0,255);
 				parent.arc(x3, y3, newR*2, newR*2, al1, al2+2*PApplet.PI);
 			}	
 		}
@@ -604,22 +608,33 @@ public class Pathway2{
 			if (al1<al2){
 				 x3=x11;
 	    		 y3=y11;
+	    		 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+	 				parent.stroke(255,0,255);
 				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2-PApplet.PI);
 			}	
 			else{
 				 x3=x11;
 	    		 y3=y11;
+    			if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+					parent.stroke(0,255,255);
 				parent.arc(x3, y3, newR*2, newR*2, al1-PApplet.PI, al2+PApplet.PI);
 			}	
 		}
   }	  
   
-  public static boolean checkBrushingArc(float xCenter, float yCenter, float radius, float al1, float al2, float mouseX, float mouseY){
+  public  boolean isBrushingArc(float xCenter, float yCenter, float radius,float weight, float al1, float al2, float mouseX, float mouseY){
 	    float delX1 = (mouseX-xCenter);
 		float delY1 = (mouseY-yCenter);
 		float al = PApplet.atan2(delY1,delX1);
+		
+		if (al1-al>PApplet.PI*2){
+			System.out.println("displayName="+displayName);
+		}
 		if (al1<al && al<al2){
-			
+			float dis =PApplet.dist(xCenter, yCenter, mouseX, mouseY);
+			if (radius-weight<dis && dis <radius+weight){
+				return true;
+			}
 		}
 	  return false;
   }
