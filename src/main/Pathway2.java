@@ -34,7 +34,7 @@ public class Pathway2{
   public float yEntry = 500;
   public float al = 0;
   private PApplet parent = null;
-  public static float beginDarknessOfPathways = 120;
+  public static float beginDarknessOfPathways = 128;
   
   // Draw the button threading
   public int linkToParent = 0;
@@ -100,7 +100,7 @@ public class Pathway2{
 			PathwayView.bPathway = this;
 		}
 		else{
-			float v = beginDarknessOfPathways+(level+1)*14;  
+			float v = beginDarknessOfPathways+(level)*12;  
 		  	if (v>240)
 		  		v=240;
 		  
@@ -385,7 +385,7 @@ public class Pathway2{
 	  drawSubpathwayLinks();
 	  
 	  if (linkToParent>0){
-		  parent.stroke(PathwayView.sat,PathwayView.sat,0);
+		  parent.stroke(PathwayView.sat,0,0);
 		  float wei = PApplet.pow(linkToParent, 0.3f);
 		  parent.strokeWeight(wei);
 		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
@@ -613,6 +613,17 @@ public class Pathway2{
 			}	
 		}
   }	  
+  
+  public static boolean checkBrushingArc(float xCenter, float yCenter, float radius, float al1, float al2, float mouseX, float mouseY){
+	    float delX1 = (mouseX-xCenter);
+		float delY1 = (mouseY-yCenter);
+		float al = PApplet.atan2(delY1,delX1);
+		if (al1<al && al<al2){
+			
+		}
+	  return false;
+  }
+  
   
   Color getGradient(float value){
    return Color.RED;
