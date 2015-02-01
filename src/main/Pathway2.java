@@ -378,10 +378,7 @@ public class Pathway2{
 	  
 	  if (parentPathway==null)
 		  return;
-	 	//  System.out.println("drawLinkParent="+displayName);
-		//  System.out.println("linkToParent="+linkToParent);
-		//  System.out.println("linkFromParent="+linkFromParent);
-		  
+	   
 	  drawSubpathwayLinks();
 	  
 	  if (linkToParent>0){
@@ -475,17 +472,11 @@ public class Pathway2{
 		float dis = (y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1);
 		float dd = PApplet.sqrt(dis);
 		
-		float alFrom = PApplet.atan((y1 - yCenter) / (x1 - xCenter));
-		float alTo = PApplet.atan((y2 - yCenter) / (x2 - xCenter));
+		float alFrom = PApplet.atan2((y1 - yCenter) , (x1 - xCenter));
+		float alTo = PApplet.atan2((y2 - yCenter) , (x2 - xCenter));
 		
 		float alCircular = PApplet.PI-PApplet.abs(alTo-alFrom);
-		// the atan formular is wrong because it gives values from -PI/2 tp PI/2
-		// In other words if two points are distributed on two side of the vertical center, the atan is wrong 
-		// Alpha of reactions are computed separately (not use atan) so it does not need correction 
-		if (((x1<=xCenter && xCenter<=x2) || (x2<=xCenter && xCenter<=x1))){
-			alCircular = PApplet.abs(alTo-alFrom);
-		}
-		
+			
 		if (!isDown)
 			if (alCircular>PApplet.PI/4)
 				alCircular+=0.1f+weight/(40);
@@ -528,8 +519,17 @@ public class Pathway2{
 		parent.noFill();
 
 		// Adding weight
-		if (al1 < al2)
-			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al1, al2, weight);
+		if (al1 < al2){
+			 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY)){
+					parent.stroke(255,0,0);
+					parent.strokeWeight(weight);
+					parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+			 }
+			 else
+				 drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al1, al2, weight);
+				
+ 			
+		}	
 		else
 			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
 
