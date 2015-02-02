@@ -2051,9 +2051,14 @@ public class ReactionView{
 				if (sat<255)
 					sat2=sat;
 					
-				float red = 255;
+				/*float red = 255;
 				float green = sss*255;
-				float blue = 255-255*sss;
+				float blue = 255-255*sss;*/
+				
+				float red = sss*255;
+				float green = sss*255;
+				float blue = 0;
+				
 				
 				parent.stroke(red,green,blue,sat2);
 				parent.strokeWeight(3);
@@ -2061,7 +2066,7 @@ public class ReactionView{
 					red = red*(1-iDelete.value);
 					green = green*(1-iDelete.value);
 					blue = blue*(1-iDelete.value);
-					
+					red = 255;
 					if (red<0) red=0;
 					if (green<0) green=0;
 					if (blue<0) blue=0;

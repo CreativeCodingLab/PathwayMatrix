@@ -338,7 +338,7 @@ public class PathwayView{
 			drawPathways();
 			
 		   	g.drawNodes();
-		   	g.drawEdges();
+		    g.drawEdges();
 		   	rootPathway.drawLinkParent();
 			rootPathway.drawSubpathwayLinks(); // This only done at root level, no recursive
 			
@@ -476,20 +476,25 @@ public class PathwayView{
 		if (bPathway!=null)
 			bPathway.drawWhenBrushing();
 
+		/*
 		// For the survey
 		float beginX =200;
 		float beginY =700;
 		
 		parent.fill(0);
 		parent.textAlign(PApplet.RIGHT);
+		parent.textSize(20);
+		parent.text("Reaction 1",beginX-10,beginY+7);
+		parent.textAlign(PApplet.LEFT);
+		parent.text("Reaction 2",beginX+255+10,beginY+7);
 		
 		for (int i=0;i<255;i++){
-			float xx = beginX+i*2;
+			float xx = beginX+i*1;
 			parent.noStroke();
-			parent.strokeWeight(4);
+			parent.strokeWeight(6);
 			parent.stroke(255-i,255-i,0);
 			parent.line(xx, beginY, xx+3, beginY);
-		}
+		}*/
 		
 	}
 		
@@ -584,7 +589,7 @@ public class PathwayView{
 		parent.noStroke();
 		parent.ellipse(xR, yReact, nodeTo.size, nodeTo.size);
 		parent.textAlign(PApplet.CENTER);
-		parent.text(nodeFrom.reaction.getDisplayName(), xR, yReact-nodeTo.size/2-5);
+		parent.text(nodeTo.reaction.getDisplayName(), xR, yReact-nodeTo.size/2-5);
 		
 		return PApplet.max(yL, yR)+20;
 		
@@ -1338,7 +1343,7 @@ public class PathwayView{
 	public void mouseClicked() {
 		if (g==null) return;
 		
-		if (Pathway2.bEdges.size()>0){
+		if (Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
 			PathwayViewer_2_8.thread12 =new Thread(PathwayViewer_2_8.loader12);
 			PathwayViewer_2_8.thread12.start();
 		}
