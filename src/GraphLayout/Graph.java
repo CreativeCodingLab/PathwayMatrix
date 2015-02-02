@@ -163,6 +163,8 @@ public class Graph {
 			if (Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
 				if (Pathway2.bEdges.contains(e)){
 					e.draw();
+					e.from.isConnected=true;  // to highlight only the nodes connected to the selected reactions
+					e.to.isConnected = true;
 				}
 			}
 			else{

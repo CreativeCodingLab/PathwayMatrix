@@ -166,6 +166,11 @@ public class Node {
 			parent.noStroke();
 			parent.ellipse(xx, yy, size, size);
 		}
+		else if (Pathway2.bEdges.size()>0 && !isConnected) {
+			parent.fill(color.getRed(), color.getGreen(), color.getBlue(),20);
+			parent.noStroke();
+			parent.ellipse(xx, yy, size, size);
+		}
 		else{
 			//wordWidth = parent.textWidth(name);
 			parent.noStroke();

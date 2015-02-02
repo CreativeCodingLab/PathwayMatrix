@@ -87,7 +87,6 @@ public class Edge {
 	    	parent.strokeWeight(1);
 	        if (g.getHoverNode() ==null){
     	    	drawLink(240);
-    	    	
     	    }
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
@@ -102,12 +101,6 @@ public class Edge {
 	 	}
 	  }
 	  
-	  public void draw2() {  // Draw a subset of brushing links
-		  drawLink(255);
-	     from.isConnected =true;
-	     to.isConnected = true;
-	  }
-			
 	  
 	 public void drawLink(float sat) {
 		 if (!PathwayView.rootPathway.isExpanded){
@@ -435,10 +428,21 @@ public class Edge {
 			parent.noFill();
 			
 			if (type==0){
-				if (al1<al2)
+				if (al1<al2){
+					 if(Pathway2.isBrushingArc(x3, y3, newR, 1, al1, al2, parent.mouseX, parent.mouseY)){  // Brushing 7/6
+				 		if (!Pathway2.bEdges.contains(this))
+				 			Pathway2.bEdges.add(this);
+			  		 }
+				 			
 					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al1, al2, sat);
-				else
+				}	
+				else{
+					if(Pathway2.isBrushingArc(x3, y3, newR, 1, al2, al1, parent.mouseX, parent.mouseY)){  // Brushing 7/6
+				 		if (!Pathway2.bEdges.contains(this))
+				 			Pathway2.bEdges.add(this);
+			  		}
 					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al2, al1, sat);
+				}	
 			}
 			else if (type==1){
 				parent.stroke(255,0,255);
