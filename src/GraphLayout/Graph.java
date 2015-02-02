@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import main.Pathway2;
+
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 
 import processing.core.PApplet;
@@ -158,9 +160,18 @@ public class Graph {
 
 		for (int i = 0; i < edges.size(); i++) {
 			Edge e = (Edge) edges.get(i);
-			e.draw();
+			if (Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
+				if (Pathway2.bEdges.contains(e)){
+					e.draw();
+				}
+			}
+			else{
+				e.draw();
+			}
 		}
 	}
+	
+	
 	public void drawNodes() {
 		for (int i = 0; i < nodes.size(); i++) {
 			nodes.get(i).draw();

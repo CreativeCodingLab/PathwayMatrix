@@ -361,7 +361,7 @@ public class Pathway2{
   }
   
   @SuppressWarnings("unchecked")
-public void resetLinkParent(){
+  public void resetLinkParent(){
 	  linkToParent = new ArrayList<Edge>();
 	  linkFromParent = new ArrayList<Edge>();
 	  linkSubpathway =  new ArrayList[subPathwayList.size()][subPathwayList.size()];
@@ -382,8 +382,13 @@ public void resetLinkParent(){
 	  for (int p=0;p<subPathwayList.size();p++){
 		  subPathwayList.get(p).resetLinkParent();
 	  }
-	  bEdges = new ArrayList<Edge>();
   }
+  
+  public static void resetBrushingEdges(){
+	  bEdges = new ArrayList<Edge>();  
+  }
+		
+  
    
   public void drawLinkParent(){
 	  for (int p=0;p<subPathwayList.size();p++){

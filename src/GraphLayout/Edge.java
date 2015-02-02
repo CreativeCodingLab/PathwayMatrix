@@ -87,6 +87,7 @@ public class Edge {
 	    	parent.strokeWeight(1);
 	        if (g.getHoverNode() ==null){
     	    	drawLink(240);
+    	    	
     	    }
 	    	else if (g.getHoverNode().equals(from) ||
 	    		g.getHoverNode().equals(to)){ 
@@ -100,6 +101,13 @@ public class Edge {
 	     	}
 	 	}
 	  }
+	  
+	  public void draw2() {  // Draw a subset of brushing links
+		  drawLink(255);
+	     from.isConnected =true;
+	     to.isConnected = true;
+	  }
+			
 	  
 	 public void drawLink(float sat) {
 		 if (!PathwayView.rootPathway.isExpanded){
