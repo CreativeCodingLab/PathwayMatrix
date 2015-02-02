@@ -403,12 +403,21 @@ public class PathwayView{
 		else if (popupLayout.s==3 && Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
 			parent.fill(240,220,220,220);
 			parent.noStroke();
-			parent.rect(iX2.value, iY2.value-30, parent.width-iX2.value, parent.height-iY2.value+40);
+			parent.rect(parent.width-500, iY2.value-30, 501, parent.height-iY2.value+40);
 			
-			Edge edge =Pathway2.bEdges.get(0);
-			drawBrushingEdge(parent, edge, 250);   // Draw proteins/complexes in the brushing edges
+			float yReact=iY2.value;
+			//float yReact = 	iY2.value;
+			for (int e=0; e<Pathway2.bEdges.size();e++){
+				Edge edge =Pathway2.bEdges.get(e);
+				yReact = drawBrushingEdge(parent, edge, yReact, 320);   // Draw proteins/complexes in the brushing edges
+			}	
+			float totalH =  yReact-iY2.value;
+			if (totalH>parent.height-225)
+				totalH = parent.height-225;
+			iY2.target(parent.height-totalH);
+			iY2.update();
 		}
-	}
+	}	
 	public void drawPathways() {
 		float totalSize=0;
 		for (int i=0;i<filePathway.length;i++){
@@ -472,16 +481,15 @@ public class PathwayView{
 	
 	
 	// draw Reactions links
-	public void drawBrushingEdge(PApplet parent, Edge edge, float ww) {
-		float yReact = 	iY2.value;
+	public float drawBrushingEdge(PApplet parent, Edge edge, float yReact, float ww) {
 		float yL=yReact;
 		float yR=yReact;
-		float xL = iX2.value+(parent.width-iX2.value-ww)/2;
+		
+		float xL = (parent.width-400);
 		float xR = xL+ww;
-		float gapY = 17;
-		float gapYInComplex = 15;
+		float gapY = 15;
+		float gapYInComplex = 13;
 		parent.strokeWeight(1);
-		float maxTextWidth = 0;
 		
 		Object[] sRight1 = edge.getFrom().reaction.getRight().toArray();
 		Object[] sLeft2 = edge.getTo().reaction.getLeft().toArray();
@@ -500,15 +508,16 @@ public class PathwayView{
 					aRef.add(ref);
 				}
 			}
-			yL = this.drawOutputs(parent, aRef, xL, xR, yReact, yL, gapY, gapYInComplex,new Color(150,150,0));
+			yL = this.drawOutputs(parent, aRef, xL, xR, yReact, yL, gapY, gapYInComplex,true);
 		}
 		
 		ArrayList<String> b = new ArrayList<String>();
 		for (int i3=0;i3<sRight1.length;i3++){
-			b.add(sRight1[i3].toString());
+			if (!aRef.contains(sRight1[i3].toString()))
+				b.add(sRight1[i3].toString());
 		}
 		
-		this.drawOutputs(parent, b, xL, xR, yReact, yL, gapY, gapYInComplex, Color.BLACK);
+		yL = this.drawOutputs(parent, b, xL, xR, yReact, yL, gapY, gapYInComplex, false);
 		
 	
 		
@@ -522,19 +531,52 @@ public class PathwayView{
 		
 		
 		
-		float reactionNameWidth = (parent.textWidth(edge.getFrom().reaction.getDisplayName())-ww)/2;
-		if (reactionNameWidth>maxTextWidth)
-			maxTextWidth = reactionNameWidth;
 		
-		float gap=PApplet.max(yL,yR)-yReact;
-		iY2.target(parent.height-gap-500);
-		iY2.update();
-		iX2.target(parent.width-ww-2*maxTextWidth-50);
-		iX2.update();
+		///////////*********** INPUT
+		
+		ArrayList<String> c = compareInputOutput(sRight1, sLeft2);
+		ArrayList<String> cRef = new ArrayList<String>();
+		if (c==null || c.size()==0)
+			System.out.println("Can NOT find the common proteins/complexes");
+		else{ // Draw common proteins/complexes
+			for (int i=0;i<c.size();i++){
+				String ref = getRefFromName(sLeft2, c.get(i));
+				if (ref==null){
+					System.out.println("Can NOT find the common proteins/complexes");
+				}
+				else{
+					cRef.add(ref);
+				}
+			}
+			yR = this.drawInputs(parent, cRef, xL, xR, yReact, yR, gapY, gapYInComplex,true);
+		}
+		
+		
+		
+		
+		yR = PApplet.max(yL, yR);
+		
+		ArrayList<String> d = new ArrayList<String>();
+		for (int i3=0;i3<sLeft2.length;i3++){
+			if (!cRef.contains(sLeft2[i3].toString()))
+				d.add(sLeft2[i3].toString());
+		}
+		yR = this.drawInputs(parent, d, xL, xR, yReact, yR, gapY, gapYInComplex,false);
+			
+		// Draw reaction node TO
+		Node nodeTo = edge.getTo();
+		parent.fill(nodeTo.color.getRed(), nodeTo.color.getGreen(), nodeTo.color.getBlue(), 200);
+		parent.noStroke();
+		parent.ellipse(xR, yReact, nodeTo.size, nodeTo.size);
+		parent.textAlign(PApplet.CENTER);
+		parent.text(nodeFrom.reaction.getDisplayName(), xR, yReact-nodeTo.size/2-5);
+		
+		return PApplet.max(yL, yR)+20;
+		
 	 }
 	
 	// Draw output proteins and complexes of a selected reaction  for a brushing edge
-	public float drawOutputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yL_, float gapY, float gapYInComplex, Color color) {
+	public float drawOutputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yL_, float gapY, float gapYInComplex, boolean isCommonElements) {
 		float yL = yL_;
 		for (int i=0;i<a.size();i++){
 			String name = mapProteinRDFId.get(a.get(i));
@@ -542,17 +584,19 @@ public class PathwayView{
 				  parent.stroke(0);
 				  parent.line( xL, yReact, (xL+xR)/2, yL);
 				
-				  parent.fill(color.getRGB());
-				  parent.textSize(11);
-				  parent.textAlign(PApplet.CENTER);
-				  parent.text(name,(xL+xR)/2, yL+5);
-				  yL+=gapY;
+				  if (!isCommonElements){
+					  parent.fill(0);
+					  parent.textSize(11);
+					  parent.textAlign(PApplet.CENTER);
+					  parent.text(name,(xL+xR)/2, yL+5);
+				  }
+				   yL+=gapY;
 			  }
 			  // Complex LEFT
 			  else if (mapComplexRDFId_Complex.get(a.get(i))!=null){
 				  Complex complex = mapComplexRDFId_Complex.get(a.get(i));
 				  ArrayList<String> components = getProteinsInComplex(complex);
-				  yL +=gapY/2;
+				  yL +=gapY/5;
 					 
 				  float beginY = yL;
 				  float sizeYComplex = (components.size()-1)*gapYInComplex;
@@ -560,11 +604,15 @@ public class PathwayView{
 					  float y2 = beginY+k*gapYInComplex;
 					  parent.stroke(0,100,0);
 				      parent.line(xL+(xR-xL)/6f, beginY+sizeYComplex/2, (xL+xR)/2, y2);
-				      parent.fill(color.getRGB());
-					  parent.textSize(11);
-					  parent.textAlign(PApplet.CENTER);
-					  String name2 = components.get(k);
-					  parent.text(name2,(xL+xR)/2, y2+5);
+				      if (!isCommonElements){
+						  parent.fill(0);
+						  parent.textSize(11);
+						  parent.textAlign(PApplet.CENTER);
+						  String name2 = components.get(k);
+						  parent.text(name2,(xL+xR)/2, y2+5);
+					  }
+				      
+			      
 				  }
 				  
 				  parent.stroke(0,0,200);
@@ -574,7 +622,7 @@ public class PathwayView{
 				  parent.fill(0,0,150);
 				  polygon(xL+(xR-xL)/6f, beginY+sizeYComplex/2,6,4);
 				
-				  yL+=components.size()*gapYInComplex+gapY;
+				  yL+=components.size()*gapYInComplex+gapY/5;
 			  }
 			  else{
 			  }
@@ -583,56 +631,76 @@ public class PathwayView{
 	}
 	
 	// Draw input proteins and complexes of a selected reaction  for a brushing edge
-	public float drawInputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yL_, float gapY, float gapYInComplex, Color color) {
-		for (int i3=0;i3<sLeft.length;i3++){
-			String name = mapProteinRDFId.get(sLeft[i3].toString());
+	public float drawInputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yR_, float gapY, float gapYInComplex, boolean isCommonElements) {
+		float yR =yR_;
+		for (int i=0;i<a.size();i++){
+			String name = mapProteinRDFId.get(a.get(i));
 			  if (name!=null){
 				  parent.stroke(0);
-				  parent.line(xL, yL, (xL+xR)/2, yReact);
-				  parent.fill(0);
-				  parent.textSize(11);
-				  parent.textAlign(PApplet.RIGHT);
-				  parent.text(name,xL, yL+5);
-				  float tWidth = parent.textWidth(name);
-				  if (tWidth>maxTextWidth)
-					  maxTextWidth = tWidth;
-				  yL+=gapY;
+				  parent.line((xL+xR)/2, yR, xR, yReact);
+				  if (isCommonElements){
+					  parent.fill(240,220,220,240);
+					  parent.noStroke();
+					  float textWidth = parent.textWidth(name)+4;
+					  parent.rect((xL+xR)/2-textWidth/2, yR-5, textWidth, 14);
+					  
+					  parent.fill(150,150,0);
+					  parent.textSize(11);
+					  parent.textAlign(PApplet.CENTER);
+					  parent.text(name,(xL+xR)/2, yR+5);
+				  }
+				  else{
+				 	  parent.fill(0);
+					  parent.textSize(11);
+					  parent.textAlign(PApplet.CENTER);
+					  parent.text(name,(xL+xR)/2, yR+5);
+				  }
+				  yR+=gapY;
 			  }
 			  // Complex LEFT
-			  else if (mapComplexRDFId_Complex.get(sLeft[i3].toString())!=null){
-				  Complex complex = mapComplexRDFId_Complex.get(sLeft[i3].toString());
+			  else if (mapComplexRDFId_Complex.get(a.get(i))!=null){
+				  Complex complex = mapComplexRDFId_Complex.get(a.get(i));
 				  ArrayList<String> components = getProteinsInComplex(complex);
-				  yL +=gapY/2;
-				  float beginY = yL;
+				  yR +=gapY/5;
+				  float beginY = yR;
 				  float sizeYComplex = (components.size()-1)*gapYInComplex;
-				  for (int i=0;i<components.size();i++){
-					  float y2 = beginY+i*gapYInComplex;
+				  for (int k=0;k<components.size();k++){
+					  float y2 = beginY+k*gapYInComplex;
 					  parent.stroke(0,100,0);
-				      parent.line(xL, y2, xL+(xR-xL)/6f,beginY+sizeYComplex/2);
-					  parent.fill(0);
-					  parent.textSize(11);
-					  parent.textAlign(PApplet.RIGHT);
-					  
-					  String name2 = components.get(i);
-					  parent.text(name2,xL, y2+5);
-					  float tWidth = parent.textWidth(name2);
-					  if (tWidth>maxTextWidth)
-						  maxTextWidth = tWidth;
-					  
-			 	  }
+				      parent.line((xL+xR)/2, y2, xR-(xR-xL)/6f,beginY+sizeYComplex/2);
+				      if (isCommonElements){
+				    	  String name2 = components.get(k);
+						  parent.fill(240,220,220,240);
+						  parent.noStroke();
+						  float textWidth = parent.textWidth(name2)+4;
+						  parent.rect((xL+xR)/2-textWidth/2, y2-5, textWidth, 14);
+						
+				    	  parent.fill(150,150,0);
+						  parent.textSize(11);
+						  parent.textAlign(PApplet.CENTER);
+						  parent.text(name2,(xL+xR)/2, y2+5);
+				      }	  
+				      else{
+				    	  parent.fill(0);
+						  parent.textSize(11);
+						  parent.textAlign(PApplet.CENTER);
+						  String name2 = components.get(k);
+						  parent.text(name2,(xL+xR)/2, y2+5);
+				      }
+				  }
 				  
 				  parent.stroke(0,0,200);
-				  parent.line(xL+(xR-xL)/6f, beginY+sizeYComplex/2, xL+(xR-xL)/2, yReact);
+				  parent.line(xR-(xR-xL)/6f, beginY+sizeYComplex/2, xR, yReact);
 				  
 				  parent.noStroke();
 				  parent.fill(0,0,150);
-				  polygon(xL+(xR-xL)/6f,beginY+sizeYComplex/2,6,4);
-				
-				  yL+=components.size()*gapYInComplex+gapY;
+				  polygon(xR-(xR-xL)/6f,beginY+sizeYComplex/2,6,4);
+				  yR+=components.size()*gapYInComplex+gapY/5;
 			  }
 			  else{
 			  }
 		  }
+		return yR;
 	}
 		
 	
@@ -695,7 +763,7 @@ public class PathwayView{
 				  parent.fill(0,0,150);
 				  polygon(xL+(xR-xL)/6f,beginY+sizeYComplex/2,6,4);
 				
-				  yL+=components.size()*gapYInComplex+gapY;
+				  yL+=components.size()*gapYInComplex+gapY/4;
 			  }
 			  else{
 			  }
@@ -1254,6 +1322,11 @@ public class PathwayView{
 	
 	public void mouseClicked() {
 		if (g==null) return;
+		
+		if (Pathway2.bEdges.size()>0){
+			PathwayViewer_2_8.thread12 =new Thread(PathwayViewer_2_8.loader12);
+			PathwayViewer_2_8.thread12.start();
+		}
 		
 		if (buttonExpand.b){
 			rootPathway.expandAll();
