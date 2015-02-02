@@ -476,6 +476,21 @@ public class PathwayView{
 		if (bPathway!=null)
 			bPathway.drawWhenBrushing();
 
+		// For the survey
+		float beginX =200;
+		float beginY =700;
+		
+		parent.fill(0);
+		parent.textAlign(PApplet.RIGHT);
+		
+		for (int i=0;i<255;i++){
+			float xx = beginX+i*2;
+			parent.noStroke();
+			parent.strokeWeight(4);
+			parent.stroke(255-i,255-i,0);
+			parent.line(xx, beginY, xx+3, beginY);
+		}
+		
 	}
 		
 	

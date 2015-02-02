@@ -28,6 +28,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +77,8 @@ import org.biopax.paxtools.pattern.miner.UsedToProduceMiner;
 import org.biopax.paxtools.pattern.util.Blacklist;
 import org.biopax.paxtools.pattern.util.HGNC;
 
+import GraphLayout.Edge;
+
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 import edu.uic.ncdm.venn.Venn_Overview;
 
@@ -118,6 +121,10 @@ public class PathwayViewer_2_8 extends PApplet {
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
 	public Thread thread1=new Thread(loader1);
+	
+	public static ThreadLoader12 loader12;
+	public static Thread thread12=new Thread(loader12);
+	
 	
 	public ThreadLoader2 loader2=new ThreadLoader2(this);
 	public Thread thread2=new Thread(loader2);
@@ -178,6 +185,7 @@ public class PathwayViewer_2_8 extends PApplet {
     }
 
 	public void setup() {
+		loader12=new ThreadLoader12(this);
 		textFont(metaBold,14);
 		size(1440, 900);
 		//size(2000, 1200);
@@ -1231,6 +1239,111 @@ public class PathwayViewer_2_8 extends PApplet {
 			
 			vennOverview.compute();
 			check2.s  = false;
+		}
+	}
+	
+	
+	
+	// Thread for PathwayView
+	class ThreadLoader12 implements Runnable {
+		PApplet p;
+		public ThreadLoader12(PApplet parent_) {
+			p = parent_;
+		}
+		
+		@SuppressWarnings("unchecked")
+		public void run() {
+			isAllowedDrawing =  false;
+			
+			
+			ReactionView.textbox1.searchText="";
+			try{
+				mapElementRDFId = new HashMap<String,String>();
+				mapElementRef = new HashMap<String,String>();
+				mapSmallMoleculeRDFId =  new HashMap<String,String>();
+				mapComplexRDFId_index =  new HashMap<String,Integer>();
+				
+				/*
+				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 for (Protein currentProtein : proteinSet){
+					 mapElementRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					 if (currentProtein.getEntityReference()==null) continue;
+					 	mapElementRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
+				 }*/
+				 mapElementRDFId =PathwayView.mapProteinRDFId;
+					
+				 
+				 /*
+				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
+				 for (SmallMolecule currentMolecule : smallMoleculeSet){
+					 mapElementRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+				 }*/
+				 smallMoleculeSet = pathwayView.smallMoleculeSet;
+				 
+				 
+				 /*
+				 Set<PhysicalEntity> physicalEntitySet = model.getObjects(PhysicalEntity.class);
+				 for (PhysicalEntity current : physicalEntitySet){
+					 if (current.getRDFId().contains("PhysicalEntity")){
+						 mapElementRDFId.put(current.getRDFId().toString(), current.getDisplayName());
+					 }	 
+				 }*/
+				 
+				 
+						
+				 /*
+				 Set<Complex> complexSet = model.getObjects(Complex.class);
+				 complexList = new ArrayList<Complex>();
+				 int i2=0;
+				 for (Complex current : complexSet){
+					 mapComplexRDFId_index.put(current.getRDFId().toString(), i2);
+					 complexList.add(current);
+					 i2++;
+				 }*/
+				 
+				 int i2=0;
+				 complexList = new ArrayList<Complex>();
+				 for (Map.Entry<String,Complex> entry : PathwayView.mapComplexRDFId_Complex.entrySet()) {
+					 complexList.add(entry.getValue());
+					 mapComplexRDFId_index.put(entry.getKey(),i2);
+					 i2++;
+				 }
+						
+				 
+				 
+				 // Compute proteins in complexes
+				 proteinsInComplex = new ArrayList[complexList.size()];
+				 for (int i=0; i<complexList.size();i++){
+						proteinsInComplex[i] = PathwayView.getProteinsInComplex(complexList.get(i));
+				 }
+				 
+				 ArrayList<BiochemicalReaction> a = new ArrayList<BiochemicalReaction>();
+				 for (int e=0;e<Pathway2.bEdges.size();e++){
+					 Edge edge = Pathway2.bEdges.get(e);
+					 if (!a.contains(edge.getFrom().reaction))
+						 a.add(edge.getFrom().reaction);
+					 if (!a.contains(edge.getTo().reaction))
+						 a.add(edge.getTo().reaction);
+				 }
+				 reactionSet = new HashSet<BiochemicalReaction>(a);
+			//	 reactionSet = model.getObjects(BiochemicalReaction.class);
+			}
+			catch (Exception e){
+				e.printStackTrace();
+				javax.swing.JOptionPane.showMessageDialog(p, "Something wrong: ??????");
+				return;
+			}
+			
+			
+			ReactionView.check11.s=true;   // Fade small molecule
+			ReactionView.popupReactionOrder.s=2;
+			ReactionView.check5.s=false;
+			
+			popupReaction.setItems();
+			isAllowedDrawing =  true;  //******************* Start drawing **************
+			System.out.println("DONE thread12");
+			
 		}
 	}
 	
