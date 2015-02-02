@@ -483,43 +483,88 @@ public class PathwayView{
 		parent.strokeWeight(1);
 		float maxTextWidth = 0;
 		
-		Object[] sRight = edge.getFrom().reaction.getRight().toArray();
-		for (int i3=0;i3<sRight.length;i3++){
-			  String name = mapProteinRDFId.get(sRight[i3].toString());
+		Object[] sRight1 = edge.getFrom().reaction.getRight().toArray();
+		Object[] sLeft2 = edge.getTo().reaction.getLeft().toArray();
+			
+		ArrayList<String> a = compareInputOutput(sRight1, sLeft2);
+		ArrayList<String> aRef = new ArrayList<String>();
+		if (a==null || a.size()==0)
+			System.out.println("Can NOT find the common proteins/complexes");
+		else{ // Draw common proteins/complexes
+			for (int i=0;i<a.size();i++){
+				String ref = getRefFromName(sRight1, a.get(i));
+				if (ref==null){
+					System.out.println("Can NOT find the common proteins/complexes");
+				}
+				else{
+					aRef.add(ref);
+				}
+			}
+			yL = this.drawOutputs(parent, aRef, xL, xR, yReact, yL, gapY, gapYInComplex,new Color(150,150,0));
+		}
+		
+		ArrayList<String> b = new ArrayList<String>();
+		for (int i3=0;i3<sRight1.length;i3++){
+			b.add(sRight1[i3].toString());
+		}
+		
+		this.drawOutputs(parent, b, xL, xR, yReact, yL, gapY, gapYInComplex, Color.BLACK);
+		
+	
+		
+		// Draw reaction node
+		Node nodeFrom = edge.getFrom();
+		parent.fill(nodeFrom.color.getRed(), nodeFrom.color.getGreen(), nodeFrom.color.getBlue(), 200);
+		parent.noStroke();
+		parent.ellipse(xL, yReact, nodeFrom.size, nodeFrom.size);
+		parent.textAlign(PApplet.CENTER);
+		parent.text(nodeFrom.reaction.getDisplayName(), xL, yReact-nodeFrom.size/2-5);
+		
+		
+		
+		float reactionNameWidth = (parent.textWidth(edge.getFrom().reaction.getDisplayName())-ww)/2;
+		if (reactionNameWidth>maxTextWidth)
+			maxTextWidth = reactionNameWidth;
+		
+		float gap=PApplet.max(yL,yR)-yReact;
+		iY2.target(parent.height-gap-500);
+		iY2.update();
+		iX2.target(parent.width-ww-2*maxTextWidth-50);
+		iX2.update();
+	 }
+	
+	// Draw output proteins and complexes of a selected reaction  for a brushing edge
+	public float drawOutputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yL_, float gapY, float gapYInComplex, Color color) {
+		float yL = yL_;
+		for (int i=0;i<a.size();i++){
+			String name = mapProteinRDFId.get(a.get(i));
 			  if (name!=null){
 				  parent.stroke(0);
 				  parent.line( xL, yReact, (xL+xR)/2, yL);
 				
-				  parent.fill(0);
+				  parent.fill(color.getRGB());
 				  parent.textSize(11);
 				  parent.textAlign(PApplet.CENTER);
 				  parent.text(name,(xL+xR)/2, yL+5);
-				  float tWidth = parent.textWidth(name);
-				  if (tWidth>maxTextWidth)
-					  maxTextWidth = tWidth;
 				  yL+=gapY;
 			  }
 			  // Complex LEFT
-			  else if (mapComplexRDFId_Complex.get(sRight[i3].toString())!=null){
-				  Complex complex = mapComplexRDFId_Complex.get(sRight[i3].toString());
+			  else if (mapComplexRDFId_Complex.get(a.get(i))!=null){
+				  Complex complex = mapComplexRDFId_Complex.get(a.get(i));
 				  ArrayList<String> components = getProteinsInComplex(complex);
 				  yL +=gapY/2;
 					 
 				  float beginY = yL;
 				  float sizeYComplex = (components.size()-1)*gapYInComplex;
-				  for (int i=0;i<components.size();i++){
-					  float y2 = beginY+i*gapYInComplex;
+				  for (int k=0;k<components.size();k++){
+					  float y2 = beginY+k*gapYInComplex;
 					  parent.stroke(0,100,0);
 				      parent.line(xL+(xR-xL)/6f, beginY+sizeYComplex/2, (xL+xR)/2, y2);
-					  parent.fill(0);
+				      parent.fill(color.getRGB());
 					  parent.textSize(11);
 					  parent.textAlign(PApplet.CENTER);
-					  
-					  String name2 = components.get(i);
+					  String name2 = components.get(k);
 					  parent.text(name2,(xL+xR)/2, y2+5);
-					  float tWidth = parent.textWidth(name2);
-					  if (tWidth>maxTextWidth)
-						  maxTextWidth = tWidth;
 				  }
 				  
 				  parent.stroke(0,0,200);
@@ -533,17 +578,12 @@ public class PathwayView{
 			  }
 			  else{
 			  }
-		  }
-		
-		// Draw reaction node
-		Node nodeFrom = edge.getFrom();
-		parent.fill(nodeFrom.color.getRed(), nodeFrom.color.getGreen(), nodeFrom.color.getBlue(), 200);
-		parent.noStroke();
-		parent.ellipse(xL, yReact, nodeFrom.size, nodeFrom.size);
-		parent.textAlign(PApplet.CENTER);
-		parent.text(nodeFrom.reaction.getDisplayName(), xL, yReact-nodeFrom.size/2-5);
-		
-		/*
+		}	
+		return yL;
+	}
+	
+	// Draw input proteins and complexes of a selected reaction  for a brushing edge
+	public float drawInputs(PApplet parent, ArrayList<String> a, float xL, float xR, float yReact, float yL_, float gapY, float gapYInComplex, Color color) {
 		for (int i3=0;i3<sLeft.length;i3++){
 			String name = mapProteinRDFId.get(sLeft[i3].toString());
 			  if (name!=null){
@@ -592,19 +632,12 @@ public class PathwayView{
 			  }
 			  else{
 			  }
-		  }*/
+		  }
+	}
 		
-		
-		float reactionNameWidth = (parent.textWidth(edge.getFrom().reaction.getDisplayName())-ww)/2;
-		if (reactionNameWidth>maxTextWidth)
-			maxTextWidth = reactionNameWidth;
-		
-		float gap=PApplet.max(yL,yR)-yReact;
-		iY2.target(parent.height-gap);
-		iY2.update();
-		iX2.target(parent.width-ww-2*maxTextWidth-50);
-		iX2.update();
-	 }
+	
+	
+	
 	
 	// draw Reactions links
 	public void drawBrushingNode(PApplet parent, Node node, float ww) {
@@ -1148,6 +1181,24 @@ public class PathwayView{
 			
 		}
 		return results;
+	}
+	
+	public String getRefFromName(Object[] a, String name){
+		for (int i=0; i<a.length;i++){
+			String ref1 = a[i].toString();
+			if (mapProteinRDFId.get(ref1)!=null){
+				String proteinName1 = mapProteinRDFId.get(ref1);
+				if (proteinName1.equals(name))
+					return ref1;
+			}
+			else if (mapComplexRDFId.get(ref1)!=null){
+				String complexName1 = mapComplexRDFId.get(ref1);
+				if (complexName1.equals(name))
+					return ref1;
+			}
+			
+		}
+		return null;
 	}
 	
 	
