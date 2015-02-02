@@ -9,6 +9,7 @@ import org.biopax.paxtools.model.level3.BiochemicalReaction;
 
 import processing.core.PApplet;
 
+import GraphLayout.Edge;
 import GraphLayout.Graph;
 import GraphLayout.Node;
 
@@ -37,15 +38,17 @@ public class Pathway2{
   public static float beginDarknessOfPathways = 128;
   
   // Draw the button threading
-  public int linkToParent = 0;
-  public int linkFromParent = 0;
-  public int[][] linkSubpathway = null;
-  public int[] linkReactionFromThisPathway = null;
-  public int[] linkReactionToThisPathway = null;
- // public int[] linkReaction = null;
+  public ArrayList<Edge> linkToParent;
+  public ArrayList<Edge> linkFromParent;
+  public ArrayList<Edge>[][] linkSubpathway = null;
+  public ArrayList<Edge>[] linkReactionFromThisPathway = null;
+  public ArrayList<Edge>[] linkReactionToThisPathway = null;
   public ArrayList<Integer> nodeListAll;
   public ArrayList<BiochemicalReaction> reactionListAll;
   public boolean isDrawn = false;
+  
+  // Brushing edges
+  public static ArrayList<Edge> bEdges = null;
   
   // Constructor
   Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
@@ -88,7 +91,7 @@ public class Pathway2{
 	  xEntry = xEntry_;
 	  yEntry = yEntry_;
 	  al = al_;
-	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*5;
+	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*4;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
 	  	if (isExpanded)
@@ -357,18 +360,29 @@ public class Pathway2{
 	  return a;
   }
   
-  public void resetLinkParent(){
-	  linkToParent=0;
-	  linkFromParent=0;
-	  linkSubpathway =  new int[subPathwayList.size()][subPathwayList.size()];
+  @SuppressWarnings("unchecked")
+public void resetLinkParent(){
+	  linkToParent = new ArrayList<Edge>();
+	  linkFromParent = new ArrayList<Edge>();
+	  linkSubpathway =  new ArrayList[subPathwayList.size()][subPathwayList.size()];
+	  for (int p1=0;p1<subPathwayList.size();p1++){
+		  for (int p2=0;p2<subPathwayList.size();p2++){
+			  linkSubpathway[p1][p2] = new ArrayList<Edge>();
+		  }		
+	  }
 	  nodeListAll = getAllNodeId();
 	  reactionListAll = getAllReaction();
-	  linkReactionFromThisPathway = new int[nodeListAll.size()];
-	  linkReactionToThisPathway = new int[nodeListAll.size()];
+	  linkReactionFromThisPathway = new ArrayList[nodeListAll.size()];
+	  linkReactionToThisPathway = new ArrayList[nodeListAll.size()];
+	  for (int p=0;p<nodeListAll.size();p++){
+		  linkReactionFromThisPathway[p] = new ArrayList<Edge>();
+		  linkReactionToThisPathway[p] = new ArrayList<Edge>(); 
+	  }
 	  isDrawn = false;
 	  for (int p=0;p<subPathwayList.size();p++){
 		  subPathwayList.get(p).resetLinkParent();
 	  }
+	  bEdges = new ArrayList<Edge>();
   }
    
   public void drawLinkParent(){
@@ -381,20 +395,16 @@ public class Pathway2{
 	   
 	  drawSubpathwayLinks();
 	  
-	  if (linkToParent>0){
+	  if (linkToParent.size()>0){
 		  parent.stroke(PathwayView.sat,PathwayView.sat,0);
-		  float wei = PApplet.pow(linkToParent, 0.3f);
-		  parent.strokeWeight(wei);
-		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei, true);    // to parent
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,linkToParent, true);    // to parent
 		  parentPathway.isDrawn = true; // to draw the center button
 		  this.isDrawn = true; // to draw the center button
 			
 	  }
-	  if (linkFromParent>0){
+	  if (linkFromParent.size()>0){
 		  parent.stroke(0);
-		  float wei = PApplet.pow(linkFromParent, 0.3f);
-		  parent.strokeWeight(wei);
-		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,wei,false);
+		  drawArc(xEntry, yEntry, parentPathway.x, parentPathway.y,linkFromParent,false);
 		  parentPathway.isDrawn = true; // to draw the center button
 		  this.isDrawn = true; // to draw the center button
 		//  if (displayName.contains("Cytochrome c-mediated apoptotic response"))
@@ -403,10 +413,8 @@ public class Pathway2{
 	  }
 	  
 	  for (int i=0;i<nodeListAll.size();i++){
-		  if (linkReactionToThisPathway[i]>0 && level!=1){  // disable when level =1 to simplify the view
+		  if (linkReactionToThisPathway[i].size()>0 && level!=1){  // disable when level =1 to simplify the view
 			  parent.stroke(0,0,0);
-			  float wei = PApplet.pow(linkReactionToThisPathway[i], 0.3f);
-			  parent.strokeWeight(wei);
 			  Node node = Graph.nodes.get(nodeListAll.get(i));
 			  
 			  float x2 = node.iX.value;
@@ -418,15 +426,13 @@ public class Pathway2{
 			  x2 = x+portion2*dx2;
 			  y2 = y+portion2*dy2;
 			  
-			  drawArc(x, y, x2, y2,wei,true);
+			  drawArc(x, y, x2, y2,linkReactionToThisPathway[i],true);
 			  //parent.stroke(255,0,150);
 			 // parent.line(x, y, node.iX.value, node.iY.value);
 			  isDrawn = true; // to draw the center button
 		  }
-		  if (linkReactionFromThisPathway[i]>0 && level!=1){// disable when level =1 to simplify the view
+		  if (linkReactionFromThisPathway[i].size()>0 && level!=1){// disable when level =1 to simplify the view
 			  parent.stroke(PathwayView.sat,PathwayView.sat,0);
-			  float wei = PApplet.pow(linkReactionFromThisPathway[i], 0.3f);
-			  parent.strokeWeight(wei);
 			  Node node = Graph.nodes.get(nodeListAll.get(i));
 			  
 			  float x1 = node.iX.value;
@@ -438,7 +444,7 @@ public class Pathway2{
 			  x1 = x+portion2*dx1;
 			  y1 = y+portion2*dy1;
 			  
-		      drawArc(x, y, x1, y1,wei,false);
+		      drawArc(x, y, x1, y1,linkReactionFromThisPathway[i],false);
 			//  parent.stroke(155,255,0);
 			//  parent.line(x, y, node.iX.value, node.iY.value);
 		      isDrawn = true; // to draw the center button
@@ -449,11 +455,11 @@ public class Pathway2{
   public void drawSubpathwayLinks(){
 	  for (int p1=0;p1<subPathwayList.size();p1++){
 		  for (int p2=0;p2<subPathwayList.size();p2++){
-			  if (linkSubpathway[p1][p2]>0){
+			  if (linkSubpathway[p1][p2].size()>0){
 				//  System.out.println(linkSubpathway[p1][p2]);
 				  Pathway2 path1 = subPathwayList.get(p1);
 				  Pathway2 path2 = subPathwayList.get(p2);
-				  float wei = PApplet.pow(linkSubpathway[p1][p2], 0.3f);
+				  float wei = PApplet.pow(linkSubpathway[p1][p2].size(), 0.3f);
 				  parent.strokeWeight(wei);
 				  if (p1<p2)
 					  drawArc2(path1.xEntry,path1.yEntry, path2.xEntry, path2.yEntry,x,y, wei, true);
@@ -484,7 +490,7 @@ public class Pathway2{
 			if (alCircular<PApplet.PI/4)
 				alCircular-=0.1f+weight/(40);
 		
-		float newR = (dd / 2) / PApplet.sin(alCircular/2);
+		float newR = PApplet.abs((dd / 2) / PApplet.sin(alCircular/2));
 		float d3 = PApplet.dist(x1, y1, x2, y2);
 		float x11 = (x1 + x2) / 2 - ((y1 - y2) / 2)
 				* PApplet.sqrt(PApplet.pow(newR * 2 / d3, 2) - 1);
@@ -530,8 +536,17 @@ public class Pathway2{
 				
  			
 		}	
-		else
-			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
+		else{
+			if(isBrushingArc(x3, y3, newR, weight, al2, al1, parent.mouseX, parent.mouseY)){
+				parent.stroke(255,0,0);
+				parent.strokeWeight(weight);
+				parent.arc(x3, y3, newR*2, newR*2, al2, al1);
+			}
+			else{
+				drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
+				 
+  			}	
+		}	
 
   }
   
@@ -562,8 +577,12 @@ public class Pathway2{
 		
 }	  
   
-  public void drawArc(float x1, float y1, float x2, float y2, float weight,boolean isToParent){
-		 float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
+  public void drawArc(float x1, float y1, float x2, float y2, ArrayList<Edge> a,boolean isToParent){
+	  float weight = PApplet.pow(a.size(), 0.3f);
+	  parent.strokeWeight(weight);
+	  
+	  
+	  	float dis = (y2-y1)*(y2-y1)+(x2-x1)*(x2-x1);
 		 float dd = PApplet.sqrt(dis);
 		 float alCircular = PApplet.PI/25;
 		
@@ -576,7 +595,6 @@ public class Pathway2{
     	 
 		
 		// Adding weight
-		//newR+=weight/2;
 		if (isToParent){
 			 float x3=x22;
 			 float y3=y22;
@@ -589,14 +607,38 @@ public class Pathway2{
 			parent.noFill();
 				
     		 if (al1<al2){
-				 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY))
+				 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY)){
 	 				parent.stroke(255,0,0);
-				 parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+	 					/*parent.noStroke();
+						parent.textAlign(PApplet.LEFT);
+		  				parent.fill(255,0,0);
+		  				parent.ellipse(x1, y1, 10, 10);
+		  				parent.text("al1="+al1,x1+5,y1);
+		  				parent.fill(200,0,0);
+		  				parent.ellipse(x2, y2, 10, 10);
+		  				parent.text("al2="+al2,x2+5,y2);
+		  				parent.fill(0,200);
+		  				parent.stroke(0,0,255);
+		  				parent.arc(x3, y3, newR*2, newR*2, al2, al1);
+		  				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
+						*/
+		  				for (int i=0; i<a.size();i++){
+		  					if (!bEdges.contains(a.get(i)))
+		  						bEdges.add(a.get(i));
+		  				}
+		  				parent.fill(0,200,0);
+		  				parent.ellipse(x3, y3, 10, 10);
+		  				
+		  				parent.text(bEdges.toString(), x3, y3);
+		  				
+				 }	
+				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
 			}	
 			else{
 				 if(isBrushingArc(x3, y3, newR, weight, al1-2*PApplet.PI, al2, parent.mouseX, parent.mouseY)){
 	 					parent.stroke(255,0,0);
-	    	     }	
+	 			 }
+			
 	    		 parent.arc(x3, y3, newR*2, newR*2, al1-2*PApplet.PI, al2);
 	       }	
 		}
@@ -614,18 +656,6 @@ public class Pathway2{
     		 if (al1<al2){
 				 if(isBrushingArc(x3, y3, newR, weight, al2-2*PApplet.PI, al1, parent.mouseX, parent.mouseY))
 	 				parent.stroke(255,0,0);
-					/*
-	    			 else{
-	    				parent.noStroke();
-	    				parent.fill(255,0,0);
-	    				parent.ellipse(x1, y1, 15, 15);
-	    				parent.text((al1),x1,y1);
-	    				parent.fill(200,0,0);
-	    				parent.ellipse(x2, y2, 15, 15);
-	    				parent.text((al2),x2,y2);
-	    				parent.fill(0,100);
-	    				parent.stroke(0,0,255);
-	    		 }*/
 				 parent.arc(x3, y3, newR*2, newR*2, al2-2*PApplet.PI, al1);
 			}	
     		 
