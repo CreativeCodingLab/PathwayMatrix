@@ -37,8 +37,8 @@ public class PopupCausality{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_2_8.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_2_8.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_2_9.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_2_9.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -95,7 +95,7 @@ public class PopupCausality{
 			b =100;
 			return;
 		}
-		else{
+		else if (b>=0) {
 			for (int i=0; i<items.length; i++){
 				if (x<=mX && mX<=x+100 && y+itemH*i+25<=mY && mY<=y+itemH*(i+1)+6+25){
 					b =i;

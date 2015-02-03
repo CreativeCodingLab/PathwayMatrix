@@ -26,7 +26,7 @@ public class PopupOrder{
 	
 	public void draw(float x_){
 		x = x_;
-		if (main.PathwayViewer_2_8.popupRelation.b<0)
+		if (main.PathwayViewer_2_9.popupRelation.b<0)
 			checkBrushing();
 		if (b>=0){
 			parent.fill(100);
@@ -38,8 +38,8 @@ public class PopupOrder{
 			parent.rect(x, y+23, w,h);
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_2_8.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_2_8.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_2_9.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_2_9.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}
@@ -78,23 +78,23 @@ public class PopupOrder{
 		if (b<items.length){
 			s = b;
 			if (items[s].equals("Random")) { 
-				main.PathwayViewer_2_8.stateAnimation=0;
-				main.PathwayViewer_2_8.check2.s =false;
+				main.PathwayViewer_2_9.stateAnimation=0;
+				main.PathwayViewer_2_9.check2.s =false;
 				Gene.orderByRandom(parent);
 			}	
 			else if (items[s].equals("Reading order"))  {
-				main.PathwayViewer_2_8.stateAnimation=0;
-				main.PathwayViewer_2_8.check2.s =false;
+				main.PathwayViewer_2_9.stateAnimation=0;
+				main.PathwayViewer_2_9.check2.s =false;
 				Gene.orderByReadingOrder();
 			}	
 			else if (items[s].equals("Name"))  {
-				main.PathwayViewer_2_8.stateAnimation=0;
-				main.PathwayViewer_2_8.check2.s =false;
+				main.PathwayViewer_2_9.stateAnimation=0;
+				main.PathwayViewer_2_9.check2.s =false;
 				Gene.orderByName();
 			}	
 			else if (items[s].equals("Similarity"))  {
-				main.PathwayViewer_2_8.stateAnimation=0;
-				main.PathwayViewer_2_8.check2.s =false;
+				main.PathwayViewer_2_9.stateAnimation=0;
+				main.PathwayViewer_2_9.check2.s =false;
 				Gene.orderBySimilarity();
 			}	
 			

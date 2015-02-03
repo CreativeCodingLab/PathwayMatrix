@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import main.PathwayViewer_2_8.ThreadLoader4;
+import main.PathwayViewer_2_9.ThreadLoader4;
 
 import org.biopax.paxtools.model.level3.BiochemicalReaction;
 import org.biopax.paxtools.model.level3.Complex;
@@ -403,7 +403,16 @@ public class PathwayView{
 		else if (popupLayout.s==3 && Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
 			parent.fill(240,220,220,220);
 			parent.noStroke();
-			parent.rect(parent.width-500, iY2.value-30, 501, parent.height-iY2.value+40);
+			parent.rect(parent.width-500, iY2.value-70, 501, parent.height-iY2.value+70);
+			parent.fill(0);
+			parent.textSize(11);
+			parent.textAlign(PApplet.LEFT);
+			parent.text("You are brushing "+Pathway2.bEdges.size()+" causal relationship(s) of " + 
+					getDistintReactions(Pathway2.bEdges).size() +" reactions.",parent.width-490,iY2.value-50);
+			parent.text("Please click to add these reactions to View -> Reaction View", parent.width-490,iY2.value-35);
+			parent.fill(255,0,0);
+			parent.text("     "+Pathway2.meassage);
+			
 			
 			float yReact=iY2.value;
 			//float yReact = 	iY2.value;
@@ -412,12 +421,25 @@ public class PathwayView{
 				yReact = drawBrushingEdge(parent, edge, yReact, 320);   // Draw proteins/complexes in the brushing edges
 			}	
 			float totalH =  yReact-iY2.value;
-			if (totalH>parent.height-225)
-				totalH = parent.height-225;
+			if (totalH>parent.height-250)
+				totalH = parent.height-250;
 			iY2.target(parent.height-totalH);
 			iY2.update();
 		}
 	}	
+	
+	public static ArrayList<BiochemicalReaction> getDistintReactions(ArrayList<Edge> a) {
+		ArrayList<BiochemicalReaction> b = new ArrayList<BiochemicalReaction>();
+		for (int e=0;e<a.size();e++){
+			 Edge edge = a.get(e);
+			 if (!b.contains(edge.getFrom().reaction))
+				 b.add(edge.getFrom().reaction);
+			 if (!b.contains(edge.getTo().reaction))
+				 b.add(edge.getTo().reaction);
+		 }
+		return b;
+	}
+		
 	public void drawPathways() {
 		float totalSize=0;
 		for (int i=0;i<filePathway.length;i++){
@@ -1344,8 +1366,8 @@ public class PathwayView{
 		if (g==null) return;
 		
 		if (Pathway2.bEdges!=null && Pathway2.bEdges.size()>0){
-			PathwayViewer_2_8.thread12 =new Thread(PathwayViewer_2_8.loader12);
-			PathwayViewer_2_8.thread12.start();
+			PathwayViewer_2_9.thread12 =new Thread(PathwayViewer_2_9.loader12);
+			PathwayViewer_2_9.thread12.start();
 		}
 		
 		if (buttonExpand.b){

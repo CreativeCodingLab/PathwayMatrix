@@ -37,8 +37,8 @@ public class PopupView{
 			
 			// Max number of relations
 			float max =-1;
-			for (int j=0;j<main.PathwayViewer_2_8.pairs.length;j++){
-				float sqrt = PApplet.sqrt(main.PathwayViewer_2_8.pairs[j].size());
+			for (int j=0;j<main.PathwayViewer_2_9.pairs.length;j++){
+				float sqrt = PApplet.sqrt(main.PathwayViewer_2_9.pairs[j].size());
 				if (sqrt>max)
 					max = sqrt;
 			}

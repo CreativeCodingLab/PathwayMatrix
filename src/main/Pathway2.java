@@ -51,6 +51,7 @@ public class Pathway2{
   
   // Brushing edges
   public static ArrayList<Edge> bEdges = null;
+  public static String meassage = "";
   
   // Constructor
   Pathway2(PApplet parent_, Pathway2 parentPathway_, int f_, String dName, int level_, boolean isExpande_){
@@ -390,6 +391,7 @@ public class Pathway2{
   
   public static void resetBrushingEdges(){
 	  bEdges = new ArrayList<Edge>();  
+	  meassage ="";
   }
 		
   
@@ -432,7 +434,7 @@ public class Pathway2{
 			  x2 = x+portion2*dx2;
 			  y2 = y+portion2*dy2;
 			  
-			  drawArc(x, y, x2, y2,linkReactionToThisPathway[i],true);
+			  drawArc(x, y, x2, y2,linkReactionToThisPathway[i],false);
 			  //parent.stroke(255,0,150);
 			 // parent.line(x, y, node.iX.value, node.iY.value);
 			  isDrawn = true; // to draw the center button
@@ -450,7 +452,7 @@ public class Pathway2{
 			  x1 = x+portion2*dx1;
 			  y1 = y+portion2*dy1;
 			  
-		      drawArc(x, y, x1, y1,linkReactionFromThisPathway[i],false);
+		      drawArc(x, y, x1, y1,linkReactionFromThisPathway[i],true);
 			//  parent.stroke(155,255,0);
 			//  parent.line(x, y, node.iX.value, node.iY.value);
 		      isDrawn = true; // to draw the center button
