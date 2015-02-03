@@ -430,16 +430,16 @@ public class Edge {
 			if (type==0){
 				if (al1<al2){
 					 if(Pathway2.isBrushingArc(x3, y3, newR, 1, al1, al2, parent.mouseX, parent.mouseY)){  // Brushing 7/6
-				 		if (!Pathway2.bEdges.contains(this))
-				 			Pathway2.bEdges.add(this);
+				 		if (!Pathway2.isContainsEdge(Pathway2.bEdges,this))
+		  					Pathway2.bEdges.add(this);
 			  		 }
 				 			
 					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al1, al2, sat);
 				}	
 				else{
 					if(Pathway2.isBrushingArc(x3, y3, newR, 1, al2, al1, parent.mouseX, parent.mouseY)){  // Brushing 7/6
-				 		if (!Pathway2.bEdges.contains(this))
-				 			Pathway2.bEdges.add(this);
+						if (!Pathway2.isContainsEdge(Pathway2.bEdges,this))
+			  				Pathway2.bEdges.add(this);
 			  		}
 					drawArc(x1, y1, x2, y2, x3, y3, newR*2,  al2, al1, sat);
 				}	

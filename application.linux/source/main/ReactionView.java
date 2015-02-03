@@ -59,7 +59,7 @@ public class ReactionView{
 	public float xR = x+800;
 	public float xR2 = xR-200;
 	
-	public static Color smallMoleculeColor = new Color(150,150,0);
+	public static Color smallMoleculeColor = new Color(180,150,150);
 	public static Color unidentifiedElementColor = new Color(130,70,130);
 	public static Color formComplexColor = new Color(0,150,100);
 	public static Color complexRectionColor = new Color(0,0,180);
@@ -640,8 +640,8 @@ public class ReactionView{
 	public void updateReactionPositions(){
 		itemH2 = (parent.height-yBeginList)/(rectHash.size());
 		// Compute positions
-		if (itemH2>maxH)
-			itemH2 =maxH;
+		if (itemH2>maxH+2)
+			itemH2 =maxH+2;
 		for (int i=0;i<rectHash.size();i++){
 			iH[i].target(itemH2);
 		}	

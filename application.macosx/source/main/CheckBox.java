@@ -22,7 +22,7 @@ public class CheckBox{
 		
 		checkBrushing();
 		parent.textAlign(PApplet.LEFT);
-		parent.textSize(12);
+		parent.textSize(11);
 		parent.stroke(0);
 		if (b)
 			parent.fill(180);

@@ -51,6 +51,8 @@ public class PathwayView{
 	public Slider2 slider2;
 	public static PopupLayout popupLayout;
 	public static CheckBox checkName;
+	public static CheckBox checkEdges;
+	
 	public ThreadLoader5 loader5;
 	public Thread thread5 = new Thread(loader5);
 	
@@ -91,6 +93,7 @@ public class PathwayView{
 		slider2 = new Slider2(parent);
 		popupLayout = new PopupLayout(parent);
 		checkName = new CheckBox(parent,"Reactions names");
+		checkEdges = new CheckBox(parent,"Show causal links");
 		popupPathway = new PopupPathway(parent);
 		
 		float v=0.5f;
@@ -335,10 +338,13 @@ public class PathwayView{
 			iTransition.update();
 			rootPathway.resetLinkParent();
 			
+			checkEdges.draw(parent.width-150, 175);
+			
 			drawPathways();
 			
 		   	g.drawNodes();
-		    g.drawEdges();
+		   	if (checkEdges.s)
+		   		g.drawEdges();
 		   	rootPathway.drawLinkParent();
 			rootPathway.drawSubpathwayLinks(); // This only done at root level, no recursive
 			
@@ -432,13 +438,15 @@ public class PathwayView{
 		ArrayList<BiochemicalReaction> b = new ArrayList<BiochemicalReaction>();
 		for (int e=0;e<a.size();e++){
 			 Edge edge = a.get(e);
-			 if (!b.contains(edge.getFrom().reaction))
+			 if (!Pathway2.isContainsBiochemicalReaction(b,edge.getFrom().reaction))
 				 b.add(edge.getFrom().reaction);
-			 if (!b.contains(edge.getTo().reaction))
+			 if (!Pathway2.isContainsBiochemicalReaction(b, edge.getTo().reaction))
 				 b.add(edge.getTo().reaction);
 		 }
 		return b;
 	}
+	
+		
 		
 	public void drawPathways() {
 		float totalSize=0;
@@ -1418,6 +1426,8 @@ public class PathwayView{
 		}
 		else if (checkName.b)
 			checkName.mouseClicked();
+		else if (checkEdges.b)
+			checkEdges.mouseClicked();
 		else{
 			g.setSelectedNode(null);
 			for (int i = 0; i < g.getNodes().size(); i++) {

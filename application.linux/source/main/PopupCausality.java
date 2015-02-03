@@ -62,7 +62,8 @@ public class PopupCausality{
 		
 		if (s>=0 && s<items.length){
 			for (int i=0;i<w1;i++){
-				parent.stroke(255,255-i*2.55f,i*2.55f);
+			//	parent.stroke(255,255-i*2.55f,i*2.55f);
+				parent.stroke(255-i*2f,255-i*2f,0);
 				parent.line(x+i, y, x+i, y+22);
 			}
 		}

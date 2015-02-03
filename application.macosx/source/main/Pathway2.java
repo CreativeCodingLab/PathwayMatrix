@@ -325,6 +325,8 @@ public class Pathway2{
 	}
 	
 			
+	
+
   public boolean isContainReaction(String rName){
 	  for (int r=0;r<reactList.size();r++){
 		  String name = reactList.get(r).getDisplayName();
@@ -393,6 +395,30 @@ public class Pathway2{
 	  bEdges = new ArrayList<Edge>();  
 	  meassage ="";
   }
+	
+  public static boolean isContainsEdge(ArrayList<Edge> bEdges, Edge edge){
+	  for (int e=0; e<bEdges.size();e++){
+		  String rName1 = bEdges.get(e).getFrom().reaction.getDisplayName();
+		  String rName2 = bEdges.get(e).getTo().reaction.getDisplayName();
+		  String rNameL = edge.getFrom().reaction.getDisplayName();
+		  String rNameR = edge.getTo().reaction.getDisplayName();
+		  if (rName1.equals(rNameL) && rName2.equals(rNameR)){
+			  return true;
+		  }
+	  }
+	  return false;
+  }
+  
+  	public static boolean isContainsBiochemicalReaction(ArrayList<BiochemicalReaction> a, BiochemicalReaction reaction) {
+  		for (int i=0; i<a.size();i++){
+  		  String rName1 = a.get(i).getDisplayName();
+  		  String rName2 = reaction.getDisplayName();
+  		  if (rName1.equals(rName2)){
+  			  return true;
+  		  }
+  	  }
+  	  return false;
+	}
 		
   
    
@@ -537,7 +563,7 @@ public class Pathway2{
 		if (al1 < al2){
 			 if(isBrushingArc(x3, y3, newR, weight, al1, al2, parent.mouseX, parent.mouseY)){  // Brushing link 1/6
 				for (int i=0; i<a.size();i++){
-  					if (!bEdges.contains(a.get(i)))
+  					if (!isContainsEdge(bEdges,a.get(i)))
   						bEdges.add(a.get(i));
   				}
 			 }
@@ -546,8 +572,8 @@ public class Pathway2{
 		else{
 			if(isBrushingArc(x3, y3, newR, weight, al2, al1, parent.mouseX, parent.mouseY)){ // Brushing link 2/6
 				for (int i=0; i<a.size();i++){
-  					if (!bEdges.contains(a.get(i)))
-  						bEdges.add(a.get(i));
+					if (!isContainsEdge(bEdges,a.get(i)))
+	  					bEdges.add(a.get(i));
   				}
 			}
 			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
@@ -634,8 +660,8 @@ public class Pathway2{
 					*/
  				
 	  				for (int i=0; i<a.size();i++){
-	  					if (!bEdges.contains(a.get(i)))
-	  						bEdges.add(a.get(i));
+	  					if (!isContainsEdge(bEdges,a.get(i)))
+	  	  					bEdges.add(a.get(i));
 	  				}
 	  				//parent.text(bEdges.toString(), x3, y3);
 		  		 }	
@@ -648,8 +674,8 @@ public class Pathway2{
 	 				else
 	 					parent.stroke(150,0,0);
 	 				for (int i=0; i<a.size();i++){
-	  					if (!bEdges.contains(a.get(i)))
-	  						bEdges.add(a.get(i));
+	 					if (!isContainsEdge(bEdges,a.get(i)))
+	 	  					bEdges.add(a.get(i));
 	  				}
 	 			 }
 			
@@ -674,8 +700,8 @@ public class Pathway2{
 	 				else
 	 					parent.stroke(150,0,0);
 					for (int i=0; i<a.size();i++){
-						if (!bEdges.contains(a.get(i)))
-							bEdges.add(a.get(i));
+						if (!isContainsEdge(bEdges,a.get(i)))
+		  					bEdges.add(a.get(i));
 	  				}
 				 }	
 				 parent.arc(x3, y3, newR*2, newR*2, al2-2*PApplet.PI, al1);
@@ -688,8 +714,8 @@ public class Pathway2{
 	 				else
 	 					parent.stroke(150,0,0);
 					for (int i=0; i<a.size();i++){
-	  					if (!bEdges.contains(a.get(i)))
-	  						bEdges.add(a.get(i));
+						if (!isContainsEdge(bEdges,a.get(i)))
+		  					bEdges.add(a.get(i));
 	  				}
 				}	
 				parent.arc(x3, y3, newR*2, newR*2, al2, al1);
