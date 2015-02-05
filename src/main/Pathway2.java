@@ -507,7 +507,7 @@ public class Pathway2{
   
   
   public void drawArc2(float x1, float y1, float x2, float y2, float xCenter, float yCenter, ArrayList<Edge> a,boolean isDown){
-	  float weight = PApplet.pow(a.size(), 0.3f);
+	  float weight = PApplet.pow(a.size(), 0.25f);
 	  parent.strokeWeight(weight);
 	  
 	  float dis = (y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1);
@@ -591,7 +591,7 @@ public class Pathway2{
 				>PApplet.dist(x5, y5, x2, y2))
 			down = false;
 		
-		int numSec = 30;
+		int numSec =(int) (PApplet.dist(x5, y5, x1, y1)/10);
 		float beginAngle = al1;
 		if (al2<al1)
 			beginAngle = al2;
@@ -611,7 +611,7 @@ public class Pathway2{
 }	  
   
   public void drawArc(float x1, float y1, float x2, float y2, ArrayList<Edge> a,boolean isToParent){
-	  float weight = PApplet.pow(a.size(), 0.3f);
+	  float weight = PApplet.pow(a.size(), 0.25f);
 	  parent.strokeWeight(weight);
 	  
 	  

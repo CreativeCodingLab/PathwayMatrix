@@ -194,7 +194,7 @@ public class PathwayView{
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
 			Node node = new Node(new Vector3D(20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(5+PApplet.pow(rectSizeList.get(i),0.6f));
+			node.setMass(2+PApplet.pow(rectSizeList.get(i),0.5f));
 			node.nodeId = i;
 			node.reaction = rectList.get(i);
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
