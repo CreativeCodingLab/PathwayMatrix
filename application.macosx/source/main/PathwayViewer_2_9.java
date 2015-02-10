@@ -77,8 +77,6 @@ import org.biopax.paxtools.pattern.miner.UsedToProduceMiner;
 import org.biopax.paxtools.pattern.util.Blacklist;
 import org.biopax.paxtools.pattern.util.HGNC;
 
-import GraphLayout.Edge;
-
 import static edu.uic.ncdm.venn.Venn_Overview.*;
 import edu.uic.ncdm.venn.Venn_Overview;
 
@@ -122,13 +120,6 @@ public class PathwayViewer_2_9 extends PApplet {
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
 	public Thread thread1=new Thread(loader1);
 	
-	public static ThreadLoader12 loader12;
-	public static Thread thread12=new Thread(loader12);
-	
-	
-	public ThreadLoader2 loader2=new ThreadLoader2(this);
-	public Thread thread2=new Thread(loader2);
-	
 	public ThreadLoader3 loader3=new ThreadLoader3();
 	public Thread thread3=new Thread(loader3);
 	
@@ -142,7 +133,6 @@ public class PathwayViewer_2_9 extends PApplet {
 	
 	// Order genes
 	public static PopupComplex popupComplex;
-	public static ReactionView popupReaction;
 	public static PopupRelation popupRelation;
 	public static PopupOrder popupOrder;
 	public static CheckBox check1;
@@ -176,16 +166,12 @@ public class PathwayViewer_2_9 extends PApplet {
 	public static Set<SmallMolecule> smallMoleculeSet;
 	public static ArrayList<String>[] proteinsInComplex; 
 	
-	// Multiple pathways 
-	public PopupView popupView = new PopupView(this);
-	public PathwayView pathwayView;
 	
 	public static void main(String args[]){
 	  PApplet.main(new String[] { PathwayViewer_2_9.class.getName() });
     }
 
 	public void setup() {
-		loader12=new ThreadLoader12(this);
 		textFont(metaBold,14);
 		size(1440, 900);
 		//size(2000, 1200);
@@ -256,13 +242,11 @@ public class PathwayViewer_2_9 extends PApplet {
 		buttonBrowse = new ButtonBrowse(this);
 		popupRelation = new PopupRelation(this);
 		popupComplex = new PopupComplex(this);
-		popupReaction = new ReactionView(this);
 		popupOrder  = new PopupOrder(this);
 		check1 = new CheckBox(this, "Lensing");
 		check2 = new CheckBox(this, "Grouping by Similarity");
 		check3 = new CheckBox(this, "Highlighting groups");
 		
-		pathwayView = new PathwayView(this);
 		
 		//VEN DIAGRAM
 		vennOverview = new Venn_Overview(this);
@@ -270,10 +254,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			thread1=new Thread(loader1);
 			thread1.start();
 		}
-		
-		// Loading multiple pathways
-		thread2=new Thread(loader2);
-		thread2.start();
 		
 		
 		// enable the mouse wheel, for zooming
@@ -319,7 +299,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			}
 			
 			if (isAllowedDrawing){
-				if (popupView.s==0){
 					
 					if (currentFile.equals("")){
 						int ccc = this.frameCount*6%255;
@@ -348,26 +327,8 @@ public class PathwayViewer_2_9 extends PApplet {
 						if (check2.s)
 						check3.draw(this.width-500, 100);
 					}
-				}	
-				else if (popupView.s==1){
-					// Draw file name
-					this.fill(128);
-					this.textAlign(PApplet.LEFT);
-					this.textSize(12);
-					String[] str = currentFile.split("/");
-			        String nameFile = str[str.length-1];
-			  	    this.text("File: "+nameFile, 80, 16);
 					
-					popupReaction.drawReactions(150);
-				}
-				else if (popupView.s==2){
-					if (pathwayView!=null)
-						pathwayView.draw();
-				}
-					
-				
 			}
-			popupView.draw(this.width-98);
 			buttonBrowse.draw();
 			//popupRelation.draw(this.width-304);
 		}
@@ -925,102 +886,65 @@ public class PathwayViewer_2_9 extends PApplet {
 	}
 				
 	public void mousePressed() {
-		if (popupView.s==2){
-			pathwayView.mousePressed();
-		}
-		else if (popupView.s==1){
-			popupReaction.mousePressed();
-		}
-		else if (popupOrder.b>=0){
+		if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider1();
 		}
 	}
 	public void mouseReleased() {
-		if (popupView.s==2){
-			pathwayView.mouseReleased();
-		}
-		else if (popupView.s==1){
-				popupReaction.mouseReleased();
-		}
-		else if (popupOrder.b>=0){
+		if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider2();
 		}
 	}
 	public void mouseDragged() {
-		if (popupView.s==2){
-			pathwayView.mouseDragged();
-		}
-		else if (popupView.s==1){
-			popupReaction.mouseDragged();
-		}
-		else if (popupOrder.b>=0){
+		if (popupOrder.b>=0){
 			popupOrder.slider.checkSelectedSlider3();
 		}
 		
 	}
 		
 	public void mouseMoved() {
-		popupView.mouseMoved();
-		if (popupView.s==2){
-			pathwayView.mouseMoved();
-		}
-		else if (popupView.s==1){
-			ReactionView.popupCausality.mouseMoved();
-			ReactionView.popupReactionOrder.mouseMoved();
-			popupReaction.checkReactionBrushing();
-			if (isAllowedDrawing && ReactionView.simulationRectList.size()==0){
-				popupReaction.mouseMoved();
-			}
-		}
 		
 	}
 		
 	public void mouseClicked() {
-		popupView.mouseClicked();
 		if (buttonBrowse.b>=0){
 			thread4=new Thread(loader4);
 			thread4.start();
 		}
-		if (popupView.s==2){
-			pathwayView.mouseClicked();
+		
+		if (check1.b){
+			check1.mouseClicked();
 		}
-		else if (popupView.s==1){
-			popupReaction.mouseClicked();
-		}
-		else {
-			if (check1.b){
-				check1.mouseClicked();
-			}
-			else if (check2.b){
-			check2.mouseClicked();
-			if (check2.s){  
+		else if (check2.b){
+		check2.mouseClicked();
+		if (check2.s){  
+			main.PathwayViewer_2_9.stateAnimation=0;
+			Gene.orderBySimilarity();
+			Gene.groupBySimilarity();
+		}	
+			else {
 				main.PathwayViewer_2_9.stateAnimation=0;
 				Gene.orderBySimilarity();
-				Gene.groupBySimilarity();
 			}	
-				else {
-					main.PathwayViewer_2_9.stateAnimation=0;
-					Gene.orderBySimilarity();
-				}	
-			}
-			else if (check3.b){
-				check3.mouseClicked();
-			}
-			else if (popupRelation.b>=0){
-				popupRelation.mouseClicked();
-			}
-			else if (PopupComplex.b>=-1){
-				popupComplex.mouseClicked();
-			}
-			
-			else if (popupOrder.b>=0){
-				popupOrder.mouseClicked();
-			}
-			else if (vennOverview!=null){
-				vennOverview.mouseClicked();
-				//update();
-			}
 		}
+		else if (check3.b){
+			check3.mouseClicked();
+		}
+		else if (popupRelation.b>=0){
+			popupRelation.mouseClicked();
+		}
+		else if (PopupComplex.b>=-1){
+			popupComplex.mouseClicked();
+		}
+		
+		else if (popupOrder.b>=0){
+			popupOrder.mouseClicked();
+		}
+		else if (vennOverview!=null){
+			vennOverview.mouseClicked();
+			//update();
+		}
+		
 	}
 		
 	
@@ -1036,11 +960,6 @@ public class PathwayViewer_2_9 extends PApplet {
 	
 	
 	public void keyPressed() {
-		if (popupView.s==1 &&  ReactionView.textbox1.b){
-			ReactionView.textbox1.keyPressed();
-			return;
-		}
-		
 		if (this.key == '+') {
 			currentRelation++;
 			if (currentRelation>=minerList.size())
@@ -1066,11 +985,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			Gene.orderByName();
 			PopupOrder.s = 2;
 		}	
-		if (this.key == 's' || this.key == 'S'){
-			thread2=new Thread(loader2);
-			thread2.start();
-			PopupOrder.s = 3;
-		}
 		if (this.key == 'g' || this.key == 'G'){
 			thread3=new Thread(loader3);
 			thread3.start();
@@ -1103,7 +1017,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			geneRelationList = null;
 			leaderSortedMap = null;
 			
-			ReactionView.textbox1.searchText="";
 			File modFile = new File(currentFile);
 			//File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
@@ -1218,12 +1131,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			}
 			System.out.println();
 			popupComplex.setItems();
-			ReactionView.check11.s=true;   // Fade small molecule
-			ReactionView.popupReactionOrder.s=2;
-			ReactionView.check5.s=false;
-			PopupCausality.s =4;
-			
-			popupReaction.setItems();
 			vennOverview.initialize();
 			
 			stateAnimation=0;
@@ -1241,247 +1148,6 @@ public class PathwayViewer_2_9 extends PApplet {
 			check2.s  = false;
 		}
 	}
-	
-	
-	
-	// Thread for PathwayView
-	class ThreadLoader12 implements Runnable {
-		PApplet p;
-		public ThreadLoader12(PApplet parent_) {
-			p = parent_;
-		}
-		
-		@SuppressWarnings("unchecked")
-		public void run() {
-			isAllowedDrawing =  false;
-			
-			ReactionView.textbox1.searchText="";
-			try{
-				mapProteinRDFId = new HashMap<String,String>();
-				mapProteinRef = new HashMap<String,String>();
-				mapSmallMoleculeRDFId =  new HashMap<String,String>();
-				mapComplexRDFId_index =  new HashMap<String,Integer>();
-				
-				mapProteinRDFId =PathwayView.mapProteinRDFId;
-				smallMoleculeSet = pathwayView.smallMoleculeSet;
-				 for (SmallMolecule currentMolecule : smallMoleculeSet){
-					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-				 }
-				
-				 int i2=0;
-				 complexList = new ArrayList<Complex>();
-				 for (Map.Entry<String,Complex> entry : PathwayView.mapComplexRDFId_Complex.entrySet()) {
-					 complexList.add(entry.getValue());
-					 mapComplexRDFId_index.put(entry.getKey(),i2);
-					 i2++;
-				 }
-				 
-				 // Compute proteins in complexes
-				 proteinsInComplex = new ArrayList[complexList.size()];
-				 for (int i=0; i<complexList.size();i++){
-						proteinsInComplex[i] = PathwayView.getProteinsInComplex(complexList.get(i));
-				 }
-				 
-				 ArrayList<BiochemicalReaction> a = PathwayView.getDistintReactions(Pathway2.bEdges);
-				 reactionSet = new HashSet<BiochemicalReaction>(a);
-			}
-			catch (Exception e){
-				e.printStackTrace();
-				javax.swing.JOptionPane.showMessageDialog(p, "Something wrong: ??????");
-				return;
-			}
-			
-			
-			ReactionView.check11.s=true;   // Fade small molecule
-			ReactionView.popupReactionOrder.s=2;
-			ReactionView.check5.s=false;
-			
-			popupReaction.setItems();
-			isAllowedDrawing =  true;  //******************* Start drawing **************
-			Pathway2.meassage="DONE";
-			
-		}
-	}
-	
-	
-	
-	// Thread for Venn Diagram
-	class ThreadLoader2 implements Runnable {
-		PApplet parent;
-		public ThreadLoader2(PApplet parent_) {
-			parent = parent_;
-		}
-		public void run() {
-			pathwayView.isAllowedDrawing =  false;
-			
-			 String path = "./level3_2015/";
-		//	 String path = "./level3_Reactome/";
-				 String imgType = ".owl";
-			 pathwayView.files = listFileNames(path, imgType); 
-			 pathwayView.nFiles = pathwayView.files.size();
-			 println("Number of Pathway: "+pathwayView.nFiles);
-			
-			 // Initialize best plots
-			 try{
-				pathwayView.mapProteinRDFId = new HashMap<String,String>();
-				pathwayView.mapSmallMoleculeRDFId =  new HashMap<String,String>();
-				pathwayView.mapComplexRDFId = new HashMap<String,String>();
-				pathwayView.mapComplexRDFId_Complex = new HashMap<String,Complex>();
-				pathwayView.rectSizeList = new ArrayList<Integer>();
-				pathwayView.rectFileList = new ArrayList<Integer>();
-				pathwayView.maxSize=0;
-				pathwayView.filePathway = new Pathway2[pathwayView.nFiles];
-				PathwayView.rootPathway = new Pathway2(parent,null,-1,"ROOT",0, true);
-				
-
-				//multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
-				//multipleReaction.popupPathway.pathwayListFile = new ArrayList<Integer>();
-				for (int f=0;f<pathwayView.files.size();f++){
-					 File modFile = new File(pathwayView.files.get(f));
-					 SimpleIOHandler io = new SimpleIOHandler();
-					 Model model = io.convertFromOWL(new FileInputStream(modFile));
-					
-					System.out.println();
-					System.out.println("***************** Load data: "+modFile+" ***************************");
-					
-					 Set<Protein> proteinSet = model.getObjects(Protein.class);
-					 for (Protein currentProtein : proteinSet){
-						 if (!pathwayView.mapProteinRDFId.containsKey(currentProtein.getRDFId().toString()))
-							 pathwayView.mapProteinRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
-						 
-					 }
-						
-					 pathwayView.smallMoleculeSet = model.getObjects(SmallMolecule.class);
-					 for (SmallMolecule currentMolecule : pathwayView.smallMoleculeSet){
-						 if (!pathwayView.mapProteinRDFId.containsKey(currentMolecule.getRDFId().toString()))
-							 pathwayView.mapProteinRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-						 if (!pathwayView.mapSmallMoleculeRDFId.containsKey(currentMolecule.getRDFId().toString()))
-							 pathwayView.mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 }
-					 
-					 
-					 Set<Complex> complexSet = model.getObjects(Complex.class);
-					 
-					 int i2=0;
-					 for (Complex current : complexSet){
-						 if (!pathwayView.mapComplexRDFId.containsKey(current.getRDFId().toString())){
-							 pathwayView.mapComplexRDFId.put(current.getRDFId().toString(), current.getDisplayName());
-						 	 pathwayView.mapComplexRDFId_Complex.put(current.getRDFId().toString(),current);
-						 }	 
-						 i2++;
-					 }
-					 i2=0;
-					 
-					 
-					 
-					
-					// PATHWAY excited
-					 i2=0;
-					 String[] str = pathwayView.files.get(f).split("/");
-					 String nameFile = str[str.length-1];
-					 PathwayView.filePathway[f] = new Pathway2(parent,PathwayView.rootPathway,f,nameFile,1, false);
-					 for (Pathway aPathway : model.getObjects(Pathway.class)){
-						 Pathway2 newPathway = new Pathway2(parent,PathwayView.filePathway[f],
-								 f,aPathway.getDisplayName(),PathwayView.filePathway[f].level+1,false);
-						 PathwayView.filePathway[f].subPathwayList.add(newPathway);
-						 processPathway(aPathway, newPathway, f);
-				    	 i2++;
-					 }
-					 
-					 
-					 // Remove nested pathway from the top level of a file Because top contains all pathways
-					 boolean isRedundentPathway = true;
-					 while(isRedundentPathway){
-						 isRedundentPathway = false;
-						 for (int p1=0;p1< PathwayView.filePathway[f].subPathwayList.size();p1++){
-							 Pathway2 path1 = PathwayView.filePathway[f].subPathwayList.get(p1);
-							 //System.out.println(p1+"	path1="+path1.displayName);
-							 int redundentPathwayIndex = -1;
-							 for (int p2=0;p2< PathwayView.filePathway[f].subPathwayList.size();p2++){
-								 if (p1==p2) continue;
-								 Pathway2 path2 = PathwayView.filePathway[f].subPathwayList.get(p2);
-								 if (path2.isContainPathway(path1.displayName)){
-									 redundentPathwayIndex =p2;
-								 }
-							 }
-							 
-							 if (redundentPathwayIndex>=0){
-								 PathwayView.filePathway[f].subPathwayList.remove(p1);
-								 isRedundentPathway = true;
-							 }
-						 }
-					 }
-				}
-				// Compute size for 1 time
-				for (int f=0;f<pathwayView.files.size();f++){
-					PathwayView.filePathway[f].computeSize();
-					PathwayView.rootPathway.subPathwayList.add(PathwayView.filePathway[f]);
-				}
-				
-				// Set reactions to pathway view
-				ArrayList<BiochemicalReaction> rectList = new ArrayList<BiochemicalReaction>();
-				for (int f=0;f<pathwayView.files.size();f++){
-					Pathway2 pathway = PathwayView.filePathway[f];
-					ArrayList<BiochemicalReaction> a = pathway.getAllReaction();
-					for (int i=0;i<a.size();i++){
-						BiochemicalReaction react = a.get(i);
-						rectList.add(react);
-						pathwayView.rectFileList.add(f);
-					}
-				}
-				
-				
-				
-				pathwayView.setItems(rectList);
-				pathwayView.updateNodes(rectList);
-				int newId = 0;
-				// Node id to each reaction in pathway hierarchy
-				// This is done after pathwayView.updateNodes(rectList);
-				for (int f=0;f<pathwayView.files.size();f++){
-					Pathway2 pathway = PathwayView.filePathway[f];
-					newId = pathway.setNodeId(newId);
-				}
-				
-				System.out.println("Done pathwayView.updateNodes");
-				pathwayView.updateEdges();
-				System.out.println("Done pathwayView.updateEdges");
-				pathwayView.popupPathway.setItems();
-				System.out.println("Done setItems");
-				
-				// Node id to each reaction in pathway hierarchy
-				// This is done after pathwayView.updateNodes(rectList);
-				for (int f=0;f<pathwayView.files.size();f++){
-					Pathway2 pathway = PathwayView.filePathway[f];
-					pathway.setNodePathway();
-				}
-				System.out.println("setNodePathway");
-				pathwayView.order(rectList);
-				System.out.println("Done order");
-				
-			 }
-			 catch (FileNotFoundException e){
-					e.printStackTrace();
-					javax.swing.JOptionPane.showMessageDialog(parent, "Exception in multi pathways reading");
-					return;
-			 }
-		}	 
-	}
-	
-	public void processPathway(Pathway aPathway, Pathway2 thisPathway, int f) {
-		for (Process aProcess : aPathway.getPathwayComponent()) {
-			if (aProcess instanceof Pathway) { // Dig into the nested structure
-				Pathway2 newPathway = new Pathway2(this, thisPathway,f,aProcess.getDisplayName(),thisPathway.level+1,false);
-				thisPathway.subPathwayList.add(newPathway);
-				processPathway((Pathway) aProcess,newPathway,f);
-			} else if (aProcess instanceof BiochemicalReaction) {// It must be an Interaction
-				thisPathway.reactList.add((BiochemicalReaction) aProcess);
-			} else { 
-				 //System.out.println("		??? " + aProcess.getDisplayName());
-			}
-		}
-	}
-	
-	
 	
 	
 	public  boolean isContainReaction(ArrayList<BiochemicalReaction> a, String s) {
@@ -1613,14 +1279,6 @@ public class PathwayViewer_2_9 extends PApplet {
 	}	
 	
 	void mouseWheel(int delta) {
-		if (popupView.s==2){
-			PathwayView.scale += delta/100f;
-			if (PathwayView.scale<0.1f)
-				PathwayView.scale=0.1f;
-			pathwayView.updateScale();
-			
-			PathwayView.setIntegrator = 4;
-		}
 		if (PopupComplex.b>=0){
 		//	PopupComplex.y2 -= delta/2;
 		//	if (PopupComplex.y2>20)
