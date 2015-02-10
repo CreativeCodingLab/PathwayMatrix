@@ -1314,8 +1314,9 @@ public class PathwayViewer_2_9 extends PApplet {
 		public void run() {
 			pathwayView.isAllowedDrawing =  false;
 			
-			 String path = "./level3_2015/";
-			 String imgType = ".owl";
+		//	 String path = "./level3_2015/";
+			 String path = "./level3_Reactome/";
+				 String imgType = ".owl";
 			 pathwayView.files = listFileNames(path, imgType); 
 			 pathwayView.nFiles = pathwayView.files.size();
 			 println("Number of Pathway: "+pathwayView.nFiles);

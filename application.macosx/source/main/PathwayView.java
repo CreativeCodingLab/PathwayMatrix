@@ -181,7 +181,7 @@ public class PathwayView{
 		for (int i=0;i<filePathway.length;i++){
 			countReactions+=filePathway[i].numReactions;
 		}
-		rCircular = PApplet.pow(countReactions,0.6f)*4*scale;
+		rCircular = PApplet.pow(countReactions,0.5f)*2*scale;
 	}
 		
 	public void resetPosistion() {
@@ -194,7 +194,7 @@ public class PathwayView{
 		for (int i = 0; i < rectList.size(); i++) {
 			int fileId = rectFileList.get(i);
 			Node node = new Node(new Vector3D(20+parent.random(xRight-40), 20 + parent.random(parent.height-40), 0), parent) ;
-			node.setMass(5+PApplet.pow(rectSizeList.get(i),0.6f));
+			node.setMass(2+PApplet.pow(rectSizeList.get(i),0.5f));
 			node.nodeId = i;
 			node.reaction = rectList.get(i);
 			node.color = getColor(fileId);//gradient.getGradient(colorScale*(transferID(fileId)));
@@ -450,22 +450,23 @@ public class PathwayView{
 		
 	public void drawPathways() {
 		float totalSize=0;
+		float rate = 0.25f;
 		for (int i=0;i<filePathway.length;i++){
-			totalSize += PApplet.sqrt(filePathway[i].numReactions);
+			totalSize += PApplet.pow(filePathway[i].numReactions,rate);
 		}
 		
 		if (rootPathway.isExpanded){
 			float currentPos=0;
 			bPathway = null;
 			for (int i=0;i<filePathway.length;i++){
-				float newPos = currentPos+PApplet.sqrt(filePathway[i].numReactions)/2;
+				float newPos = currentPos+PApplet.pow(filePathway[i].numReactions,rate)/2;
 				float al = (newPos/totalSize)*2*PApplet.PI - PApplet.PI/2;
 				float xR2 = PathwayView.xCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.cos(al);
 				float yR2 = PathwayView.yCircular + (PathwayView.rCircular+filePathway[i].radiusCenter)*PApplet.sin(al);
 				float xR3 = PathwayView.xCircular + (PathwayView.rCircular)*PApplet.cos(al);
 				float yR3 = PathwayView.yCircular + (PathwayView.rCircular)*PApplet.sin(al);
 				filePathway[i].draw(xR2, yR2, xR3, yR3, al);
-				currentPos += PApplet.sqrt(filePathway[i].numReactions);
+				currentPos += PApplet.pow(filePathway[i].numReactions,rate);
 			}
 		}
 		else{

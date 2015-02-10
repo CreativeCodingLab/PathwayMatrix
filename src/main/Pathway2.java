@@ -94,7 +94,7 @@ public class Pathway2{
 	  xEntry = xEntry_;
 	  yEntry = yEntry_;
 	  al = al_;
-	  radius = PApplet.pow(numReactions,0.6f)*PathwayView.scale*4;
+	  radius = PApplet.pow(numReactions,0.5f)*PathwayView.scale*2;
 	  radiusCenter = radius/4;
 	  parent.noStroke();
 	  	if (isExpanded)
@@ -486,6 +486,7 @@ public class Pathway2{
 	  }
   }
   
+  // Draw links between sub-pathways
   public void drawSubpathwayLinks(){
 	  for (int p1=0;p1<subPathwayList.size();p1++){
 		  for (int p2=0;p2<subPathwayList.size();p2++){
@@ -567,6 +568,20 @@ public class Pathway2{
   						bEdges.add(a.get(i));
   				}
 			 }
+			 /*
+			 if (this.displayName.equals("ROOT")){
+				 parent.noStroke();
+				parent.textAlign(PApplet.LEFT);
+				parent.fill(255,0,0);
+				parent.text("al1="+al1,x3+5,y3);
+				parent.fill(200,0,0);
+				parent.text("al2="+al2,x3+5,y3+14);
+				parent.text("newR="+al2,x3+5,y3+14);
+				parent.fill(0,200);
+				parent.stroke(0,0,255);
+				parent.noFill();
+				parent.arc(x3, y3, newR * 2, newR * 2, al1, al2);
+			 }*/
 			  drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al1, al2, weight);
 		}	
 		else{
@@ -577,10 +592,7 @@ public class Pathway2{
   				}
 			}
 			drawArc22(x1, y1, x2, y2, x3, y3, newR * 2, al2, al1, weight);
-				 
-  				
 		}	
-
   }
   
   public void drawArc22(float x1, float y1, float x2, float y2 ,float x3, float y3, float d3, float al1, float al2, float weight){
@@ -591,7 +603,7 @@ public class Pathway2{
 				>PApplet.dist(x5, y5, x2, y2))
 			down = false;
 		
-		int numSec =(int) (PApplet.dist(x5, y5, x1, y1)/10);
+		int numSec =(int) (PApplet.dist(x1, y1, x2, y2)/10);
 		float beginAngle = al1;
 		if (al2<al1)
 			beginAngle = al2;
@@ -645,19 +657,7 @@ public class Pathway2{
 	 					parent.stroke(200,150,0);
 	 				else
 	 					parent.stroke(150,0,0);
- 					/*parent.noStroke();
-					parent.textAlign(PApplet.LEFT);
-	  				parent.fill(255,0,0);
-	  				parent.ellipse(x1, y1, 10, 10);
-	  				parent.text("al1="+al1,x1+5,y1);
-	  				parent.fill(200,0,0);
-	  				parent.ellipse(x2, y2, 10, 10);
-	  				parent.text("al2="+al2,x2+5,y2);
-	  				parent.fill(0,200);
-	  				parent.stroke(0,0,255);
-	  				parent.arc(x3, y3, newR*2, newR*2, al2, al1);
-	  				parent.arc(x3, y3, newR*2, newR*2, al1, al2);
-					*/
+ 					
  				
 	  				for (int i=0; i<a.size();i++){
 	  					if (!isContainsEdge(bEdges,a.get(i)))

@@ -502,7 +502,7 @@ public class Edge {
 				down = false;
 			}
 			
-			int numSec = 30;
+			int numSec =(int) (PApplet.dist(x5, y5, x1, y1)/10);
 			float beginAngle = al1;
 			if (al2<al1)
 				beginAngle = al2;
