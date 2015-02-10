@@ -89,10 +89,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	//public String currentFile = "./level3/Pathway Commons.4.Reactome.BIOPAX.owl";
-	//public String currentFile = "./level3/Regulation of DNA Replication.owl";
 	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
-	//public String currentFile = "";
 	
 	
 	public static ButtonBrowse buttonBrowse;
@@ -113,8 +110,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 	//public static ArrayList<Integrator> iW;
 	// Contains the location and size of each gene to display
 	public float size=0;
-	public static float marginX = 100;
-	public static float marginY = 100;
+	public static float marginX = 140;
+	public static float marginY = 140;
 	public static String message="";
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
@@ -128,7 +125,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 	
 	// Venn
 	public Venn_Overview vennOverview; 
-	
 	public int bX,bY;
 	
 	// Order genes
@@ -262,21 +258,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 				mouseWheel(evt.getWheelRotation());
 			}
 		});
-		/*
-		    Pathway2 pathway = new Pathway2(this, null, 0, "Tuan", 2);
-		    System.out.println( "Main: 1	" +pathway.displayName);
-		    foo(pathway);
-		    System.out.println( "Main: 2	" +pathway.displayName);*/
-		}	
-	/*
-	public void foo(Pathway2 d) {
-		System.out.println( "Foo: 0	" +d.displayName);
-		 d.displayName = "Max";
-		 System.out.println( "Foo: 1	" +d.displayName);
-		 d =  new Pathway2(this, null, 0, "Amy", 2);
-		 System.out.println( "Foo: 2	" +d.displayName);
-		   
-	}*/
+	}	
 	
 	
 	public void draw() {
@@ -299,7 +281,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 			}
 			
 			if (isAllowedDrawing){
-					
 					if (currentFile.equals("")){
 						int ccc = this.frameCount*6%255;
 						this.fill(ccc, 255-ccc,(ccc*3)%255);
@@ -315,17 +296,17 @@ public class PathwayMatrix_1_1 extends PApplet {
 						this.triangle(x6, y6, x6+4, y6+13, x6+13, y6+4);
 					}
 					else{
-						check1.draw(this.width-500, 60);
-						check2.draw(this.width-500, 82);
+						check1.draw(this.width-500, 10);
+						check2.draw(this.width-500, 30);
 						
 						drawMatrix();
 						this.textSize(13);
 						
-						popupOrder.draw(this.width-298);
-						popupComplex.draw(this.width-198);
+						popupOrder.draw(this.width-198);
+						popupComplex.draw(this.width-98);
 					
 						if (check2.s)
-						check3.draw(this.width-500, 100);
+							check3.draw(this.width-500, 48);
 					}
 					
 			}
