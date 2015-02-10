@@ -1333,7 +1333,6 @@ public class PathwayViewer_2_9 extends PApplet {
 				pathwayView.filePathway = new Pathway2[pathwayView.nFiles];
 				PathwayView.rootPathway = new Pathway2(parent,null,-1,"ROOT",0, true);
 				
-
 				//multipleReaction.popupPathway.pathwayList = new ArrayList<String>();
 				//multipleReaction.popupPathway.pathwayListFile = new ArrayList<Integer>();
 				for (int f=0;f<pathwayView.files.size();f++){
