@@ -78,6 +78,7 @@ import org.biopax.paxtools.pattern.util.Blacklist;
 import org.biopax.paxtools.pattern.util.HGNC;
 
 import static edu.uic.ncdm.venn.Venn_Overview.*;
+import static main.PathwayMatrix_1_1.ggg;
 import edu.uic.ncdm.venn.Venn_Overview;
 
 import processing.core.*;
@@ -110,8 +111,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 	//public static ArrayList<Integrator> iW;
 	// Contains the location and size of each gene to display
 	public float size=0;
-	public static float marginX = 140;
-	public static float marginY = 140;
+	public static float marginX = 160;
+	public static float marginY = 120;
 	public static String message="";
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
@@ -158,7 +159,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public static  Map<String,String> mapPhysicalEntity;
 	public static ArrayList<Complex> complexList; 
 	public static  Map<String,Integer> mapComplexRDFId_index;
-	public static Set<BiochemicalReaction> reactionSet; 
 	public static Set<SmallMolecule> smallMoleculeSet;
 	public static ArrayList<String>[] proteinsInComplex; 
 	
@@ -188,7 +188,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 		//minerList.add(new CSCOThroughBindingSmallMoleculeMiner());
 		//minerList.add(new CSCOThroughDegradationMiner());
 		//minerList.add(new ControlsStateChangeDetailedMiner());
-		//minerList.add(new ControlsPhosphorylationMiner());
+		minerList.add(new ControlsPhosphorylationMiner());
 		
 		minerList.add(new ControlsTransportMiner());
 		minerList.add(new ControlsExpressionMiner());
@@ -217,6 +217,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 				colorRelations[i] = Color.BLUE.getRGB();		//BLUE
 			else if (name.equals("controls-state-change-of"))
 				colorRelations[i] = new Color(220,0,0).getRGB(); //RED
+			else if (name.contains("phosphorylation-"))
+				colorRelations[i] = new Color(0,255,0).getRGB(); //color = Color.GREEN;
 			else if (name.equals("directed-relations"))
 				colorRelations[i] = new Color(50,180,0).getRGB(); //color = Color.GREEN;
 			else if (name.equals("chemical-affects-through-binding"))
@@ -224,7 +226,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			else if (name.equals("consumption-controlled-by"))
 				colorRelations[i] = Color.MAGENTA.darker().getRGB();	//MAGENTA
 			else if (name.equals("controls-transport-of"))
-				colorRelations[i] = Color.PINK.darker().getRGB();	//PINK
+				colorRelations[i] = Color.ORANGE.darker().getRGB();	//PINK
 			else if (name.equals("controls-expression-of"))
 				colorRelations[i] = Color.ORANGE.getRGB();	//PINK
 			else if (name.equals("controls-production-of"))
@@ -281,33 +283,32 @@ public class PathwayMatrix_1_1 extends PApplet {
 			}
 			
 			if (isAllowedDrawing){
-					if (currentFile.equals("")){
-						int ccc = this.frameCount*6%255;
-						this.fill(ccc, 255-ccc,(ccc*3)%255);
-						this.textAlign(PApplet.LEFT);
-						this.textSize(20);
-						this.text("Please select a BioPax input file", 300,250);
-						
-						float x6 =74;
-						float y6 =25;
-						this.stroke(ccc, 255-ccc,(ccc*3)%255);
-						this.line(74,25,300,233);
-						this.noStroke();
-						this.triangle(x6, y6, x6+4, y6+13, x6+13, y6+4);
-					}
-					else{
-						check1.draw(this.width-500, 10);
-						check2.draw(this.width-500, 30);
-						
-						drawMatrix();
-						this.textSize(13);
-						
-						popupOrder.draw(this.width-198);
-						popupComplex.draw(this.width-98);
+				if (currentFile.equals("")){
+					int ccc = this.frameCount*6%255;
+					this.fill(ccc, 255-ccc,(ccc*3)%255);
+					this.textAlign(PApplet.LEFT);
+					this.textSize(20);
+					this.text("Please select a BioPax input file", 300,250);
+					float x6 =74;
+					float y6 =25;
+					this.stroke(ccc, 255-ccc,(ccc*3)%255);
+					this.line(74,25,300,233);
+					this.noStroke();
+					this.triangle(x6, y6, x6+4, y6+13, x6+13, y6+4);
+				}
+				else{
+					check1.draw(this.width-500, 10);
+					check2.draw(this.width-500, 30);
 					
-						if (check2.s)
-							check3.draw(this.width-500, 48);
-					}
+					drawMatrix();
+					this.textSize(12);
+					
+					popupOrder.draw(this.width-198);
+					popupComplex.draw(this.width-98);
+				
+					if (check2.s)
+						check3.draw(this.width-500, 48);
+				}
 					
 			}
 			buttonBrowse.draw();
@@ -484,7 +485,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			float ww = ggg.get(index).iW.value;
 			String name = ggg.get(index).name;
 			this.fill(50);
-			float fontSize = PApplet.map(numE, 1, maxElement, 9, 15);
+			float fontSize = PApplet.map(PApplet.sqrt(numE), 1, PApplet.sqrt(maxElement), 11, 15);
 			this.textSize(fontSize);
 			if (locals[index].size()>1){
 				name = locals[index].size()+" proteins";
@@ -675,7 +676,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			bX = ggg.size()+10;
 			bY = ggg.size()+10;
 		}
-		float lensingSize = PApplet.map(size, 0, 100, 25, 120);	
+		float lensingSize = PApplet.map(size, 0, 100, 20, 100);	
 		
 		int num = 4; // Number of items in one side of lensing
 		for (int i=0;i<ggg.size();i++){
@@ -745,9 +746,9 @@ public class PathwayMatrix_1_1 extends PApplet {
 		for (int i=0;i<ggg.size();i++){
 			float ww = ggg.get(i).iW.value;
 			float xx =  ggg.get(i).iX.value;
-			this.fill(50);
+			this.fill(0,255);
 			
-			if (ww>3){
+			if (ww>6){
 				this.textSize(12);
 				if (isSmallMolecule(ggg.get(i).name)){
 					this.fill(150,150,0);
@@ -764,11 +765,11 @@ public class PathwayMatrix_1_1 extends PApplet {
 			
 			float hh =ggg.get(i).iH.value;
 			float yy =  ggg.get(i).iY.value;
-			this.fill(50);
+			this.fill(0,255);
 			if (isSmallMolecule(ggg.get(i).name)){
 				this.fill(150,150,0);
 			}	
-			if (hh>3){
+			if (hh>6){
 				this.textSize(12);
 				this.textAlign(PApplet.RIGHT);
 				this.text(ggg.get(i).name, marginX-6, yy+hh/2+5);
@@ -979,9 +980,9 @@ public class PathwayMatrix_1_1 extends PApplet {
 	
 	// Thread for Venn Diagram
 	class ThreadLoader1 implements Runnable {
-		PApplet p;
+		PApplet parent;
 		public ThreadLoader1(PApplet parent_) {
-			p = parent_;
+			parent = parent_;
 		}
 		
 		@SuppressWarnings("unchecked")
@@ -1013,7 +1014,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
 				 for (Protein currentProtein : proteinSet){
-					 mapProteinRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
+					 if (!mapProteinRDFId.containsValue(currentProtein.getDisplayName()))
+						mapProteinRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
 					 if (currentProtein.getEntityReference()==null) continue;
 					 	mapProteinRef.put(currentProtein.getEntityReference().toString(), currentProtein.getDisplayName());
 				 }
@@ -1021,7 +1023,9 @@ public class PathwayMatrix_1_1 extends PApplet {
 				 smallMoleculeSet = model.getObjects(SmallMolecule.class);
 				 for (SmallMolecule currentMolecule : smallMoleculeSet){
 					 mapProteinRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
-					 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
+					 if (currentMolecule.getEntityReference()!=null)
+					 mapProteinRef.put(currentMolecule.getEntityReference().toString(), currentMolecule.getDisplayName());
+						//	 mapSmallMoleculeRDFId.put(currentMolecule.getRDFId().toString(), currentMolecule.getDisplayName());
 				 }
 				 
 				 
@@ -1056,28 +1060,14 @@ public class PathwayMatrix_1_1 extends PApplet {
 				 for (int i=0; i<complexList.size();i++){
 						proteinsInComplex[i] = getProteinsInComplexById(i);
 				 }
-				 reactionSet = model.getObjects(BiochemicalReaction.class);
-				
-				
-				 /*
-				 Set<PathwayStep> set3 = 	 model.getObjects(PathwayStep.class);
-				 i2=0;
-				 System.out.println("SET2 ******:"+set3);
-				 for (PathwayStep current : set3){
-				//	 System.out.println("PathwayStep"+i2+"	"+current.getNextStepOf()+"	"+current.getPathwayOrderOf());
-				//	 System.out.println("		"+current.getNextStep());
-					 i2++;
-				 }*/
-				 
-				 
-				
 			}
 			catch (FileNotFoundException e){
 				e.printStackTrace();
-				javax.swing.JOptionPane.showMessageDialog(p, "File not found: " + modFile.getPath());
+				javax.swing.JOptionPane.showMessageDialog(parent, "File not found: " + modFile.getPath());
 				return;
 			}
 			
+			ArrayList<String> a = new ArrayList<String>(); 
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
 				 message = "Processing relation ("+processingMiner+"/"+minerList.size()
 					+"): "+minerList.get(processingMiner);
@@ -1091,7 +1081,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 					for (Match match : matchList){
 						String s1 = getProteinName(match.getFirst().toString());
 						String s2 = getProteinName(match.getLast().toString());
-						
 						if (s1==null) 
 							s1 = match.getFirst().toString();
 						if (s2==null) 
@@ -1100,7 +1089,14 @@ public class PathwayMatrix_1_1 extends PApplet {
 						if (s1!=null && s2!=null){
 							// Store results for visualization
 							if (!pairs[processingMiner].contains(s1+"\t"+s2)){
+						//			&& !s1.contains("SmallMolecule") && !s1.contains("SmallMolecule")
+						//			&& !s1.contains("http:") && !s2.contains("http:")){
+						//		System.out.println("	"+s1+"	"+mapSmallMoleculeRDFId.get(s1)+"	"+mapSmallMoleculeRDFId);
 								pairs[processingMiner].add(s1+"\t"+s2);
+							//	System.out.println(s1+"\t" +minerList.get(processingMiner).getName() 
+							//			+"\t"+s2);
+								a.add(s1+"\t" +minerList.get(processingMiner).getName() 
+										+"\t"+s2);
 							}	
 						}	
 						else{
@@ -1109,7 +1105,25 @@ public class PathwayMatrix_1_1 extends PApplet {
 						}
 					}	
 				}
+				// SIF
+				String[] b = new String[a.size()];
+				for (int i=0;i<a.size();i++){
+					b[i] = a.get(i);
+				}
+				parent.saveStrings("../../../../CCC.sif", b);
+				/*
+				// Iterate through all BioPAX Elements and print basic info
+				 SimpleInteractionConverter converter =
+					 new SimpleInteractionConverter(new ControlRule());
+					 try {
+						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				*/
 			}
+			
 			System.out.println();
 			popupComplex.setItems();
 			vennOverview.initialize();
@@ -1122,7 +1136,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			
 			Gene.computeGeneRelationList();
 			Gene.computeGeneGeneInComplex();
-			Gene.orderByRandom(p);
+			Gene.orderByRandom(parent);
 			//write();
 			
 			vennOverview.compute();
@@ -1182,10 +1196,11 @@ public class PathwayMatrix_1_1 extends PApplet {
 	}
 	
 	public static boolean isSmallMolecule(String name){	
-		if (mapSmallMoleculeRDFId.containsValue(name))
+		return false;
+		/*if (mapSmallMoleculeRDFId.containsValue(name))
 			return true;
 		else
-			return false;
+			return false;*/
 	}
 	
 	
