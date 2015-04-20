@@ -235,7 +235,7 @@ public class PopupComplex{
 			parent.noFill();
 			
 			float num = main.PathwayMatrix_1_1.proteinsInComplex[indexSet].size();
-			float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
+			float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, 5);
 			int g2 = g+40*level;
 			if (g2>255)
 				g2=255;
@@ -272,7 +272,7 @@ public class PopupComplex{
 				parent.noFill();
 				
 				float num = main.PathwayMatrix_1_1.proteinsInComplex[indexSet2].size();
-				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, maxH/2);
+				float thickness = PApplet.map(PApplet.sqrt(num), 0, PApplet.sqrt(maxSize), 0, 5);
 				int g2 = g+0*level;
 				if (g2>255)
 					g2=255;

@@ -27,8 +27,13 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,7 +95,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	public String currentFile = "./level3RAS/1_RAF-Cascade.owl";
+	public String currentFile = "./level3/RAF-Cascade.owl";
+	//public String currentFile = "./level3/RAF-MAP Kinase Cascade.owl";
 	
 	
 	public static ButtonBrowse buttonBrowse;
@@ -180,31 +186,30 @@ public class PathwayMatrix_1_1 extends PApplet {
 		smooth();
 		
 		// Get the output file
-		minerList.add(new DirectedRelationMiner());
-		minerList.add(new ControlsStateChangeOfMiner());
+		//minerList.add(new DirectedRelationMiner());
 		//minerList.add(new CSCOButIsParticipantMiner());
 		//minerList.add(new CSCOBothControllerAndParticipantMiner());
 		//minerList.add(new CSCOThroughControllingSmallMoleculeMiner());
 		//minerList.add(new CSCOThroughBindingSmallMoleculeMiner());
 		//minerList.add(new CSCOThroughDegradationMiner());
 		//minerList.add(new ControlsStateChangeDetailedMiner());
+		//minerList.add(new ControlsExpressionWithConvMiner());
+		//minerList.add(new ControlsDegradationIndirectMiner());
+		//minerList.add(new ConsumptionControlledByMiner());
+		//minerList.add(new ControlsProductionOfMiner());
+		//minerList.add(new ChemicalAffectsThroughBindingMiner());
+		//minerList.add(new ChemicalAffectsThroughControlMiner());
+		//minerList.add(new ControlsTransportOfChemicalMiner());
+		minerList.add(new NeighborOfMiner());
+		minerList.add(new InComplexWithMiner());  //
+		minerList.add(new ControlsStateChangeOfMiner());
 		minerList.add(new ControlsPhosphorylationMiner());
-		
 		minerList.add(new ControlsTransportMiner());
 		minerList.add(new ControlsExpressionMiner());
-		minerList.add(new ControlsExpressionWithConvMiner());
-		minerList.add(new ControlsDegradationIndirectMiner());
-		minerList.add(new ConsumptionControlledByMiner());
-		minerList.add(new ControlsProductionOfMiner());
 		minerList.add(new CatalysisPrecedesMiner());
-		minerList.add(new ChemicalAffectsThroughBindingMiner());
-		minerList.add(new ChemicalAffectsThroughControlMiner());
-		minerList.add(new ControlsTransportOfChemicalMiner());
-		minerList.add(new InComplexWithMiner());
 		minerList.add(new InteractsWithMiner());
-		minerList.add(new NeighborOfMiner());
-		minerList.add(new ReactsWithMiner());
-		minerList.add(new UsedToProduceMiner());
+		//minerList.add(new ReactsWithMiner());
+		//minerList.add(new UsedToProduceMiner());
 		//minerList.add(new RelatedGenesOfInteractionsMiner()); Genes related to Biochemical reactions which involves multiple proteins/complex input and output
 		//minerList.add(new UbiquitousIDMiner());
 	
@@ -212,27 +217,17 @@ public class PathwayMatrix_1_1 extends PApplet {
 		for (int i=0; i<minerList.size();i++){
 			String name = minerList.get(i).toString();
 			if (name.equals("in-complex-with"))
-				colorRelations[i] = new Color(0,200,200).getRGB(); //light blue
+				colorRelations[i] = new Color(0,220,220).getRGB(); 
 			else if (name.equals("neighbor-of"))
-				colorRelations[i] = Color.BLUE.getRGB();		//BLUE
+				colorRelations[i] = Color.BLUE.getRGB();		
 			else if (name.equals("controls-state-change-of"))
 				colorRelations[i] = new Color(220,0,0).getRGB(); //RED
 			else if (name.contains("phosphorylation-"))
 				colorRelations[i] = new Color(0,255,0).getRGB(); //color = Color.GREEN;
-			else if (name.equals("directed-relations"))
-				colorRelations[i] = new Color(50,180,0).getRGB(); //color = Color.GREEN;
-			else if (name.equals("chemical-affects-through-binding"))
-				colorRelations[i] = new Color(200,200,0).getRGB(); //color = Color.YELLOW;	
-			else if (name.equals("consumption-controlled-by"))
-				colorRelations[i] = Color.MAGENTA.darker().getRGB();	//MAGENTA
 			else if (name.equals("controls-transport-of"))
-				colorRelations[i] = Color.ORANGE.darker().getRGB();	//PINK
-			else if (name.equals("controls-expression-of"))
-				colorRelations[i] = Color.ORANGE.getRGB();	//PINK
-			else if (name.equals("controls-production-of"))
-				colorRelations[i] = Color.PINK.darker().getRGB();	//PINK
-			else if (name.equals("used-to-produce"))
-				colorRelations[i] = new Color(100,50,0).getRGB();	// dark Red
+				colorRelations[i] = new Color(200,200,0).getRGB(); //color = Color.GREEN;
+			else if (name.equals("catalysis-precedes"))
+				colorRelations[i] = new Color(255,0,255).getRGB(); 
 			else
 				colorRelations[i] = Color.BLACK.getRGB();
 		}
@@ -799,6 +794,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 		}
 		
 		// brushingComplex &&&&&& selectedComplex
+		
 		int brushingComplex = popupComplex.getIndexInSet(PopupComplex.b);
 		if (brushingComplex>=0){
 			drawComplex(brushingComplex,200,100,0);
@@ -978,7 +974,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 	}
 	
 	
-	// Thread for Venn Diagram
 	class ThreadLoader1 implements Runnable {
 		PApplet parent;
 		public ThreadLoader1(PApplet parent_) {
@@ -1111,17 +1106,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 					b[i] = a.get(i);
 				}
 				parent.saveStrings("../../../../CCC.sif", b);
-				/*
-				// Iterate through all BioPAX Elements and print basic info
-				 SimpleInteractionConverter converter =
-					 new SimpleInteractionConverter(new ControlRule());
-					 try {
-						converter.writeInteractionsInSIF(model, new FileOutputStream("A.txt"));
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				*/
+				
+					
 			}
 			
 			System.out.println();
@@ -1134,17 +1120,328 @@ public class PathwayMatrix_1_1 extends PApplet {
 			// Compute the summary for each Gene
 			Gene.compute();
 			
+			
+
+			
+			
+			for (int type=0;type<minerList.size();type++){
+				for (int i=0;i<pairs[type].size(); i++){
+				//	System.out.println(pairs[type].get(i));
+				}	
+			}
+			
 			Gene.computeGeneRelationList();
 			Gene.computeGeneGeneInComplex();
-			Gene.orderByRandom(parent);
+			Gene.orderByName();
+			PopupOrder.s=2;
 			//write();
+			
+			
+			
 			
 			vennOverview.compute();
 			check2.s  = false;
+			
+
+			System.out.println();
+			/*
+			//for (int axis=0; axis<3; axis++){
+				for (int i=0;i<ggg.size();i++){
+					int axis =-1;
+					if (isOnlyOut(i))
+						axis=0;
+					else if (isOnlyIn(i))
+						axis=3;
+					else
+						axis=1;
+					System.out.println("{axis: "+axis+", pos: "+(float) i/ggg.size()+"},");
+				}
+			//}	*/
+			ArrayList<Integer> nodes = new ArrayList<Integer>();
+			ArrayList<Integer> types = new ArrayList<Integer>();
+			ArrayList<String> edgesStrings = new ArrayList<String>();
+			for (int i=0;i<ggg.size();i++){
+				//System.out.println("{axis: 1, pos: ."+(float) i/ggg.size()+"},");
+				for (int j=0;j<ggg.size();j++){
+					for (int i2=0;geneRelationList[i][j]!=null && i2<geneRelationList[i][j].size();i2++){
+						//System.out.println(i+"	"+j+"	"+geneRelationList[i][j].get(i2));
+					//	System.out.println("{source: nodes["+nodes.size()+"], target: nodes["+(nodes.size()+1)+"], type: "+geneRelationList[i][j].get(i2)+"},");
+						//if (geneRelationList[i][j].get(i2)>1){
+							edgesStrings.add("{source: nodes["+nodes.size()+"], target: nodes["+(nodes.size()+1)+"]},");
+							nodes.add(i);
+							nodes.add(j);
+							types.add(geneRelationList[i][j].get(i2));
+							types.add(geneRelationList[i][j].get(i2));
+					//	}
+					}	
+				}
+			}	
+			
+			
+			ArrayList<Integer> axises = new ArrayList<Integer>();
+			
+			ArrayList<Integer> list0 = new ArrayList<Integer>();
+			ArrayList<Integer> list1 = new ArrayList<Integer>();
+			ArrayList<Integer> list3 = new ArrayList<Integer>();
+			for (int i=0;i<nodes.size();i=i+2){
+				int axis1 =-1;
+				int index1 = nodes.get(i);
+				
+				/*
+				if (isIn(index1)){
+					axis1=3;
+					System.out.println("**************"+ggg.get(index1).name);
+				}	
+				else if (isOut(index1)){
+					axis1=0;
+					System.out.println("	axis1=0: "+ggg.get(index1).name);
+					
+				}	
+				else{
+					axis1=1;
+				}*/
+				int check1 = checkInOut(index1);
+				if (check1==0)
+					axis1=0;
+				else if (check1==2)
+					axis1 = 3;
+				else if (check1==1)
+					axis1=1;
+				
+				int axis2 =-1;
+				int index2 = nodes.get(i+1);
+				/*if (isIn(index2)){
+					axis2=3;
+				}	
+				else if (isOut(index2)){
+					axis2=0;
+				}	
+				else{
+					axis2=2;
+				}*/
+				int check2 = checkInOut(index2);
+				if (check2==0)
+					axis2=0;
+				else if (check2==2)
+					axis2 = 3;
+				else if (check2==1)
+					axis2=2;
+				
+				if (axis1==0 && axis2==2)
+					axis2=1;
+				else if (axis1==2 && axis2==0)
+					axis1 =1;
+				else if (axis1==1 && axis2==3)
+					axis1=2;
+				else if (axis1==3 && axis2==1)
+					axis2 =2;
+				
+				if(axis1==0 && !list0.contains(index1))
+					list0.add(index1);
+				if(axis2==0 && !list0.contains(index2))
+					list0.add(index2);
+				
+				if(axis1==1 && !list1.contains(index1))
+					list1.add(index1);
+				if(axis2==1 && !list1.contains(index2))
+					list1.add(index2);
+				
+				if(axis1==3 && !list3.contains(index1))
+					list3.add(index1);
+				if(axis2==3 && !list3.contains(index2))
+					list3.add(index2);
+				
+				axises.add(axis1);
+				axises.add(axis2);
+				
+				//nodesStrings.add("{axis: "+axis1+", pos: "+(float) index1/ggg.size()+", conType: "+types.get(i)+"},");
+				//nodesStrings.add("{axis: "+axis2+", pos: "+(float) index2/ggg.size()+", conType: "+types.get(i+1)+"},");
+			}
+			
+			
+			System.out.println("list0 = "+list0.size());
+			System.out.println("list1 = "+list1.size());
+			System.out.println("list3 = "+list3.size());
+			
+			Map<Integer, Float> unsortMap0  =  new HashMap<Integer, Float>();
+			for (int p=0; p<list0.size(); p++){
+				unsortMap0.put(list0.get(p), (float) computeDegree(list0.get(p)));
+			}
+			Map<Integer, Float> unsortMap1  =  new HashMap<Integer, Float>();
+			for (int p=0; p<list1.size(); p++){
+				unsortMap1.put(list1.get(p), (float) computeDegree(list1.get(p)));
+			}
+			Map<Integer, Float> unsortMap3  =  new HashMap<Integer, Float>();
+			for (int p=0; p<list3.size(); p++){
+				unsortMap3.put(list3.get(p), (float) computeDegree(list3.get(p)));
+			}
+			
+			Map<Integer, Float> sortedMap0 = sortByComparator2(unsortMap0,false);
+			Map<Integer, Float> sortedMap1 = sortByComparator2(unsortMap1,false);
+			Map<Integer, Float> sortedMap3 = sortByComparator2(unsortMap3,false);
+			
+		
+			ArrayList<String> nodesStrings = new ArrayList<String>();
+			for (int i=0;i<nodes.size();i++){
+				int axis = axises.get(i);
+				int index = nodes.get(i);
+				float pos = (float) index/ggg.size();
+				if (axis==0){
+					int i6 = 0;
+					for (Map.Entry<Integer, Float> entry : sortedMap0.entrySet()) {
+						if(index == entry.getKey())
+							pos = (float) (i6+1)/(list0.size()+1);
+						i6++;
+					}
+				}
+				else if (axis==1 || axis==2){
+					int i6 = 0;
+					for (Map.Entry<Integer, Float> entry : sortedMap1.entrySet()) {
+						if(index == entry.getKey())
+							pos = (float) (i6+1)/(list1.size()+1);
+						i6++;
+					}
+				}
+				else if (axis==3){
+					int i6 = 0;
+					for (Map.Entry<Integer, Float> entry : sortedMap3.entrySet()) {
+						if(index == entry.getKey())
+							pos = (float) (i6+1)/(list3.size()+1);
+						i6++;
+					}
+				}
+				
+				nodesStrings.add("{axis: "+axis+", pos: "+pos+", conType: "+types.get(i)+"},");
+			}
+				
+			
+			
+			
+			
+			String[]  nodesStrings2= new String[ nodesStrings.size()];
+			for (int i=0;i<nodesStrings.size();i++){
+				nodesStrings2[i] = nodesStrings.get(i);
+			}
+			String[]  edgesStrings2= new String[edgesStrings.size()];
+			for (int i=0;i<edgesStrings.size();i++){
+				edgesStrings2[i] = edgesStrings.get(i);
+			}
+			parent.saveStrings("../../../../nodesStrings.txt", nodesStrings2);
+			parent.saveStrings("../../../../edgesStrings.txt", edgesStrings2);
+			
 		}
 	}
 	
+	public boolean isOut(int i) {
+		int sum = 0;
+		//for (int j=0;j<ggg.size();j++){
+			//if (geneRelationList[i][j]!=null){
+			//	if (geneRelationList[j][i]==null){
+			//		return true;
+			//	}
+			//	else{
+			//		if (geneRelationList[j][i].size()<geneRelationList[i][j].size())
+			//			 return true;
+			//	}
+			//}
+		//}	
+		for (int j=0;j<ggg.size();j++){
+			if (geneRelationList[j][i]==null) continue;
+			sum+=geneRelationList[j][i].size();
+		}
+		if (sum==0)
+			return true;
+		else 
+			return false;
+	}
 	
+	public boolean isIn(int i) {
+		int sum = 0;
+		//for (int j=0;j<ggg.size();j++){
+			//if (geneRelationList[j][i]!=null){
+			//	if (geneRelationList[i][j]==null){
+			//		return true;
+			//	}
+			//	else{
+			///		if (geneRelationList[j][i].size()>geneRelationList[i][j].size())
+			//			 return true;
+			//	}
+			//}
+		//}
+		for (int j=0;j<ggg.size();j++){
+			if (geneRelationList[i][j]==null) continue;
+				sum+=geneRelationList[i][j].size();
+		}
+		if (sum==0)
+			return true;
+		else 
+			return false;
+	}
+	public int computeDegree(int i) {
+		int sumOut = 0;
+		int sumIn = 0;
+		for (int j=0;j<ggg.size();j++){
+			if (geneRelationList[i][j]!=null)
+				sumOut+=geneRelationList[i][j].size();
+			if (geneRelationList[j][i]!=null) 
+				sumIn+=geneRelationList[j][i].size();
+		}
+		return sumIn+sumOut;
+	}
+		
+	
+	// Sort Reactions by score (average positions of proteins)
+	public static Map<Integer, Float> sortByComparator2(Map<Integer, Float> unsortMap, boolean decreasing) {
+		// Convert Map to List
+		List<Map.Entry<Integer, Float>> list = 
+			new LinkedList<Map.Entry<Integer, Float>>(unsortMap.entrySet());
+ 
+		// Sort list with comparator, to compare the Map values
+		if (decreasing){
+			Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+				public int compare(Map.Entry<Integer, Float> o1,
+	                                           Map.Entry<Integer, Float> o2) {
+						return -(o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+		}
+		else{
+			Collections.sort(list, new Comparator<Map.Entry<Integer, Float>>() {
+				public int compare(Map.Entry<Integer, Float> o1,
+	                                           Map.Entry<Integer, Float> o2) {
+						return (o1.getValue()).compareTo(o2.getValue());
+				}
+			});
+		}
+ 
+		// Convert sorted map back to a Map
+		Map<Integer, Float> sortedMap = new LinkedHashMap<Integer, Float>();
+		for (Iterator<Map.Entry<Integer, Float>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<Integer, Float> entry = it.next();
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
+		return sortedMap;
+	}
+	
+	
+	public int checkInOut(int i) {
+		int sumOut = 0;
+		int sumIn = 0;
+		for (int j=0;j<ggg.size();j++){
+			if (geneRelationList[i][j]!=null)
+				sumOut+=geneRelationList[i][j].size();
+			if (geneRelationList[j][i]!=null) 
+				sumIn+=geneRelationList[j][i].size();
+		}	
+		if (sumOut>sumIn)
+			return 0;
+		else if (sumOut==sumIn)
+			return 1;
+		else if (sumOut<sumIn)
+			return 2;
+		return -1;
+	}
+		
 	public  boolean isContainReaction(ArrayList<BiochemicalReaction> a, String s) {
 		if (a==null || s==null)
 			return false;

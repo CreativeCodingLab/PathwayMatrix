@@ -265,7 +265,6 @@ public class Gene {
 		
 		// Find the smallest molecule
 		for (int p=0;p<ggg.size();p++){
-			System.out.println("ggg.get(p).name="+ggg.get(p).name);
 			if (main.PathwayMatrix_1_1.isSmallMolecule(ggg.get(p).name)){
 				int count = getNumberRelationOfProtein(p);
 				if (count>maxRelation){

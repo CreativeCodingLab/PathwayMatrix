@@ -316,6 +316,8 @@ public class Gene {
 		ArrayList<Integer> processedGenes =  new ArrayList<Integer>();
 		
 		// Eliminate small molecules
+		
+		
 		for (int i=0;i<ggg.size();i++){
 			if (main.PathwayMatrix_1_1.isSmallMolecule(ggg.get(i).name)){
 				processedGenes.add(i);

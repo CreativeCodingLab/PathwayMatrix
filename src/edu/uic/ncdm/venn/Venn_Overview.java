@@ -70,7 +70,8 @@ public class Venn_Overview{
 			if (main.PathwayMatrix_1_1.pairs[i].size()>0){
 				minerGlobalIDof[count] = i;
 				pair2[count] = main.PathwayMatrix_1_1.pairs[i];
-				minerNames[count] = ""+minerList.get(i);
+				minerNames[count] = (" "+minerList.get(i));
+				minerNames[count] = minerNames[count].replace("controls-state-change-ofcontrols-phosphorylation-of", "controls-phosphorylation-of");
 				count++;
 			}	           
 		}
@@ -227,6 +228,7 @@ public class Venn_Overview{
             	currentSize = radius;
             }
             
+            /*
             if (labels[i].contains("controls-production-of")){
             	x=x-50;
             }
@@ -239,7 +241,7 @@ public class Venn_Overview{
             	y=y-50;
             	
             }
-           
+           */
             
            if (radius>0){
         	   	parent.fill(color.getRed(), color.getGreen(), color.getBlue(),180);
@@ -253,6 +255,7 @@ public class Venn_Overview{
         	   	//if (deactive[i])
 	            //	parent.fill(50,50,50,50);
 	            parent.text(labels[i], x , y+4);
+	          //  System.out.println(i+"	labels[i] = "+labels[i]);
            }
         }
         if (minerGlobalIDof!=null && brushing>=0)

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/core.jar"/>
 	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/cpath-client-4.2.0-SNAPSHOT-fat-jar.jar"/>
 	<classpathentry kind="lib" path="/Users/TuanDang/Desktop/DARPA/workspaceHelios/lib/paxtools-4.2.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM Contents (MacOS X Default)"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
