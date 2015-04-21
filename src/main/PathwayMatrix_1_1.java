@@ -95,9 +95,10 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	public String currentFile = "./level3/RAF-Cascade.owl";
+	//public String currentFile = "./level3/RAF-Cascade.owl";
 	//public String currentFile = "./level3/RAF-MAP Kinase Cascade.owl";
-	
+	public String currentFile = "./level3_2015/HIV_life_cycle.owl";
+
 	
 	public static ButtonBrowse buttonBrowse;
 	
@@ -998,6 +999,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			//File outFile = new File("output.txt");
 			SimpleIOHandler io = new SimpleIOHandler();
 			Model model;
+			long t1 = System.currentTimeMillis();
 			try{
 				System.out.println();
 				System.out.println("***************** Load data: "+modFile+" ***************************");
@@ -1008,6 +1010,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 				mapComplexRDFId_index =  new HashMap<String,Integer>();
 				
 				 Set<Protein> proteinSet = model.getObjects(Protein.class);
+				 System.out.println(proteinSet.size());
 				 for (Protein currentProtein : proteinSet){
 					 if (!mapProteinRDFId.containsValue(currentProtein.getDisplayName()))
 						mapProteinRDFId.put(currentProtein.getRDFId().toString(), currentProtein.getDisplayName());
@@ -1061,6 +1064,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 				javax.swing.JOptionPane.showMessageDialog(parent, "File not found: " + modFile.getPath());
 				return;
 			}
+			long t2 = System.currentTimeMillis();
 			
 			ArrayList<String> a = new ArrayList<String>(); 
 			for (processingMiner=0;processingMiner<minerList.size();processingMiner++){
@@ -1084,14 +1088,9 @@ public class PathwayMatrix_1_1 extends PApplet {
 						if (s1!=null && s2!=null){
 							// Store results for visualization
 							if (!pairs[processingMiner].contains(s1+"\t"+s2)){
-						//			&& !s1.contains("SmallMolecule") && !s1.contains("SmallMolecule")
-						//			&& !s1.contains("http:") && !s2.contains("http:")){
-						//		System.out.println("	"+s1+"	"+mapSmallMoleculeRDFId.get(s1)+"	"+mapSmallMoleculeRDFId);
 								pairs[processingMiner].add(s1+"\t"+s2);
-							//	System.out.println(s1+"\t" +minerList.get(processingMiner).getName() 
+							//	a.add(s1+"\t" +minerList.get(processingMiner).getName() 
 							//			+"\t"+s2);
-								a.add(s1+"\t" +minerList.get(processingMiner).getName() 
-										+"\t"+s2);
 							}	
 						}	
 						else{
@@ -1101,16 +1100,14 @@ public class PathwayMatrix_1_1 extends PApplet {
 					}	
 				}
 				// SIF
-				String[] b = new String[a.size()];
-				for (int i=0;i<a.size();i++){
-					b[i] = a.get(i);
-				}
-				parent.saveStrings("../../../../CCC.sif", b);
-				
-					
+				//String[] b = new String[a.size()];
+				//for (int i=0;i<a.size();i++){
+				//	b[i] = a.get(i);
+				//}
+				//parent.saveStrings("../../../../CCC.sif", b);
 			}
 			
-			System.out.println();
+			long t3 = System.currentTimeMillis();
 			popupComplex.setItems();
 			vennOverview.initialize();
 			
@@ -1119,30 +1116,33 @@ public class PathwayMatrix_1_1 extends PApplet {
 			
 			// Compute the summary for each Gene
 			Gene.compute();
-			
-			
-
-			
-			
-			for (int type=0;type<minerList.size();type++){
-				for (int i=0;i<pairs[type].size(); i++){
-				//	System.out.println(pairs[type].get(i));
-				}	
-			}
-			
+			long t32 = System.currentTimeMillis();
 			Gene.computeGeneRelationList();
+			long t33 = System.currentTimeMillis();
 			Gene.computeGeneGeneInComplex();
-			Gene.orderByName();
+			long t4 = System.currentTimeMillis();
+			
+			
+			Gene.orderBySimilarity();
 			PopupOrder.s=2;
 			//write();
+			long t5 = System.currentTimeMillis();
 			
 			
 			
 			
 			vennOverview.compute();
 			check2.s  = false;
+			long t6 = System.currentTimeMillis();
+			System.out.println("Time to read BioPAX = "+(t2-t1));
+			System.out.println("Time to process Binary Relations = "+(t3-t2));
+			//System.out.println("Time to gen compute = "+(t32-t3));
+			//System.out.println("Time to lists = "+(t33-t32));
+			//System.out.println("Time to Complex = "+(t4-t33));
+			System.out.println("Time to orderBySimilarity = "+(t5-t4));
+			System.out.println("Time to vennOverview = "+(t6-t5));
+			System.out.println((t2-t1)+","+(t3-t2)+","+(t5-t4)+","+(t6-t5));
 			
-
 			System.out.println();
 			/*
 			//for (int axis=0; axis<3; axis++){
@@ -1164,9 +1164,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 				//System.out.println("{axis: 1, pos: ."+(float) i/ggg.size()+"},");
 				for (int j=0;j<ggg.size();j++){
 					for (int i2=0;geneRelationList[i][j]!=null && i2<geneRelationList[i][j].size();i2++){
-						//System.out.println(i+"	"+j+"	"+geneRelationList[i][j].get(i2));
-					//	System.out.println("{source: nodes["+nodes.size()+"], target: nodes["+(nodes.size()+1)+"], type: "+geneRelationList[i][j].get(i2)+"},");
-						//if (geneRelationList[i][j].get(i2)>1){
+					//if (geneRelationList[i][j].get(i2)>1){
 							edgesStrings.add("{source: nodes["+nodes.size()+"], target: nodes["+(nodes.size()+1)+"]},");
 							nodes.add(i);
 							nodes.add(j);
@@ -1178,8 +1176,8 @@ public class PathwayMatrix_1_1 extends PApplet {
 			}	
 			
 			
-			ArrayList<Integer> axises = new ArrayList<Integer>();
 			
+			ArrayList<Integer> axises = new ArrayList<Integer>();
 			ArrayList<Integer> list0 = new ArrayList<Integer>();
 			ArrayList<Integer> list1 = new ArrayList<Integer>();
 			ArrayList<Integer> list3 = new ArrayList<Integer>();
@@ -1257,11 +1255,6 @@ public class PathwayMatrix_1_1 extends PApplet {
 				//nodesStrings.add("{axis: "+axis1+", pos: "+(float) index1/ggg.size()+", conType: "+types.get(i)+"},");
 				//nodesStrings.add("{axis: "+axis2+", pos: "+(float) index2/ggg.size()+", conType: "+types.get(i+1)+"},");
 			}
-			
-			
-			System.out.println("list0 = "+list0.size());
-			System.out.println("list1 = "+list1.size());
-			System.out.println("list3 = "+list3.size());
 			
 			Map<Integer, Float> unsortMap0  =  new HashMap<Integer, Float>();
 			for (int p=0; p<list0.size(); p++){
