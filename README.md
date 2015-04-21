@@ -10,7 +10,7 @@ Please click to watch the overview video.
 
 [![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/TeaserVideo.png)](http://www2.cs.uic.edu/~tdang/PathwayMatrix/PathwayMatrixBioVis960x540.mp4)
 
-This work was funded by the DARPA \emph{Big Mechanism} Program under ARO contract WF911NF-14-1-0395.
+This work was funded by the DARPA Big Mechanism Program under ARO contract WF911NF-14-1-0395.
 
 
 
