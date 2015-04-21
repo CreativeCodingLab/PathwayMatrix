@@ -95,9 +95,9 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public static List<Miner> minerList = new ArrayList<Miner>();
 	public static int currentRelation = -1;
 	public static int processingMiner = 0;
-	//public String currentFile = "./level3/RAF-Cascade.owl";
+	public String currentFile = "./level3/RAF-Cascade.owl";
 	//public String currentFile = "./level3/RAF-MAP Kinase Cascade.owl";
-	public String currentFile = "./level3_2015/HIV_life_cycle.owl";
+	//public String currentFile = "./level3_2015/HIV_life_cycle.owl";
 
 	
 	public static ButtonBrowse buttonBrowse;
