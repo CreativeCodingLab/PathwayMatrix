@@ -1,3 +1,0 @@
--Xmx10g
-main.PathwayMatrix_1_1
-PathwayMatrix_1_1.jar
