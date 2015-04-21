@@ -10,7 +10,7 @@ PathwayMatrix supports interactive capabilities to help users interested in expl
 
 The overview can be found here: http://www2.cs.uic.edu/~tdang/PathwayMatrix/PathwayMatrixBioVis960x540.mp4
 
-[![ScreenShot](https://raw.github.com/GabLeRoux/WebMole/master/ressources/WebMole_Youtube_Video.png)](http://youtu.be/vt5fpE0bzSY)
+[![ScreenShot](http://www2.cs.uic.edu/~tdang/media/PixSearcher.png)](http://www2.cs.uic.edu/~tdang/PathwayMatrix/PathwayMatrixBioVis960x540.mp4)
 
 
 ![PathwayMatrix](http://www2.cs.uic.edu/~tdang/media/PixSearcher.png "PathwayMatrix")
