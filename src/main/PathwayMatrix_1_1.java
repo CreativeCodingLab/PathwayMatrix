@@ -1085,7 +1085,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 						if (s2==null) 
 							s2 = match.getFirst().toString();
 						
-						message = (s1+"\t"+s2);
+						message = (s1+"\t "+s2);
 						if (s1!=null && s2!=null){
 							// Store results for visualization
 							if (!pairs[processingMiner].contains(s1+"\t"+s2)){
