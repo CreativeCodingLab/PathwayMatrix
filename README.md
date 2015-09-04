@@ -1,4 +1,4 @@
-PathwayMatrix Tung
+PathwayMatrix
 =============
 PathwayMatrix presents an alternative visual representation of biological pathways using an interactive matrix representation instead of a node-linked diagram. PathwayMatrix imports pathway data in BioPAX format.
 
