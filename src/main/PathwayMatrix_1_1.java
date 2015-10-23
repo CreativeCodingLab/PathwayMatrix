@@ -119,7 +119,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 	// Contains the location and size of each gene to display
 	public float size=0;
 	public static float marginX = 160;
-	public static float marginY = 120;
+	public static float marginY = 160;
 	public static String message="";
 	
 	public ThreadLoader1 loader1=new ThreadLoader1(this);
@@ -323,7 +323,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			return;
 		else{
 			size = (this.height-marginY)/ggg.size();
-			size = size*0.7f;
+			size = size*1f;
 			if (size>100)
 				size=100;
 		}
@@ -385,7 +385,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public void drawGroups() {
 		if (leaderSortedMap==null) return;
 		size = (this.height-marginY)/leaderSortedMap.size();
-		size = size*0.7f;
+		size = size*0.99f;
 		if (size>100)
 			size=100;
 		
