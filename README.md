@@ -8,11 +8,11 @@ The following figure shows two different views of the HIV life cycle (contains 7
 
 ![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/TearserImage.png)
 
-The application (PathwayMatrix_1_1.jar) is available in application.Cross-Platform folder.
-
 Please click to watch the overview video.
 
 [![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/TeaserVideo.png)](http://www2.cs.uic.edu/~tdang/PathwayMatrix/PathwayMatrixBioVis960x540.mp4)
+
+The application (PathwayMatrix_1_1.jar) is available in application.Cross-Platform folder.
 
 This work was funded by the DARPA Big Mechanism Program under ARO contract WF911NF-14-1-0395.
 
