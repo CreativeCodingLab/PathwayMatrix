@@ -13,13 +13,14 @@ Here are more examples:
 The data is the RAF Cascade pathway. A Venn diagram is supplied on  the right to provide an overview of the types of interactions within the pathway. The size of circles in this diagram represents the frequency of different relations in the pathway, and overlapping areas provide an overview of how often relations co-exist in the pathway. We use the same color encoding for the Venn diagram and the matrix. For example, red represents "controls-state-change-of" relationships and blue represents "neighbor of" relationships.
 ![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/Image1-RAF Cascade.png)
 
-In the next figure, the data is the Influenza Infection pathway. Lensing is applied on a middle section of the matrix.
+In the next figure, the data is the Influenza Infection pathway.
 ![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/Image2-Influenza Infection.png)
 
-In the next figure, the data is the ERBB2 pathway. The protein ordering algorithm enables similar proteins to locate next to each other to reveal cluster structures.
+In the next figure, the data is the ERBB2 pathway.  Lensing is applied on a middle section of the matrix.
 ![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/Image3-ERBB2.png)
 
-In the next figure, the data is the Replication of DNA pathway.
+In the next figure, the data is the Replication of DNA pathway. The protein ordering algorithm enables similar proteins to locate next to each other to reveal cluster structures.
+
 ![ScreenShot](http://www.cs.uic.edu/~tdang/PathwayMatrix/Image4-Replication of DNA.png)
 
 In the next figure, the data is the Signaling to TGF pathway.
