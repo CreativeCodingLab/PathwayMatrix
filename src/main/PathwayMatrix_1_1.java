@@ -323,7 +323,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 			return;
 		else{
 			size = (this.height-marginY)/ggg.size();
-			size = size*1f;
+			size = size*.97f;
 			if (size>100)
 				size=100;
 		}
@@ -385,7 +385,7 @@ public class PathwayMatrix_1_1 extends PApplet {
 	public void drawGroups() {
 		if (leaderSortedMap==null) return;
 		size = (this.height-marginY)/leaderSortedMap.size();
-		size = size*0.99f;
+		size = size*0.95f;
 		if (size>100)
 			size=100;
 		
